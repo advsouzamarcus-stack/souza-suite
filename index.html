@@ -1,0 +1,2451 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,user-scalable=no,viewport-fit=cover">
+<meta name="theme-color" content="#0B1A3B">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<title>Souza Advocacia — Sistema Completo</title>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
+<style>
+/* ═══════════════════════════════════════════════
+   TOKENS
+═══════════════════════════════════════════════ */
+:root{
+  --n:#0B1A3B;--n2:#162347;--g:#C8A96A;--gd:#A07840;--gb:#FAF6EE;--gc:#F0E6D4;--bd:#E8DDD0;
+  --tx:#1A1F36;--mu:#7A7D8E;--wh:#fff;--gr:#16a34a;--re:#dc2626;--am:#d97706;--bl:#2563eb;
+  --pu:#7c3aed;--r:12px;--bg:#f8fafc;
+}
+*{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent}
+html,body{height:100%;font-family:'Segoe UI',system-ui,sans-serif;font-size:14px;color:var(--tx);background:var(--gb)}
+
+/* ═══════════════════════════════════════════════
+   PUBLIC SCREENS (screen-based)
+═══════════════════════════════════════════════ */
+.sc{position:fixed;inset:0;overflow-y:auto;display:none;flex-direction:column;background:var(--gb);-webkit-overflow-scrolling:touch}
+.sc.on{display:flex}
+
+/* ═══════════════════════════════════════════════
+   ADMIN APP (normal flow)
+═══════════════════════════════════════════════ */
+#admin-app{display:none;min-height:100vh;background:var(--bg)}
+
+/* ═══════════════════════════════════════════════
+   HERO / PUBLIC
+═══════════════════════════════════════════════ */
+.hero{background:linear-gradient(160deg,#050d1e,var(--n) 55%,#1a2e60);padding:calc(env(safe-area-inset-top,0px) + 44px) 0 28px;display:flex;flex-direction:column;align-items:center;flex-shrink:0}
+.hero h1{font-size:17px;font-weight:300;letter-spacing:3px;color:var(--g);text-transform:uppercase;text-align:center;padding:0 20px;margin-top:12px}
+.hero .sub{font-size:10px;letter-spacing:3px;color:rgba(255,255,255,.4);text-transform:uppercase;margin-top:3px}
+.hero .msg{font-size:12px;color:rgba(255,255,255,.65);text-align:center;margin:12px 20px 0;line-height:1.6;max-width:300px}
+.hero .oab{margin-top:12px;font-size:10px;color:rgba(255,255,255,.35);border:1px solid rgba(255,255,255,.1);padding:3px 12px;border-radius:20px;letter-spacing:.6px}
+
+/* ═══════════════════════════════════════════════
+   TOP BAR (public screens)
+═══════════════════════════════════════════════ */
+.tpb{background:linear-gradient(90deg,#050d1e,var(--n));color:#fff;padding:calc(env(safe-area-inset-top,0px) + 10px) 14px 10px;display:flex;align-items:center;gap:9px;position:sticky;top:0;z-index:50;border-bottom:1px solid rgba(200,169,106,.15);flex-shrink:0}
+.tpb-back{background:none;border:none;color:var(--g);font-size:20px;cursor:pointer;padding:4px 8px;min-width:40px;min-height:40px;display:flex;align-items:center;justify-content:center}
+.tpb h2{font-size:14px;font-weight:700;color:var(--g);flex:1;letter-spacing:.5px}
+.progbar{height:3px;background:rgba(255,255,255,.1)}.progfill{height:100%;background:linear-gradient(90deg,var(--gd),var(--g));transition:width .3s}
+.stepdots{display:flex;justify-content:center;gap:5px;padding:8px 0}
+.sd{width:6px;height:6px;border-radius:50%;background:rgba(255,255,255,.2);transition:all .2s}
+.sd.on{width:18px;border-radius:3px;background:var(--g)}.sd.done{background:rgba(200,169,106,.55)}
+
+/* ═══════════════════════════════════════════════
+   ADMIN HEADER
+═══════════════════════════════════════════════ */
+.ahdr{background:linear-gradient(90deg,#050d1e,var(--n));color:#fff;padding:10px 14px;display:flex;align-items:center;gap:9px;position:sticky;top:0;z-index:100;border-bottom:1px solid rgba(200,169,106,.15);flex-shrink:0;box-shadow:0 2px 10px rgba(0,0,0,.3)}
+.ahdr-nm{font-size:13px;font-weight:700;color:var(--g);letter-spacing:1px}
+.ahdr-nm small{display:block;font-size:9px;color:rgba(255,255,255,.35);letter-spacing:2px;font-weight:400}
+.ahdr-r{margin-left:auto;display:flex;align-items:center;gap:6px;flex-wrap:wrap}
+.sync-b{padding:5px 11px;background:rgba(200,169,106,.12);border:1px solid rgba(200,169,106,.25);color:var(--g);border-radius:20px;cursor:pointer;font-size:11px;font-weight:600}
+.sync-b.spin{animation:pulse .7s infinite alternate}
+@keyframes pulse{from{opacity:.4}to{opacity:1}}
+.nb{width:32px;height:32px;background:rgba(255,255,255,.07);border:none;border-radius:8px;color:#fff;font-size:15px;cursor:pointer;display:flex;align-items:center;justify-content:center;position:relative}
+.ndot{position:absolute;top:4px;right:4px;width:8px;height:8px;background:#ef4444;border-radius:50%;border:1px solid var(--n);display:none}
+.lob{background:none;border:none;color:rgba(255,255,255,.4);cursor:pointer;font-size:11px;padding:4px 6px}
+.uchip{display:flex;align-items:center;gap:6px;background:rgba(255,255,255,.12);padding:4px 10px 4px 5px;border-radius:20px;font-size:11px;cursor:pointer;border:none;color:#fff}
+.av{width:26px;height:26px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:10px;font-weight:700}
+
+/* ═══════════════════════════════════════════════
+   ADMIN TABS
+═══════════════════════════════════════════════ */
+.atabs{background:var(--n);border-bottom:1px solid rgba(200,169,106,.1);display:flex;overflow-x:auto;padding:0 4px;scrollbar-width:none;flex-shrink:0;position:sticky;top:56px;z-index:99}
+.atabs::-webkit-scrollbar{display:none}
+.atab{padding:9px 9px;cursor:pointer;font-size:11px;font-weight:500;color:rgba(255,255,255,.38);background:none;border:none;border-bottom:2px solid transparent;white-space:nowrap;letter-spacing:.3px;transition:all .15s}
+.atab.on{color:var(--g);font-weight:700;border-bottom-color:var(--g)}
+.tab-sep{width:1px;background:rgba(200,169,106,.2);margin:8px 3px;flex-shrink:0}
+
+/* ═══════════════════════════════════════════════
+   CONTENT AREAS
+═══════════════════════════════════════════════ */
+.cnt{padding:14px;flex:1}.cnt-t{padding:14px;flex:1}
+main{padding:14px 16px;max-width:1600px;margin:0 auto}
+.tp{display:none}.tp.on{display:block}
+
+/* ═══════════════════════════════════════════════
+   CARDS
+═══════════════════════════════════════════════ */
+.card{background:var(--wh);border-radius:var(--r);border:1px solid var(--bd);padding:13px 15px;margin-bottom:11px;box-shadow:0 2px 7px rgba(0,0,0,.05)}
+.card.gl{border-left:3px solid var(--g)}
+.card.nv{background:linear-gradient(135deg,var(--n),var(--n2));color:#fff;border-color:transparent}
+.card.hi{border-color:var(--bl)}
+.krow{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:13px}
+.kc{background:#fff;border-radius:10px;border:1px solid var(--bd);padding:11px 13px;flex:1;min-width:105px;text-align:center}
+.kn{font-size:22px;font-weight:700;line-height:1.2}.kl{font-size:10px;color:var(--mu);margin-top:2px}
+
+/* ═══════════════════════════════════════════════
+   SECTION TITLE
+═══════════════════════════════════════════════ */
+.stit{font-size:10px;font-weight:800;text-transform:uppercase;letter-spacing:.8px;color:var(--n);margin-bottom:9px;display:flex;align-items:center;gap:5px}
+.stit::before{content:'';display:inline-block;width:3px;height:13px;background:linear-gradient(var(--gd),var(--g));border-radius:2px}
+.stitle{font-weight:700;font-size:13px;margin-bottom:9px;display:flex;align-items:center;gap:6px}
+
+/* ═══════════════════════════════════════════════
+   HOME BUTTONS
+═══════════════════════════════════════════════ */
+.hbtn{display:flex;align-items:center;gap:13px;background:var(--wh);border:1px solid var(--bd);border-radius:var(--r);padding:15px;cursor:pointer;transition:all .15s;box-shadow:0 2px 6px rgba(0,0,0,.05);text-decoration:none;color:inherit}
+.hbtn:active{border-color:var(--g);background:var(--gb)}
+.hbtn-ic{width:44px;height:44px;border-radius:10px;display:flex;align-items:center;justify-content:center;font-size:20px;flex-shrink:0}
+.hbtn h3{font-size:13px;font-weight:700;color:var(--n)}
+.hbtn p{font-size:11px;color:var(--mu);margin-top:1px}
+.hbtn-arr{margin-left:auto;color:var(--g);font-size:18px}
+
+/* TYPE GRID */
+.tgrid{display:grid;grid-template-columns:1fr 1fr;gap:9px;padding:14px}
+.tc{background:var(--wh);border-radius:var(--r);border:1px solid var(--bd);padding:13px 10px;cursor:pointer;transition:all .14s;text-align:center;box-shadow:0 2px 5px rgba(0,0,0,.05);min-height:100px;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:5px}
+.tc:active{border-color:var(--g);background:var(--gb)}
+.tc-ic{font-size:26px}.tc-nm{font-size:11px;font-weight:700;color:var(--n);line-height:1.3}.tc-d{font-size:10px;color:var(--mu)}
+
+/* STATS */
+.sgrid{display:grid;grid-template-columns:repeat(2,1fr);gap:8px;margin-bottom:11px}
+.sc2{background:var(--wh);border-radius:var(--r);border:1px solid var(--bd);padding:12px;text-align:center}
+.sn{font-size:24px;font-weight:800;line-height:1.1}.sl{font-size:10px;color:var(--mu);text-transform:uppercase;letter-spacing:.4px;margin-top:2px}
+
+/* ═══════════════════════════════════════════════
+   FORMS
+═══════════════════════════════════════════════ */
+.fg{margin-bottom:12px}
+.fl{font-size:10px;font-weight:700;color:var(--mu);text-transform:uppercase;letter-spacing:.5px;display:block;margin-bottom:4px}
+.fi,.fsel,textarea{width:100%;padding:11px 13px;border:1px solid var(--bd);border-radius:9px;font-size:13px;background:var(--wh);color:var(--tx);outline:none;font-family:inherit;transition:border .14s;-webkit-appearance:none}
+.fi:focus,.fsel:focus,textarea:focus{border-color:var(--g);box-shadow:0 0 0 3px rgba(200,169,106,.09)}
+.fsel{background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='10' height='6'%3E%3Cpath d='M1 1l4 4 4-4' stroke='%23C8A96A' stroke-width='1.5' fill='none'/%3E%3C/svg%3E");background-repeat:no-repeat;background-position:right 12px center;padding-right:30px}
+textarea{min-height:80px;resize:vertical;line-height:1.5}
+.frow{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:8px}
+.frow .fg{flex:1;min-width:110px}
+.ff{display:flex;flex-direction:column;flex:1;min-width:120px}
+.fhint{font-size:10px;color:var(--mu);margin-top:3px;line-height:1.4}
+.fbar{display:flex;gap:7px;flex-wrap:wrap;align-items:center;margin-bottom:11px}
+input,select{padding:6px 9px;border-radius:7px;border:1px solid var(--bd);font-size:12px;outline:none;background:#fff;color:var(--tx);font-family:inherit;transition:border .12s}
+input:focus,select:focus{border-color:var(--bl);box-shadow:0 0 0 2px rgba(37,99,235,.08)}
+input[type=checkbox]{width:14px;height:14px;accent-color:var(--g);cursor:pointer}
+
+/* ═══════════════════════════════════════════════
+   BUTTONS
+═══════════════════════════════════════════════ */
+.btn{display:inline-flex;align-items:center;justify-content:center;gap:6px;padding:7px 14px;border-radius:9px;border:none;cursor:pointer;font-size:13px;font-weight:700;letter-spacing:.3px;transition:all .14s;-webkit-user-select:none;white-space:nowrap}
+.btn:active,.btn:hover{opacity:.88}
+.bw{width:100%}.bsm{padding:5px 11px;font-size:11px;border-radius:7px}.xs{padding:2px 7px;font-size:10px;border-radius:6px}
+.bgold{background:linear-gradient(135deg,var(--gd),var(--g));color:var(--n)}
+.bnav{background:linear-gradient(135deg,var(--n),var(--n2));color:#fff}
+.bghost,.bgh{background:var(--gb);border:1px solid var(--bd);color:var(--tx)}
+.bgreen,.bg_{background:#f0fdf4;border:1px solid #bbf7d0;color:#15803d}
+.bred,.bd_{background:#fef2f2;border:1px solid #fecaca;color:#b91c1c}
+.bblue,.bp{background:var(--bl);color:#fff}
+.bwa{background:linear-gradient(135deg,#16a34a,#22c55e);color:#fff}
+.brow{display:flex;gap:7px;margin-top:11px;flex-wrap:wrap}
+.bma{background:#f59e0b;color:#fff}.bca{background:#8b5cf6;color:#fff}.bsa{background:#0ea5e9;color:#fff}
+
+/* ═══════════════════════════════════════════════
+   BADGES
+═══════════════════════════════════════════════ */
+.badge{display:inline-block;padding:2px 7px;border-radius:10px;font-size:10px;font-weight:700;letter-spacing:.2px}
+.b-req,.bb{background:#eff6ff;color:#1d4ed8;border:1px solid #bfdbfe}
+.b-cfm,.bg{background:#f0fdf4;color:#15803d;border:1px solid #bbf7d0}
+.b-doc,.by{background:#fffbeb;color:#b45309;border:1px solid #fde68a}
+.b-dn{background:var(--n);color:var(--g)}
+.b-cn,.br{background:#fef2f2;color:#b91c1c;border:1px solid #fecaca}
+.b-co{background:#f0fdf4;color:#15803d;border:2px solid #16a34a}
+.b-gd,.bga{background:var(--gb);color:var(--gd);border:1px solid var(--bd)}
+.bpu{background:#faf5ff;color:#7c3aed;border:1px solid #ddd6fe}
+
+/* ═══════════════════════════════════════════════
+   TABLES
+═══════════════════════════════════════════════ */
+.tw{overflow-x:auto}
+table{width:100%;border-collapse:collapse;font-size:12px}
+th{background:#f1f5f9;padding:6px 8px;text-align:left;font-size:10px;font-weight:700;color:var(--mu);border-bottom:1px solid var(--bd);white-space:nowrap}
+td{padding:6px 8px;border-bottom:1px solid var(--bd);vertical-align:middle}
+tr:hover td{background:#f8fafc!important}
+.late td{background:#fff5f5!important}
+.mono{font-family:monospace;font-size:10px}
+.eli{max-width:150px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+
+/* ═══════════════════════════════════════════════
+   RADIO / CHECKBOX
+═══════════════════════════════════════════════ */
+.ri{display:flex;align-items:center;gap:11px;padding:11px;background:var(--wh);border:1px solid var(--bd);border-radius:9px;cursor:pointer;transition:all .13s;margin-bottom:7px;-webkit-user-select:none}
+.ri.on{border-color:var(--g);background:var(--gb)}
+.rc{width:19px;height:19px;border-radius:50%;border:2px solid var(--bd);flex-shrink:0;display:flex;align-items:center;justify-content:center;transition:all .13s}
+.ri.on .rc{border-color:var(--g);background:var(--g)}
+.ri.on .rc::after{content:'';width:7px;height:7px;border-radius:50%;background:var(--n)}
+.rt{font-size:12px;font-weight:600;color:var(--n)}
+.crow{display:flex;align-items:flex-start;gap:11px;padding:11px;background:var(--wh);border:1px solid var(--bd);border-radius:9px;cursor:pointer;-webkit-user-select:none}
+.cbox{width:21px;height:21px;border:2px solid var(--bd);border-radius:5px;flex-shrink:0;display:flex;align-items:center;justify-content:center;background:var(--wh);transition:all .14px;margin-top:1px}
+.cbox.on{background:linear-gradient(135deg,var(--gd),var(--g));border-color:var(--g);color:var(--n)}
+.ctxt{font-size:11px;color:var(--tx);line-height:1.5}
+
+/* ═══════════════════════════════════════════════
+   CALENDAR (public booking)
+═══════════════════════════════════════════════ */
+.cnav{display:flex;align-items:center;gap:6px;margin-bottom:9px}
+.cnav h3{flex:1;text-align:center;font-size:13px;font-weight:700;text-transform:capitalize;color:var(--n)}
+.cnb{width:32px;height:32px;border:1px solid var(--bd);border-radius:7px;background:var(--wh);cursor:pointer;font-size:14px;display:flex;align-items:center;justify-content:center;color:var(--n)}
+.cgrid{display:grid;grid-template-columns:repeat(7,1fr);gap:2px}
+.chdr{text-align:center;font-size:9px;font-weight:700;color:var(--mu);padding:3px 0;text-transform:uppercase}
+.cday{aspect-ratio:1;display:flex;align-items:center;justify-content:center;border-radius:7px;font-size:12px;cursor:pointer;border:1px solid transparent;transition:all .14s;-webkit-user-select:none}
+.cday.avail{color:var(--n);font-weight:600}
+.cday.avail:active{background:var(--gb);border-color:var(--g)}
+.cday.sel{background:linear-gradient(135deg,var(--gd),var(--g));color:var(--n);font-weight:800}
+.cday.tod{border-color:var(--g)}.cday.dis{color:#ccc;cursor:default}.cday.busy{background:#fef2f2;color:#b91c1c}
+.tslots{display:grid;grid-template-columns:repeat(3,1fr);gap:7px}
+.ts{padding:10px 4px;border:1px solid var(--bd);border-radius:9px;background:var(--wh);font-size:12px;font-weight:600;color:var(--n);text-align:center;cursor:pointer;transition:all .14s;-webkit-user-select:none}
+.ts.taken{background:#f1f5f9;color:#ccc;cursor:default}
+.ts.sel{background:linear-gradient(135deg,var(--gd),var(--g));color:var(--n);font-weight:800;border-color:transparent}
+
+/* ═══════════════════════════════════════════════
+   ADMIN CALENDAR (full)
+═══════════════════════════════════════════════ */
+.cday-full{min-height:60px;border:1px solid var(--bd);border-radius:6px;padding:3px;font-size:11px;background:#fff}
+.cday-full.tod{border-color:var(--bl);background:#eff6ff}
+.cday-full.hdl{background:#fffbeb}
+.cdot{font-size:9px;padding:1px 3px;border-radius:3px;margin-bottom:1px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.dot-a{background:#fef2f2;color:#b91c1c}.dot-m{background:#fffbeb;color:#b45309}
+.dot-ok{background:#f0fdf4;color:#15803d}.dot-p{background:#fef3c7;color:#92400e}
+
+/* ═══════════════════════════════════════════════
+   KANBAN
+═══════════════════════════════════════════════ */
+.kb{display:flex;gap:9px;overflow-x:auto;padding-bottom:8px;-webkit-overflow-scrolling:touch}
+.kbc{min-width:215px;flex-shrink:0}
+.kbh{padding:7px 9px;border-radius:8px 8px 0 0;font-size:10px;font-weight:800;letter-spacing:.5px;text-transform:uppercase;display:flex;align-items:center;justify-content:space-between}
+.kbb{background:var(--wh);border:1px solid var(--bd);border-top:none;border-radius:0 0 8px 8px;min-height:100px;padding:7px;display:flex;flex-direction:column;gap:6px}
+.kbc2{background:var(--gb);border:1px solid var(--bd);border-radius:7px;padding:8px 9px;cursor:pointer;transition:all .13s}
+.kbc2:active{border-color:var(--g);background:var(--gc)}
+
+/* ═══════════════════════════════════════════════
+   APPOINTMENT ROW
+═══════════════════════════════════════════════ */
+.ar{background:var(--wh);border:1px solid var(--bd);border-radius:var(--r);padding:11px;margin-bottom:7px;cursor:pointer;transition:all .14s;display:flex;align-items:center;gap:9px}
+.ar:active{border-color:var(--g);background:var(--gb)}
+.arav{width:38px;height:38px;border-radius:9px;display:flex;align-items:center;justify-content:center;font-size:17px;flex-shrink:0}
+.ari{flex:1;min-width:0}.arn{font-size:12px;font-weight:700;color:var(--n);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.ars{font-size:10px;color:var(--mu);margin-top:1px}
+.arr{text-align:right;flex-shrink:0}
+
+/* ═══════════════════════════════════════════════
+   FILTER BAR
+═══════════════════════════════════════════════ */
+.fbarx{background:var(--wh);border:1px solid var(--bd);border-radius:var(--r);padding:10px;margin-bottom:10px}
+.fbr{display:flex;gap:6px;flex-wrap:wrap;margin-bottom:7px}
+.fbr:last-child{margin:0}
+.fbi{flex:1;min-width:110px}
+.fbi label{font-size:10px;font-weight:700;color:var(--mu);text-transform:uppercase;letter-spacing:.4px;display:block;margin-bottom:3px}
+.fbi input,.fbi select{width:100%;padding:8px 10px;border:1px solid var(--bd);border-radius:8px;font-size:12px;background:var(--wh);outline:none;-webkit-appearance:none}
+.fbi input:focus,.fbi select:focus{border-color:var(--g)}
+
+/* ═══════════════════════════════════════════════
+   MODALS
+═══════════════════════════════════════════════ */
+.mo{position:fixed;inset:0;background:rgba(0,0,0,.55);z-index:200;display:none;align-items:flex-end;backdrop-filter:blur(3px)}
+.mo.on{display:flex}
+.mob{background:var(--wh);border-radius:20px 20px 0 0;width:100%;max-height:92vh;overflow-y:auto;padding-bottom:env(safe-area-inset-bottom,16px)}
+.moh{width:34px;height:4px;background:var(--bd);border-radius:2px;margin:11px auto 0}
+.moi{padding:18px}
+.mot{font-size:15px;font-weight:700;color:var(--n);margin-bottom:13px}
+/* Desktop modal */
+.mo-desk{display:none;position:fixed;inset:0;background:rgba(0,0,0,.5);z-index:200;align-items:flex-start;justify-content:center;padding:16px;overflow-y:auto}
+.mo-desk.on{display:flex}
+.mbox{background:#fff;border-radius:12px;padding:20px 22px;width:100%;max-width:620px;margin:auto;box-shadow:0 20px 60px rgba(0,0,0,.2)}
+.mbox h3{font-size:14px;font-weight:700;color:var(--bl);margin-bottom:14px;display:flex;align-items:center;gap:6px}
+.mfoot{display:flex;gap:8px;margin-top:12px;padding-top:12px;border-top:1px solid var(--bd)}
+
+/* ═══════════════════════════════════════════════
+   DETAIL CARD
+═══════════════════════════════════════════════ */
+.dhdr{background:linear-gradient(135deg,var(--n),var(--n2));border-radius:var(--r);padding:14px;margin-bottom:11px;color:#fff}
+.dn{font-size:17px;font-weight:800;color:var(--g);margin-bottom:4px}
+.drow{display:flex;padding:8px 0;border-bottom:1px solid var(--bd)}
+.drow:last-child{border:none}
+.dl{font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.4px;color:var(--mu);width:84px;flex-shrink:0;padding-top:1px}
+.dv{font-size:12px;color:var(--tx);flex:1;line-height:1.4}
+.ri2{display:flex;justify-content:space-between;padding:7px 0;border-bottom:1px solid var(--bd);font-size:12px}
+.ri2:last-child{border:none}.rl{color:var(--mu);font-size:10px;text-transform:uppercase;letter-spacing:.4px}.rv{font-weight:600;color:var(--n);text-align:right;max-width:55%}
+
+/* ═══════════════════════════════════════════════
+   PROGRESS / BARS
+═══════════════════════════════════════════════ */
+.pb{background:#e2e8f0;border-radius:99px;height:6px;overflow:hidden}
+.pf{height:100%;border-radius:99px;transition:width .3s}
+.br2{display:flex;align-items:center;gap:7px;margin-bottom:7px}
+.bl2{font-size:11px;color:var(--tx);width:100px;flex-shrink:0;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.bt{flex:1;height:16px;background:var(--gb);border-radius:4px;overflow:hidden;border:1px solid var(--bd)}
+.bf{height:100%;background:linear-gradient(90deg,var(--gd),var(--g));border-radius:4px;transition:width .5s;display:flex;align-items:center;justify-content:flex-end;padding-right:4px;font-size:9px;font-weight:800;color:var(--n)}
+
+/* ═══════════════════════════════════════════════
+   ALERTS
+═══════════════════════════════════════════════ */
+.al{padding:10px 12px;border-radius:9px;font-size:11px;line-height:1.5;margin-bottom:10px}
+.al-info{background:#eff6ff;border:1px solid #bfdbfe;color:#1d4ed8}
+.al-warn{background:#fffbeb;border:1px solid #fde68a;color:#b45309}
+.al-gold{background:var(--gb);border:1px solid var(--bd);color:var(--tx)}
+.al-ok{background:#f0fdf4;border:1px solid #bbf7d0;color:#15803d}
+.al-err{background:#fef2f2;border:1px solid #fecaca;color:#b91c1c}
+.abox{background:#fef2f2;border:1px solid #fecaca;border-radius:10px;padding:11px 13px;margin-bottom:11px}
+.abox h4{color:#b91c1c;margin-bottom:5px;font-size:13px}
+.code{background:#1e293b;color:#e2e8f0;padding:11px;border-radius:8px;font-family:monospace;font-size:9px;line-height:1.6;overflow-x:auto;white-space:pre;margin:7px 0}
+
+/* ═══════════════════════════════════════════════
+   SUCCESS / MISC
+═══════════════════════════════════════════════ */
+.sc-ic{width:84px;height:84px;border-radius:50%;background:linear-gradient(135deg,var(--gd),var(--g));display:flex;align-items:center;justify-content:center;font-size:38px;margin:0 auto 18px;box-shadow:0 8px 24px rgba(200,169,106,.4)}
+.divider{height:1px;background:linear-gradient(90deg,transparent,var(--bd),transparent);margin:11px 0}
+.foot{text-align:center;padding:14px;font-size:10px;color:var(--mu);line-height:1.7;flex-shrink:0}
+.empty{text-align:center;padding:28px 16px;color:var(--mu)}
+.empty .ei{font-size:36px;margin-bottom:7px}
+.up{border:2px dashed var(--bd);border-radius:10px;padding:22px 14px;text-align:center;cursor:pointer;background:var(--wh)}
+.up:active{border-color:var(--g);background:var(--gb)}
+
+/* TIMELINE */
+.tl{position:relative;margin-left:38px}
+.tlh{position:relative;height:58px;border-top:1px solid var(--bd)}
+.tll{position:absolute;left:-38px;top:-7px;font-size:9px;font-weight:700;color:var(--mu);width:34px;text-align:right}
+.tls{position:absolute;left:5px;right:0;border-radius:7px;padding:4px 7px;font-size:11px;font-weight:600;cursor:pointer;overflow:hidden}
+.tlnow{position:absolute;left:-38px;right:0;height:2px;background:#ef4444;z-index:5}
+.tlnow::before{content:'';position:absolute;left:32px;top:-4px;width:8px;height:8px;background:#ef4444;border-radius:50%}
+
+/* WEEK */
+.wgrid{display:grid;grid-template-columns:repeat(auto-fill,minmax(200px,1fr));gap:9px}
+.wcard{background:#fff;border-radius:10px;border:1px solid var(--bd);padding:11px}
+.wcard.tod{border:2px solid var(--bl);background:#f0f7ff}
+.wday{font-weight:700;font-size:12px;margin-bottom:7px;text-transform:capitalize}
+.titem{display:flex;align-items:flex-start;gap:5px;padding:3px 0;border-bottom:1px solid var(--bd);font-size:11px}
+.titem:last-child{border:none}
+
+/* COMM */
+.tpl-btn{width:100%;text-align:left;padding:8px 10px;background:#f8fafc;border:1px solid var(--bd);border-radius:8px;cursor:pointer;font-size:12px;margin-bottom:5px;transition:all .12s}
+.tpl-btn:hover{background:#eff6ff;border-color:#bfdbfe}
+
+/* BUSCA */
+.trib-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(180px,1fr));gap:9px;margin-bottom:14px}
+.trib-c{background:#fff;border:1px solid var(--bd);border-radius:10px;padding:14px;text-align:center;cursor:pointer;transition:all .15s}
+.trib-c:hover{border-color:var(--bl);background:#f0f7ff;transform:translateY(-1px)}
+.trib-c .ti{font-size:26px;margin-bottom:5px}.trib-c h4{font-size:12px;font-weight:700;color:var(--tx)}
+.trib-c p{font-size:10px;color:var(--mu);margin-top:2px}
+
+/* USERS */
+.urole{display:inline-block;padding:2px 8px;border-radius:10px;font-size:10px;font-weight:700}
+.r-admin{background:#fef2f2;color:#b91c1c}.r-advogado{background:#eff6ff;color:#1d4ed8}
+.r-colaborador{background:#fffbeb;color:#b45309}.r-estagiario{background:#faf5ff;color:#7c3aed}
+
+/* DATE ALERTS */
+.dr{color:#b91c1c;font-weight:600}.dy{color:#b45309;font-weight:600}.dg{color:#15803d}
+
+/* CHARTS */
+.ccrow{display:flex;gap:12px;flex-wrap:wrap;margin-bottom:13px}
+.cc{flex:1;min-width:220px}
+
+/* ═══════════════════════════════════════════════
+   LOGIN SCREEN
+═══════════════════════════════════════════════ */
+#ls{position:fixed;inset:0;background:linear-gradient(135deg,#0f2444,var(--n) 50%,#2563eb);display:flex;align-items:center;justify-content:center;z-index:999;padding:16px}
+.lb{background:#fff;border-radius:16px;padding:32px 28px;width:100%;max-width:360px;text-align:center;box-shadow:0 25px 60px rgba(0,0,0,.35)}
+.lb .ico{font-size:42px;margin-bottom:8px}.lb h2{font-size:18px;font-weight:700;color:var(--n);margin-bottom:3px}
+.lb .sub{font-size:12px;color:var(--mu);margin-bottom:22px}
+.lerr{color:#dc2626;font-size:12px;margin-bottom:8px;display:none;text-align:left;padding:6px 8px;background:#fef2f2;border-radius:6px}
+.lhint{font-size:11px;color:var(--mu);margin-top:12px;background:#f8fafc;padding:8px 10px;border-radius:8px;text-align:left;line-height:1.6}
+
+@media(min-width:640px){.cnt{padding:16px 20px}.sgrid{grid-template-columns:repeat(4,1fr)}}
+@media(max-width:600px){main{padding:8px}.kc{min-width:90px}.ccrow{flex-direction:column}}
+</style>
+</head>
+<body>
+
+<!-- ╔══════════════════════════════════════════════╗
+     ║         SCREENS PÚBLICAS (AGENDAMENTO)       ║
+     ╚══════════════════════════════════════════════╝ -->
+
+<!-- HOME -->
+<div class="sc on" id="s-home">
+  <div class="hero">
+    <svg viewBox="0 0 70 70" width="76" height="76" fill="none">
+      <polygon points="35,4 62,19 62,51 35,66 8,51 8,19" fill="#060e22" stroke="rgba(200,169,106,0.3)" stroke-width="1.5"/>
+      <polygon points="35,11 55,22 55,48 35,59 15,48 15,22" fill="#101f45" stroke="rgba(138,155,181,0.35)" stroke-width="1"/>
+      <polygon points="35,21 46,27 46,43 35,49 24,43 24,27" fill="#8A9BB5" opacity="0.85"/>
+      <polygon points="35,27 40,30 40,40 35,43 30,40 30,30" fill="#C8A96A"/>
+    </svg>
+    <h1>Souza Advocacia</h1>
+    <p class="sub">Advocacia e Consultoria Jurídica</p>
+    <p class="msg">Seja bem-vindo! Agende seu atendimento com segurança, praticidade e total sigilo profissional.</p>
+    <p class="oab">OAB/RJ 160.689 · 250.430 · (21) 96534-8183</p>
+  </div>
+  <div class="cnt" style="padding-top:14px;display:flex;flex-direction:column;gap:9px">
+    <button class="hbtn" onclick="go('s-type')"><div class="hbtn-ic" style="background:#eff6ff">📅</div><div><h3>Agendar Atendimento</h3><p>Escolha o tipo e horário disponível</p></div><span class="hbtn-arr">›</span></button>
+    <button class="hbtn" onclick="go('s-type');qtype('documentos')"><div class="hbtn-ic" style="background:#f0fdf4">📄</div><div><h3>Enviar Documentos</h3><p>Anexe documentos ao seu caso</p></div><span class="hbtn-arr">›</span></button>
+    <button class="hbtn" onclick="go('s-type');qtype('andamento')"><div class="hbtn-ic" style="background:#faf5ff">⚖️</div><div><h3>Andamento do Processo</h3><p>Atualize-se sobre seu caso</p></div><span class="hbtn-arr">›</span></button>
+    <a href="https://wa.me/5521965348183?text=Olá!%20Gostaria%20de%20falar%20com%20o%20escritório." target="_blank" class="hbtn"><div class="hbtn-ic" style="background:#f0fdf4">💬</div><div><h3>Falar com o Escritório</h3><p>WhatsApp (21) 96534-8183</p></div><span class="hbtn-arr">›</span></a>
+    <div class="al al-warn" style="font-size:11px">⚠️ <strong>Importante:</strong> O agendamento não representa contratação automática. A análise depende dos documentos e fatos apresentados.</div>
+  </div>
+  <div class="foot">Souza Advocacia · Dr. Luiz Fabiano (OAB/RJ 160.689) · Dr. Marcus Souza (OAB/RJ 250.430)<br>Seg–Sex 10h–18h · Somente com agendamento<br><span onclick="showLGPD()" style="color:var(--g);cursor:pointer">Política de Privacidade</span> · <span onclick="goAdmin()" style="color:var(--g);cursor:pointer">Acesso ao Sistema</span></div>
+</div>
+
+<!-- TYPE SELECTION -->
+<div class="sc" id="s-type">
+  <div class="tpb"><button class="tpb-back" onclick="go('s-home')">‹</button><h2>Tipo de Atendimento</h2></div>
+  <div style="padding:8px 14px;font-size:10px;color:var(--mu);letter-spacing:.5px">Selecione como podemos ajudar você</div>
+  <div class="tgrid">
+    <div class="tc" onclick="selType('primeiro')"><div class="tc-ic">👤</div><div class="tc-nm">Primeiro Atendimento</div><div class="tc-d">30 min</div></div>
+    <div class="tc" onclick="selType('andamento')"><div class="tc-ic">⚖️</div><div class="tc-nm">Andamento de Processo</div><div class="tc-d">20 min</div></div>
+    <div class="tc" onclick="selType('documentos')"><div class="tc-ic">📄</div><div class="tc-nm">Entrega de Documentos</div><div class="tc-d">15 min</div></div>
+    <div class="tc" onclick="selType('duvidas')"><div class="tc-ic">❓</div><div class="tc-nm">Dúvidas Jurídicas</div><div class="tc-d">20 min</div></div>
+    <div class="tc" onclick="selType('retorno')"><div class="tc-ic">🔄</div><div class="tc-nm">Retorno de Atendimento</div><div class="tc-d">20 min</div></div>
+    <div class="tc" onclick="selType('previdenciario')"><div class="tc-ic">🏦</div><div class="tc-nm">Consulta Previdenciária</div><div class="tc-d">40 min</div></div>
+    <div class="tc" onclick="selType('trabalhista')"><div class="tc-ic">💼</div><div class="tc-nm">Consulta Trabalhista</div><div class="tc-d">40 min</div></div>
+    <div class="tc" onclick="selType('consumidor')"><div class="tc-ic">🛡️</div><div class="tc-nm">Direito do Consumidor</div><div class="tc-d">30 min</div></div>
+    <div class="tc" onclick="selType('autista')"><div class="tc-ic">💙</div><div class="tc-nm">BPC/LOAS · Autismo</div><div class="tc-d">40 min</div></div>
+    <div class="tc" onclick="selType('outros')"><div class="tc-ic">📋</div><div class="tc-nm">Outros Assuntos</div><div class="tc-d">30 min</div></div>
+  </div>
+  <div class="al al-warn" style="margin:0 14px 14px;font-size:11px">O sistema <strong>não oferece atendimento criminal</strong>.</div>
+</div>
+
+<!-- FORM -->
+<div class="sc" id="s-form">
+  <div class="tpb" id="form-tpb"><button class="tpb-back" onclick="formBack()">‹</button><h2 id="form-title">Dados Pessoais</h2></div>
+  <div class="progbar"><div class="progfill" id="form-prog"></div></div>
+  <div class="stepdots" id="form-dots"></div>
+  <div class="cnt" id="form-cnt"></div>
+</div>
+
+<!-- SUCCESS -->
+<div class="sc" id="s-success">
+  <div class="tpb"><h2>Agendamento Confirmado</h2></div>
+  <div class="cnt" style="display:flex;flex-direction:column;align-items:center;padding-top:24px">
+    <div class="sc-ic">✅</div>
+    <div style="font-size:21px;font-weight:800;color:var(--n);text-align:center;margin-bottom:6px">Agendamento Realizado!</div>
+    <div id="suc-msg" style="font-size:12px;color:var(--mu);text-align:center;line-height:1.6;margin-bottom:18px"></div>
+    <div class="card" style="width:100%;margin-bottom:11px" id="suc-det"></div>
+    <div class="al al-warn" style="width:100%;font-size:11px;margin-bottom:13px">⏰ Você receberá confirmação pelo WhatsApp.</div>
+    <div style="width:100%;display:flex;flex-direction:column;gap:8px">
+      <a id="suc-wa" href="#" target="_blank" class="btn bgold bw">📱 Confirmar pelo WhatsApp</a>
+      <a id="suc-cal" href="#" target="_blank" class="btn bnav bw">📅 Adicionar ao Google Agenda</a>
+      <button class="btn bghost bw" onclick="go('s-home')">🏠 Voltar ao Início</button>
+    </div>
+  </div>
+  <div class="foot">O agendamento não gera contratação automática.</div>
+</div>
+
+<!-- ╔══════════════════════════════════════════════╗
+     ║          SISTEMA ADMINISTRATIVO             ║
+     ╚══════════════════════════════════════════════╝ -->
+
+<!-- LOGIN -->
+<div id="ls" style="display:none">
+  <div class="lb">
+    <div class="ico">⚖️</div>
+    <h2>Souza Advocacia</h2>
+    <p class="sub">Sistema de Gestão Jurídica + Agendamentos</p>
+    <input type="email" id="lemail" placeholder="E-mail" onkeydown="if(event.key==='Enter')doLogin()">
+    <input type="password" id="lpwd" placeholder="Senha" style="margin-top:8px" onkeydown="if(event.key==='Enter')doLogin()">
+    <div class="lerr" id="lerr">E-mail ou senha incorretos.</div>
+    <button class="btn bgold" style="width:100%;padding:11px;margin-top:8px" onclick="doLogin()">Entrar no Sistema</button>
+    <button onclick="go('s-home')" style="margin-top:10px;background:none;border:none;color:var(--mu);cursor:pointer;font-size:12px;width:100%">‹ Voltar ao Site</button>
+    <div class="lhint">
+      <strong>Acesso padrão:</strong><br>
+      marcus@souzaadv.com / Admin@2025 (Admin)<br>
+      luiz@souzaadv.com / Luiz@2025 (Advogado)
+    </div>
+  </div>
+</div>
+
+<!-- ADMIN APP -->
+<div id="admin-app">
+  <div class="ahdr">
+    <svg viewBox="0 0 70 70" width="30" height="30" fill="none">
+      <polygon points="35,4 62,19 62,51 35,66 8,51 8,19" fill="#060e22" stroke="rgba(200,169,106,.25)" stroke-width="1"/>
+      <polygon points="35,27 40,30 40,40 35,43 30,40 30,30" fill="#C8A96A"/>
+    </svg>
+    <div class="ahdr-nm">Souza Advocacia<small id="hdr-oab">OAB/RJ 250.430 · 160.689</small></div>
+    <div class="ahdr-r">
+      <span id="a-clock" style="font-size:10px;color:rgba(255,255,255,.35)"></span>
+      <span id="sbadge" style="font-size:11px;color:rgba(255,255,255,.5)">✅ Salvo</span>
+      <button class="sync-b" id="sync-btn" onclick="syncGCal()">📅 Sync</button>
+      <button class="nb" onclick="showPending()">🔔<span class="ndot" id="ndot"></span></button>
+      <button class="btn bca bsm" onclick="exportExcel()">📥 Excel</button>
+      <button class="uchip" id="uchip" onclick="showUserMenu()">
+        <div class="av" id="uav" style="background:#3b82f6;color:#fff">MS</div>
+        <span id="uname">Dr. Marcus</span>
+      </button>
+    </div>
+  </div>
+
+  <div class="atabs" id="admin-tabs">
+    <button class="atab on" onclick="aTab('dash',this)">📊 Dashboard</button>
+    <button class="atab" onclick="aTab('clientes',this)">👥 Clientes</button>
+    <button class="atab" onclick="aTab('processos',this)">⚖️ Processos</button>
+    <button class="atab" onclick="aTab('tarefas',this)">✅ Tarefas</button>
+    <button class="atab" onclick="aTab('semana',this)">📋 Semana</button>
+    <button class="atab" onclick="aTab('calmes',this)">🗓️ Mês</button>
+    <button class="atab" onclick="aTab('financeiro',this)">💰 Financeiro</button>
+    <button class="atab" onclick="aTab('comunicacoes',this)">💬 Comunicações</button>
+    <div class="tab-sep"></div>
+    <button class="atab" onclick="aTab('agenda',this)">📌 Agenda Hoje</button>
+    <button class="atab" onclick="aTab('agcal',this)">📅 Cal. Agend.</button>
+    <button class="atab" onclick="aTab('kanban',this)">🔄 Kanban</button>
+    <button class="atab" onclick="aTab('agendamentos',this)">🔍 Agendamentos</button>
+    <button class="atab" onclick="aTab('metricas',this)">📈 Métricas</button>
+    <div class="tab-sep"></div>
+    <button class="atab" onclick="aTab('busca',this)">🔎 Busca Proc.</button>
+    <button class="atab" id="tab-users-btn" onclick="aTab('usuarios',this)">👤 Usuários</button>
+    <button class="atab" onclick="aTab('gcal',this)">🔗 Google Cal</button>
+    <button class="atab" onclick="aTab('config',this)">⚙️ Config</button>
+  </div>
+
+  <main id="admin-cnt" style="padding-top:14px"></main>
+</div>
+
+<!-- ╔══════════════════════════════════════════════╗
+     ║               MODAIS GLOBAIS                 ║
+     ╚══════════════════════════════════════════════╝ -->
+
+<!-- Modal: Detalhe Agendamento (mobile) -->
+<div class="mo" id="mo-detail"><div class="mob"><div class="moh"></div><div class="moi" id="mo-det-i"></div></div></div>
+
+<!-- Modal: LGPD -->
+<div class="mo" id="mo-lgpd">
+  <div class="mob"><div class="moh"></div><div class="moi">
+    <div class="mot">🔒 Política de Privacidade</div>
+    <p style="font-size:12px;line-height:1.7;margin-bottom:14px">O Souza Advocacia trata seus dados com base na LGPD (Lei nº 13.709/2018).<br><br><strong>Dados coletados:</strong> nome, CPF, telefone, e-mail e documentos.<br><strong>Finalidade:</strong> Agendamento, análise jurídica e prestação de serviços.<br><strong>Compartilhamento:</strong> Não compartilhamos dados com terceiros, salvo obrigação legal.<br><strong>Seus direitos:</strong> Acesso, correção e exclusão. Contato: souzaadvogadosa@gmail.com</p>
+    <button class="btn bgold bw" onclick="closeMo('mo-lgpd')">Entendido</button>
+  </div></div>
+</div>
+
+<!-- Modal: Cliente -->
+<div class="mo-desk" id="m-cli"><div class="mbox">
+  <h3>👤 <span id="m-cli-t">Novo Cliente</span></h3>
+  <input type="hidden" id="cli-id">
+  <div class="frow"><div class="ff" style="flex:2"><div class="fl">Nome Completo *</div><input id="cli-nome" placeholder="Nome completo"></div><div class="ff"><div class="fl">Tipo</div><select id="cli-tipo"><option>Novo</option><option>Ativo</option><option>Inativo</option></select></div></div>
+  <div class="frow"><div class="ff"><div class="fl">CPF / CNPJ</div><input id="cli-cpf" placeholder="000.000.000-00"></div><div class="ff"><div class="fl">Telefone (WhatsApp) *</div><input id="cli-tel" placeholder="(21) 99999-9999"></div><div class="ff"><div class="fl">E-mail</div><input type="email" id="cli-email" placeholder="email@exemplo.com"></div></div>
+  <div class="frow"><div class="ff" style="flex:2"><div class="fl">Endereço</div><input id="cli-end" placeholder="Rua, Número – Cidade/Estado"></div></div>
+  <div class="frow"><div class="ff"><div class="fl">Observações</div><textarea id="cli-obs" rows="2" style="resize:vertical"></textarea></div></div>
+  <div class="mfoot"><button class="btn bp" onclick="saveCli()">💾 Salvar</button><button class="btn bgh" onclick="closeMo('m-cli')">Cancelar</button></div>
+</div></div>
+
+<!-- Modal: Processo -->
+<div class="mo-desk" id="m-proc"><div class="mbox">
+  <h3>⚖️ <span id="m-proc-t">Novo Processo</span></h3>
+  <input type="hidden" id="proc-id">
+  <div class="frow"><div class="ff" style="flex:3"><div class="fl">Nº do Processo *</div><input id="proc-num" placeholder="0000000-00.0000.8.00.0000"></div></div>
+  <div class="frow"><div class="ff" style="flex:2"><div class="fl">Cliente *</div><select id="proc-cli"></select></div><div class="ff"><div class="fl">Área</div><select id="proc-tipo"><option>Trabalhista</option><option>Consumidor</option><option>Previdenciário</option><option>Cível</option><option>Criminal</option><option>Família</option><option>Tributário</option><option>Empresarial</option></select></div></div>
+  <div class="frow"><div class="ff" style="flex:2"><div class="fl">Tribunal / Vara</div><input id="proc-vara" placeholder="Ex: 1ª VT Rio de Janeiro"></div><div class="ff"><div class="fl">Status</div><select id="proc-status"><option>Em andamento</option><option>Suspenso</option><option>Finalizado</option><option>Arquivado</option></select></div></div>
+  <div class="frow"><div class="ff"><div class="fl">Início</div><input type="date" id="proc-ini"></div><div class="ff"><div class="fl">Próx. Movimentação</div><input type="date" id="proc-prox"></div><div class="ff"><div class="fl">Advogado</div><select id="proc-adv"></select></div></div>
+  <div class="frow"><div class="ff"><div class="fl">Observações</div><textarea id="proc-obs" rows="2" style="resize:vertical"></textarea></div></div>
+  <div class="mfoot"><button class="btn bp" onclick="saveProc()">💾 Salvar</button><button class="btn bgh" onclick="closeMo('m-proc')">Cancelar</button></div>
+</div></div>
+
+<!-- Modal: Tarefa -->
+<div class="mo-desk" id="m-tar"><div class="mbox">
+  <h3>✅ <span id="m-tar-t">Nova Tarefa</span></h3>
+  <input type="hidden" id="tar-id">
+  <div class="frow"><div class="ff"><div class="fl">Data *</div><input type="date" id="tar-data"></div><div class="ff" style="flex:3"><div class="fl">Descrição *</div><input id="tar-desc" placeholder="Descreva a tarefa..."></div></div>
+  <div class="frow"><div class="ff"><div class="fl">Cliente</div><select id="tar-cli" onchange="updTarProc()"><option value="">— Selecionar —</option></select></div><div class="ff"><div class="fl">Processo</div><select id="tar-proc"><option value="">— Selecionar —</option></select></div></div>
+  <div class="frow"><div class="ff"><div class="fl">Prioridade</div><select id="tar-prio"><option>Alta</option><option>Média</option><option>Baixa</option></select></div><div class="ff"><div class="fl">Status</div><select id="tar-status"><option>Pendente</option><option>Em andamento</option><option>Concluído</option></select></div><div class="ff"><div class="fl">Responsável</div><select id="tar-resp"></select></div></div>
+  <div class="frow"><div class="ff"><div class="fl">Local / Endereço</div><input id="tar-local" placeholder="Ex: Fórum Central, Sala 12"></div></div>
+  <div class="mfoot"><button class="btn bp" onclick="saveTar()">💾 Salvar</button><button class="btn bca" onclick="calFromTar()">📅 Salvar + Google Agenda</button><button class="btn bgh" onclick="closeMo('m-tar')">Cancelar</button></div>
+</div></div>
+
+<!-- Modal: Financeiro -->
+<div class="mo-desk" id="m-fin"><div class="mbox">
+  <h3>💰 <span id="m-fin-t">Novo Lançamento</span></h3>
+  <input type="hidden" id="fin-id">
+  <div class="frow"><div class="ff"><div class="fl">Cliente *</div><select id="fin-cli"></select></div><div class="ff" style="flex:2"><div class="fl">Descrição *</div><input id="fin-desc" placeholder="Ex: Honorários – Ação Trabalhista"></div><div class="ff"><div class="fl">Data</div><input type="date" id="fin-data"></div></div>
+  <div class="frow"><div class="ff"><div class="fl">Valor Contratado (R$)</div><input type="number" id="fin-ct" min="0" step="0.01"></div><div class="ff"><div class="fl">Valor Recebido (R$)</div><input type="number" id="fin-rc" min="0" step="0.01"></div><div class="ff"><div class="fl">Pagamento</div><select id="fin-pg"><option>PIX</option><option>Transferência</option><option>Boleto</option><option>Parcelado</option><option>Dinheiro</option><option>Cartão</option></select></div><div class="ff"><div class="fl">Status</div><select id="fin-st"><option>Pago</option><option>Parcial</option><option>Pendente</option></select></div></div>
+  <div class="mfoot"><button class="btn bp" onclick="saveFin()">💾 Salvar</button><button class="btn bgh" onclick="closeMo('m-fin')">Cancelar</button></div>
+</div></div>
+
+<!-- Modal: WhatsApp -->
+<div class="mo-desk" id="m-wa"><div class="mbox">
+  <h3>📱 Enviar WhatsApp</h3>
+  <div id="wa-cliinfo" style="background:#f0fdf4;border:1px solid #bbf7d0;border-radius:8px;padding:10px;margin-bottom:12px;font-size:12px"></div>
+  <div class="fl">Modelos rápidos:</div>
+  <div style="margin:8px 0">
+    <button class="tpl-btn" onclick="setWAMsg(this,'audiencia')">📋 Lembrete de Audiência</button>
+    <button class="tpl-btn" onclick="setWAMsg(this,'prazo')">⏰ Prazo Processual</button>
+    <button class="tpl-btn" onclick="setWAMsg(this,'docs')">📂 Solicitar Documentos</button>
+    <button class="tpl-btn" onclick="setWAMsg(this,'cobranca')">💰 Cobrança de Honorários</button>
+    <button class="tpl-btn" onclick="setWAMsg(this,'update')">📣 Atualização do Processo</button>
+  </div>
+  <div class="fl" style="margin-top:10px">Mensagem (editável):</div>
+  <textarea id="wa-msg" rows="5" style="resize:vertical;margin-top:4px;width:100%;padding:8px;border:1px solid var(--bd);border-radius:8px;font-size:12px"></textarea>
+  <div class="mfoot"><button class="btn bwa" onclick="sendWA()">📱 Abrir WhatsApp</button><button class="btn bgh" onclick="closeMo('m-wa')">Cancelar</button></div>
+</div></div>
+
+<!-- Modal: E-mail -->
+<div class="mo-desk" id="m-email"><div class="mbox">
+  <h3>✉️ Enviar E-mail</h3>
+  <div id="email-cliinfo" style="background:#fffbeb;border:1px solid #fde68a;border-radius:8px;padding:10px;margin-bottom:12px;font-size:12px"></div>
+  <div class="fl">Modelos:</div>
+  <div style="margin:8px 0">
+    <button class="tpl-btn" onclick="setEmailTpl('audiencia')">📋 Notificação de Audiência</button>
+    <button class="tpl-btn" onclick="setEmailTpl('prazo')">⏰ Alerta de Prazo</button>
+    <button class="tpl-btn" onclick="setEmailTpl('docs')">📂 Solicitação de Documentos</button>
+    <button class="tpl-btn" onclick="setEmailTpl('cobranca')">💰 Cobrança de Honorários</button>
+    <button class="tpl-btn" onclick="setEmailTpl('update')">📣 Atualização Processual</button>
+  </div>
+  <div class="frow"><div class="ff"><div class="fl">Assunto</div><input id="email-sub" placeholder="Assunto do e-mail"></div></div>
+  <textarea id="email-body" rows="6" style="resize:vertical;margin-top:4px;width:100%;padding:8px;border:1px solid var(--bd);border-radius:8px;font-size:12px"></textarea>
+  <div class="mfoot"><button class="btn bma" onclick="sendEmail()">✉️ Abrir E-mail</button><button class="btn bgh" onclick="closeMo('m-email')">Cancelar</button></div>
+</div></div>
+
+<!-- Modal: Usuário -->
+<div class="mo-desk" id="m-user"><div class="mbox">
+  <h3>👤 <span id="m-user-t">Novo Usuário</span></h3>
+  <input type="hidden" id="user-id">
+  <div class="frow"><div class="ff" style="flex:2"><div class="fl">Nome Completo *</div><input id="user-nome" placeholder="Dr. Nome Sobrenome"></div><div class="ff"><div class="fl">Cargo</div><input id="user-cargo" placeholder="Ex: Advogado, Estagiário..."></div></div>
+  <div class="frow"><div class="ff" style="flex:2"><div class="fl">E-mail *</div><input type="email" id="user-email" placeholder="email@souzaadv.com"></div><div class="ff"><div class="fl">Telefone</div><input id="user-tel" placeholder="(21) 99999-9999"></div></div>
+  <div class="frow"><div class="ff"><div class="fl">OAB</div><input id="user-oab" placeholder="OAB/RJ 000.000"></div><div class="ff"><div class="fl">Senha *</div><input type="password" id="user-pwd" placeholder="Mínimo 6 caracteres"></div><div class="ff"><div class="fl">Função</div><select id="user-role"><option value="advogado">Advogado</option><option value="colaborador">Colaborador</option><option value="estagiario">Estagiário</option><option value="admin">Administrador</option></select></div></div>
+  <div class="frow"><div class="ff"><div class="fl">Status</div><select id="user-ativo"><option value="1">Ativo</option><option value="0">Inativo</option></select></div></div>
+  <div class="mfoot"><button class="btn bp" onclick="saveUser()">💾 Salvar</button><button class="btn bgh" onclick="closeMo('m-user')">Cancelar</button></div>
+</div></div>
+
+<!-- Modal: Menu Usuário -->
+<div class="mo-desk" id="m-umenu"><div class="mbox" style="max-width:320px">
+  <h3>👤 Minha Conta</h3>
+  <div id="umenu-info" style="font-size:12px;margin-bottom:14px"></div>
+  <button class="btn bgh" style="width:100%;margin-bottom:7px" onclick="closeMo('m-umenu');openEditSelf()">✏️ Editar meus dados</button>
+  <button class="btn" style="width:100%;background:#fef2f2;border:1px solid #fecaca;color:#b91c1c" onclick="doLogout()">🚪 Sair do Sistema</button>
+</div></div>
+
+<script>
+// ═══════════════════════════════════════════════════════════════════
+// BOOKING CONSTANTS (from INDEX.HTML)
+// ═══════════════════════════════════════════════════════════════════
+const BT={
+  primeiro:{n:'Primeiro Atendimento',i:'👤',d:30},andamento:{n:'Andamento de Processo',i:'⚖️',d:20},
+  documentos:{n:'Entrega de Documentos',i:'📄',d:15},duvidas:{n:'Dúvidas Jurídicas',i:'❓',d:20},
+  retorno:{n:'Retorno de Atendimento',i:'🔄',d:20},previdenciario:{n:'Consulta Previdenciária',i:'🏦',d:40},
+  trabalhista:{n:'Consulta Trabalhista',i:'💼',d:40},consumidor:{n:'Direito do Consumidor',i:'🛡️',d:30},
+  autista:{n:'BPC/LOAS · Autismo',i:'💙',d:40},outros:{n:'Outros Assuntos',i:'📋',d:30}
+};
+const SS={
+  solicitado:{l:'Solicitado',c:'b-req',kb:'#eff6ff',kt:'#1d4ed8'},
+  confirmado:{l:'Confirmado',c:'b-cfm',kb:'#f0fdf4',kt:'#15803d'},
+  aguardando_docs:{l:'Aguard. Docs',c:'b-doc',kb:'#fffbeb',kt:'#b45309'},
+  realizado:{l:'Realizado',c:'b-dn',kb:'#0B1A3B',kt:'#C8A96A'},
+  nao_compareceu:{l:'Não Compareceu',c:'b-cn',kb:'#fef2f2',kt:'#b91c1c'},
+  reagendado:{l:'Reagendado',c:'b-doc',kb:'#fffbeb',kt:'#b45309'},
+  cancelado:{l:'Cancelado',c:'b-cn',kb:'#fff5f5',kt:'#b91c1c'},
+  contratado:{l:'Contratado ✓',c:'b-co',kb:'#f0fdf4',kt:'#15803d'},
+  arquivado:{l:'Arquivado',c:'b-dn',kb:'#f1f5f9',kt:'#94a3b8'}
+};
+const AREAS=['Direito Previdenciário','BPC/LOAS','Direito dos Autistas','Direito Trabalhista','Direito Civil','Direito de Família','Direito do Consumidor','Direito de Trânsito','Direito Tributário','Direito do Idoso','ECA','Contratos','Imobiliário','Tributário','Empresarial','Outros'];
+const HRS=['10:00','10:30','11:00','11:30','12:00','12:30','13:00','13:30','14:00','14:30','15:00','15:30','16:00','16:30','17:00','17:30'];
+const TC={primeiro:'#2563eb',andamento:'#7c3aed',documentos:'#16a34a',duvidas:'#d97706',retorno:'#6b7280',previdenciario:'#0891b2',trabalhista:'#dc2626',consumidor:'#c026d3',autista:'#2563eb',outros:'#64748b'};
+
+// ═══════════════════════════════════════════════════════════════════
+// STATE — helpers primeiro (sem dependências externas)
+// ═══════════════════════════════════════════════════════════════════
+const td0=new Date().toISOString().split('T')[0];
+function dt(n){const d=new Date();d.setDate(d.getDate()+n);return d.toISOString().split('T')[0];}
+const gid2=()=>Date.now()+Math.floor(Math.random()*9999);
+const gidb=()=>'AG'+Date.now().toString(36).toUpperCase();
+const am=(t,m)=>{const[h,mn]=t.split(':').map(Number),tot=h*60+mn+m;return`${String(Math.floor(tot/60)).padStart(2,'0')}:${String(tot%60).padStart(2,'0')}`;};
+const fd=s=>{if(!s)return'—';const d=new Date(s+'T00:00:00');return d.toLocaleDateString('pt-BR',{weekday:'short',day:'2-digit',month:'short'});};
+const fdl=s=>{if(!s)return'—';const d=new Date(s+'T00:00:00');return d.toLocaleDateString('pt-BR',{weekday:'long',day:'2-digit',month:'long',year:'numeric'});};
+const fmtD=s=>s?new Date(s+'T00:00:00').toLocaleDateString('pt-BR'):'—';
+const fmt=v=>'R$ '+Number(v||0).toLocaleString('pt-BR',{minimumFractionDigits:2,maximumFractionDigits:2});
+const isPast=d=>d&&d<td0;
+const isNear=d=>{if(!d)return false;const x=(new Date(d)-new Date(td0))/864e5;return x>=0&&x<=7;};
+const esc=s=>String(s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
+
+// ═══════════════════════════════════════════════════════════════════
+// VARIÁVEIS DE ESTADO — declaradas antes de qualquer referência
+// ═══════════════════════════════════════════════════════════════════
+let currentUser=null,users=[],cli=[],proc=[],tar=[],fin=[];
+const cn=id=>(cli.find(c=>c.id===+id)||{}).nome||'—';
+
+// ═══════════════════════════════════════════════════════════════════
+// GESTÃO JURÍDICA CONSTANTS — após td0, dt() e currentUser
+// ═══════════════════════════════════════════════════════════════════
+const ROLES={admin:{l:'Administrador',cls:'r-admin',e:1,del:1,fin:1,usr:1,cfg:1},advogado:{l:'Advogado',cls:'r-advogado',e:1,del:1,fin:1,usr:0,cfg:1},colaborador:{l:'Colaborador',cls:'r-colaborador',e:1,del:0,fin:0,usr:0,cfg:0},estagiario:{l:'Estagiário',cls:'r-estagiario',e:0,del:0,fin:0,usr:0,cfg:0}};
+const perm=()=>ROLES[currentUser?.role]||ROLES.estagiario;
+const avatarColor=['#3b82f6','#16a34a','#d97706','#9333ea','#ef4444','#0ea5e9','#f59e0b'];
+const ac=id=>avatarColor[id%avatarColor.length];
+const initials=n=>n.split(' ').filter(Boolean).slice(0,2).map(w=>w[0].toUpperCase()).join('');
+
+// DEFAULT DATA — após td0 e dt() para poder usá-los
+const D_USERS=[
+  {id:1,nome:'Dr. Marcus Vinicius Souza',cargo:'Advogado Sócio',email:'marcus@souzaadv.com',pwd:'Admin@2025',oab:'OAB/RJ 250.430',tel:'(21) 99752-9727',role:'admin',ativo:true},
+  {id:2,nome:'Dr. Luiz Fabiano Ribeiro de Souza',cargo:'Advogado Sócio',email:'luiz@souzaadv.com',pwd:'Luiz@2025',oab:'OAB/RJ 160.689',tel:'(21) 99999-0000',role:'advogado',ativo:true},
+];
+const D_CLI=[
+  {id:1,nome:'João Silva Santos',cpf:'123.456.789-00',tel:'21999991111',email:'joao@gmail.com',end:'Rua das Flores, 100 – Rio de Janeiro/RJ',tipo:'Ativo',obs:'Preferência por WhatsApp'},
+  {id:2,nome:'Maria Oliveira Costa',cpf:'987.654.321-00',tel:'21988882222',email:'maria@gmail.com',end:'Av. Pres. Vargas, 200 – Niterói/RJ',tipo:'Ativo',obs:'Plano de saúde negado'},
+  {id:3,nome:'Carlos Pereira Lima',cpf:'456.789.123-00',tel:'21977773333',email:'carlos@gmail.com',end:'Rua 7 de Setembro, 300 – Duque de Caxias/RJ',tipo:'Novo',obs:'Indicação de João Silva'},
+  {id:4,nome:'Frutbras Rio Comércio Ltda',cpf:'12.345.678/0001-99',tel:'21966664444',email:'frutbras@gmail.com',end:'CEASA-RJ, Galpão 45',tipo:'Ativo',obs:'Pessoa Jurídica'},
+  {id:5,nome:'Ana Paula Rodrigues',cpf:'321.654.987-00',tel:'21955555555',email:'ana@gmail.com',end:'Rua da Paz, 400 – São João de Meriti/RJ',tipo:'Inativo',obs:''},
+];
+const D_PROC=[
+  {id:1,num:'0001234-56.2024.8.19.0001',cliId:1,tipo:'Trabalhista',vara:'1ª VT Rio de Janeiro',status:'Em andamento',ini:'2024-03-15',prox:dt(22),adv:'Dr. Marcus Vinicius Souza',obs:'Rescisão indireta – salários em atraso'},
+  {id:2,num:'0009876-54.2024.8.19.0002',cliId:2,tipo:'Consumidor',vara:'3º JEC Rio de Janeiro',status:'Em andamento',ini:'2024-06-20',prox:dt(5),adv:'Dr. Luiz Fabiano Ribeiro de Souza',obs:'Negativa plano de saúde'},
+  {id:3,num:'0005678-90.2023.8.19.0003',cliId:3,tipo:'Previdenciário',vara:'JEF Rio de Janeiro',status:'Suspenso',ini:'2023-11-10',prox:dt(60),adv:'Dr. Marcus Vinicius Souza',obs:'Aguardando perícia INSS'},
+  {id:4,num:'0002345-67.2024.8.19.0004',cliId:4,tipo:'Cível',vara:'15ª Vara Cível RJ',status:'Finalizado',ini:'2024-01-08',prox:'',adv:'Dr. Luiz Fabiano Ribeiro de Souza',obs:'Acordo celebrado'},
+  {id:5,num:'0007654-32.2025.8.19.0005',cliId:1,tipo:'Criminal',vara:'1ª Vara Criminal RJ',status:'Em andamento',ini:'2025-01-15',prox:td0,adv:'Dr. Marcus Vinicius Souza',obs:'TC em andamento'},
+  {id:6,num:'0003456-78.2025.8.19.0006',cliId:5,tipo:'Família',vara:'1ª Vara de Família RJ',status:'Em andamento',ini:'2025-02-01',prox:dt(42),adv:'Dr. Luiz Fabiano Ribeiro de Souza',obs:'Divórcio consensual'},
+];
+const D_TAR=[
+  {id:1,data:td0,desc:'Protocolar petição inicial – Light SERJ',cliId:2,procId:2,prio:'Alta',status:'Pendente',resp:'Dr. Marcus Vinicius Souza',local:'Fórum Central RJ',ok:false},
+  {id:2,data:td0,desc:'Audiência trabalhista João Silva',cliId:1,procId:1,prio:'Alta',status:'Em andamento',resp:'Dr. Marcus Vinicius Souza',local:'1ª VT Rio de Janeiro',ok:false},
+  {id:3,data:dt(-1),desc:'Enviar documentos ao perito INSS',cliId:3,procId:3,prio:'Média',status:'Pendente',resp:'Dr. Luiz Fabiano Ribeiro de Souza',local:'',ok:false},
+  {id:4,data:dt(1),desc:'Reunião com Frutbras sobre contrato',cliId:4,procId:4,prio:'Média',status:'Pendente',resp:'Dr. Marcus Vinicius Souza',local:'CEASA-RJ',ok:false},
+  {id:5,data:dt(4),desc:'Prazo para recurso trabalhista',cliId:1,procId:5,prio:'Alta',status:'Pendente',resp:'Dr. Luiz Fabiano Ribeiro de Souza',local:'',ok:false},
+  {id:6,data:td0,desc:'Consulta inicial Ana Paula',cliId:5,procId:6,prio:'Baixa',status:'Concluído',resp:'Dr. Marcus Vinicius Souza',local:'',ok:true},
+];
+const D_FIN=[
+  {id:1,cliId:1,desc:'Honorários – Reclamação Trabalhista',ct:3500,rc:2000,pg:'PIX',st:'Parcial',data:'2024-03-15'},
+  {id:2,cliId:2,desc:'Honorários – Plano de Saúde',ct:1500,rc:1500,pg:'Transferência',st:'Pago',data:'2024-06-20'},
+  {id:3,cliId:3,desc:'Honorários – Previdenciário',ct:2000,rc:500,pg:'PIX',st:'Parcial',data:'2023-11-10'},
+  {id:4,cliId:4,desc:'Honorários – Consultoria Frutbras',ct:800,rc:800,pg:'PIX',st:'Pago',data:'2024-01-08'},
+  {id:5,cliId:5,desc:'Honorários – Direito de Família',ct:1200,rc:0,pg:'Parcelado',st:'Pendente',data:'2025-02-01'},
+];
+// Agendamentos data
+let bk=[], gcfg={key:'',calId:'',script:'',on:false}, gcEvt=[];
+// UI state
+let aTabCur='dash', calV=new Date(), selD=null;
+let tarFil='Todas', waCliId=null, emailCliId=null;
+let cht1=null,cht2=null;
+let fSt={q:'',status:'',type:'',dFrom:'',dTo:''};
+let calMB=new Date().getMonth(), calYB=new Date().getFullYear();
+// Booking state
+let app={type:null,step:0,nome:'',cpf:'',tel:'',email:'',cidade:'',estado:'',area:'',resumo:'',modal:'whatsapp',data:'',hora:'',extra:{},files:[],lgpd:false};
+let selDate=null, selTime=null, calM=new Date().getMonth(), calY=new Date().getFullYear();
+
+// ═══════════════════════════════════════════════════════════════════
+// PERSISTENCE
+// ═══════════════════════════════════════════════════════════════════
+let saveT;
+function save(){
+  clearTimeout(saveT);
+  const el=document.getElementById('sbadge');
+  if(el)el.textContent='💾 Salvando...';
+  saveT=setTimeout(()=>{
+    const _sd={users,cli,proc,tar,fin};['users','cli','proc','tar','fin'].forEach(k=>localStorage.setItem('sa_'+k,JSON.stringify(_sd[k])));
+    if(el)el.textContent='✅ Salvo às '+new Date().toLocaleTimeString('pt-BR',{hour:'2-digit',minute:'2-digit'});
+  },700);
+}
+function saveBk(){localStorage.setItem('ms_bookings',JSON.stringify(bk));}
+function saveGc(){localStorage.setItem('ms_gcal',JSON.stringify(gcfg));}
+function load(){
+  const _ld={users:D_USERS,cli:D_CLI,proc:D_PROC,tar:D_TAR,fin:D_FIN};
+  ['users','cli','proc','tar','fin'].forEach(k=>{
+    const d=localStorage.getItem('sa_'+k);
+    try{_ld[k]=d?JSON.parse(d):_ld[k];}catch(e){console.warn('load err',k,e);}
+  });
+  users=(_ld.users&&_ld.users.length)?_ld.users:D_USERS;
+  cli=_ld.cli||D_CLI; proc=_ld.proc||D_PROC; tar=_ld.tar||D_TAR; fin=_ld.fin||D_FIN;
+  bk=JSON.parse(localStorage.getItem('ms_bookings')||'[]');
+  const gc=localStorage.getItem('ms_gcal');if(gc)gcfg=JSON.parse(gc);
+  if(!bk.length)seedBk();
+}
+function seedBk(){
+  bk=[
+    {id:'AG001',type:'primeiro',status:'confirmado',nome:'Maria Fernanda Oliveira',cpf:'123.456.789-00',tel:'21988887777',email:'mf@gmail.com',cidade:'Rio de Janeiro',estado:'RJ',area:'Direito do Consumidor',resumo:'Plano de saúde negou cobertura de cirurgia urgente.',modal:'videoconferencia',data:td0,hora:'10:00',createdAt:new Date().toISOString(),obs:''},
+    {id:'AG002',type:'trabalhista',status:'aguardando_docs',nome:'Carlos Eduardo Santos',cpf:'987.654.321-00',tel:'21977776666',email:'ces@gmail.com',cidade:'Niterói',estado:'RJ',area:'Direito Trabalhista',resumo:'Verbas rescisórias não pagas pela empresa.',modal:'whatsapp',data:td0,hora:'11:00',createdAt:new Date().toISOString(),obs:'Solicitar CTPS'},
+    {id:'AG003',type:'previdenciario',status:'solicitado',nome:'Ana Paula Costa',cpf:'456.789.123-00',tel:'21966665555',email:'ana@gmail.com',cidade:'Duque de Caxias',estado:'RJ',area:'Direito Previdenciário',resumo:'Negativa de auxílio-doença. Possui laudo médico.',modal:'ligacao',data:dt(1),hora:'14:00',createdAt:new Date().toISOString(),obs:''},
+    {id:'AG004',type:'autista',status:'solicitado',nome:'Roberto Lima',cpf:'321.654.987-00',tel:'21955554444',email:'rob@gmail.com',cidade:'São Gonçalo',estado:'RJ',area:'BPC/LOAS',resumo:'Filho com TEA nível 2. INSS negou.',modal:'videoconferencia',data:dt(1),hora:'15:00',createdAt:new Date().toISOString(),obs:''},
+    {id:'AG005',type:'consumidor',status:'confirmado',nome:'Joana Pereira Lima',cpf:'654.987.321-00',tel:'21944443333',email:'joana@gmail.com',cidade:'Belford Roxo',estado:'RJ',area:'Direito do Consumidor',resumo:'Banco cobrou parcelas após quitação.',modal:'whatsapp',data:dt(2),hora:'10:30',createdAt:new Date().toISOString(),obs:''},
+    {id:'AG006',type:'trabalhista',status:'contratado',nome:'Lucia Menezes',cpf:'111.222.333-44',tel:'21922221111',email:'lucia@gmail.com',cidade:'Rio de Janeiro',estado:'RJ',area:'Direito Trabalhista',resumo:'Assédio moral.',modal:'videoconferencia',data:dt(-3),hora:'10:00',createdAt:new Date().toISOString(),obs:'Contrato assinado'},
+  ];
+  saveBk();
+}
+
+// ═══════════════════════════════════════════════════════════════════
+// NAVIGATION
+// ═══════════════════════════════════════════════════════════════════
+function go(id){
+  document.querySelectorAll('.sc').forEach(s=>s.classList.remove('on'));
+  document.getElementById('admin-app').style.display='none';
+  document.getElementById('ls').style.display='none';
+  const s=document.getElementById(id);if(s){s.classList.add('on');s.scrollTop=0;}
+}
+function goAdmin(){
+  document.querySelectorAll('.sc').forEach(s=>s.classList.remove('on'));
+  document.getElementById('ls').style.display='flex';
+}
+function showApp(){
+  document.querySelectorAll('.sc').forEach(s=>s.classList.remove('on'));
+  document.getElementById('ls').style.display='none';
+  document.getElementById('admin-app').style.display='block';
+  const nm=currentUser.nome;
+  document.getElementById('uname').textContent=nm.split(' ')[1]?'Dr. '+nm.split(' ').slice(-1)[0]:nm;
+  document.getElementById('uav').textContent=initials(nm);
+  document.getElementById('uav').style.background=ac(currentUser.id);
+  document.getElementById('hdr-oab').textContent=users.filter(u=>u.oab&&u.ativo).map(u=>u.oab).join(' · ')||'Souza Advocacia';
+  if(!perm().usr) document.getElementById('tab-users-btn').style.display='none';
+  startClock();updNotif();
+  aTab('dash',document.querySelector('.atab'));
+}
+function openMo(id){document.getElementById(id).classList.add('on');}
+function closeMo(id){document.getElementById(id).classList.remove('on');}
+document.addEventListener('click',e=>{if(e.target.classList.contains('mo')||e.target.classList.contains('mo-desk'))e.target.classList.remove('on');});
+document.addEventListener('keydown',e=>{if(e.key==='Escape')document.querySelectorAll('.mo.on,.mo-desk.on').forEach(m=>m.classList.remove('on'));});
+
+// ═══════════════════════════════════════════════════════════════════
+// AUTH
+// ═══════════════════════════════════════════════════════════════════
+function doLogin(){
+  const email=document.getElementById('lemail').value.trim().toLowerCase();
+  const pwd=document.getElementById('lpwd').value;
+  const u=users.find(x=>x.email.toLowerCase()===email&&x.pwd===pwd&&x.ativo);
+  if(!u){document.getElementById('lerr').style.display='block';return;}
+  currentUser=u;localStorage.setItem('sa_sess',u.id);showApp();
+}
+function doLogout(){closeMo('m-umenu');localStorage.removeItem('sa_sess');location.reload();}
+function showUserMenu(){
+  document.getElementById('umenu-info').innerHTML=`
+    <div style="display:flex;align-items:center;gap:10px;margin-bottom:10px">
+      <div class="av" style="width:40px;height:40px;font-size:15px;background:${ac(currentUser.id)};color:#fff">${initials(currentUser.nome)}</div>
+      <div><div style="font-weight:700">${currentUser.nome}</div><div style="color:var(--mu);font-size:11px">${currentUser.cargo}</div></div>
+    </div>
+    <div><span class="urole ${ROLES[currentUser.role].cls}">${ROLES[currentUser.role].l}</span></div>
+    <div style="margin-top:6px;color:var(--mu)">${currentUser.email}</div>
+    <div style="color:var(--mu)">${currentUser.oab||''}</div>`;
+  openMo('m-umenu');
+}
+function openEditSelf(){populateUserForm(currentUser);document.getElementById('m-user-t').textContent='Editar Minha Conta';openMo('m-user');}
+function startClock(){const el=document.getElementById('a-clock');const tick=()=>el&&(el.textContent=new Date().toLocaleTimeString('pt-BR',{hour:'2-digit',minute:'2-digit'}));tick();setInterval(tick,60000);}
+function updNotif(){const n=bk.filter(b=>b.status==='solicitado').length;const d=document.getElementById('ndot');if(d)d.style.display=n>0?'block':'none';}
+function showLGPD(){openMo('mo-lgpd');}
+
+// ═══════════════════════════════════════════════════════════════════
+// ADMIN TABS
+// ═══════════════════════════════════════════════════════════════════
+function aTab(tab,btn){
+  aTabCur=tab;
+  document.querySelectorAll('.atab').forEach(b=>b.classList.remove('on'));
+  if(btn)btn.classList.add('on');
+  const r={
+    dash:renderDash,clientes:renderCli,processos:renderProc,tarefas:renderTar,
+    semana:renderSem,calmes:renderCal,financeiro:renderFin,comunicacoes:renderCom,
+    agenda:renderAgenda,agcal:renderAgCal,kanban:renderKanban,agendamentos:renderAgendamentos,
+    metricas:renderMetricas,busca:renderBusca,usuarios:renderUsers,gcal:renderGCal,config:renderConfig
+  };
+  document.getElementById('admin-cnt').innerHTML='';
+  (r[tab]||renderDash)();
+}
+
+// ═══════════════════════════════════════════════════════════════════
+// DASHBOARD
+// ═══════════════════════════════════════════════════════════════════
+function renderDash(){
+  const at=cli.filter(c=>c.tipo==='Ativo').length,pa=proc.filter(p=>p.status==='Em andamento').length;
+  const hj=tar.filter(t=>t.data===td0&&!t.ok).length,se=tar.filter(t=>t.data>=td0&&t.data<=dt(7)&&!t.ok).length;
+  const atr=tar.filter(t=>t.data<td0&&!t.ok).length;
+  const totC=fin.reduce((s,f)=>s+(+f.ct||0),0),totR=fin.reduce((s,f)=>s+(+f.rc||0),0);
+  const agHj=bk.filter(b=>b.data===td0).length,agPen=bk.filter(b=>b.status==='solicitado').length;
+
+  let html=`<div class="krow">
+    ${kc('#eff6ff',at,'#2563eb','Clientes Ativos')}
+    ${kc('#f0fdf4',pa,'#16a34a','Processos Ativos')}
+    ${kc('#faf5ff',hj,'#7c3aed','Tarefas Hoje')}
+    ${kc('#fffbeb',se,'#d97706','Tarefas Semana')}
+    ${kc(atr>0?'#fef2f2':'#f8fafc',atr,atr>0?'#dc2626':'#94a3b8','⚠️ Atrasadas')}
+    ${kc('#faf6ee',agHj,'#A07840','Agend. Hoje')}
+    ${kc(agPen>0?'#fef2f2':'#f8fafc',agPen,agPen>0?'#dc2626':'#94a3b8','Agend. Pendentes')}
+  </div>`;
+  if(agPen>0)html+=`<div class="al al-warn">⚠️ <strong>${agPen}</strong> agendamento(s) aguardando confirmação. <button class="btn bghost bsm" style="display:inline-flex" onclick="aTab('agendamentos',document.querySelectorAll('.atab')[13])">Ver agendamentos →</button></div>`;
+  if(atr>0){const atrTar=tar.filter(t=>t.data<td0&&!t.ok);html+=`<div class="abox"><h4>🔴 ${atrTar.length} Tarefa(s) Atrasada(s)!</h4>${atrTar.map(t=>`<div style="padding:2px 0;font-size:12px">• ${t.desc} — <strong>${fmtD(t.data)}</strong> — ${cn(t.cliId)}</div>`).join('')}</div>`;}
+  html+=`<div class="ccrow">
+    <div class="card cc"><div class="stitle">📊 Status dos Processos</div><div style="position:relative;height:170px"><canvas id="c1"></canvas></div></div>
+    <div class="card cc"><div class="stitle">⚖️ Processos por Área</div><div style="position:relative;height:170px"><canvas id="c2"></canvas></div></div>
+    <div class="card cc"><div class="stitle">💰 Financeiro Resumido</div>
+      <div style="margin-bottom:7px"><div style="font-size:10px;color:var(--mu)">Total contratado</div><div style="font-weight:700;color:#2563eb">${fmt(totC)}</div></div>
+      <div style="margin-bottom:7px"><div style="font-size:10px;color:var(--mu)">Recebido</div><div style="font-weight:700;color:#16a34a">${fmt(totR)}</div></div>
+      <div><div style="font-size:10px;color:var(--mu)">A receber</div><div style="font-weight:700;color:${totC-totR>0?'#dc2626':'#94a3b8'}">${fmt(totC-totR)}</div></div>
+      <div class="pb" style="margin-top:9px"><div class="pf" style="width:${totC>0?Math.round(totR/totC*100):0}%;background:${totC>0&&totR/totC>.7?'#16a34a':'#d97706'}"></div></div>
+      <div style="font-size:10px;color:var(--mu);margin-top:3px">${totC>0?Math.round(totR/totC*100):0}% recebido</div>
+    </div>
+  </div>`;
+  const tod=tar.filter(t=>t.data===td0);
+  html+=`<div class="card"><div class="stitle">📌 Tarefas de Hoje — ${new Date().toLocaleDateString('pt-BR',{weekday:'long',day:'2-digit',month:'long'})}</div>`;
+  if(!tod.length)html+=`<p style="color:var(--mu);font-size:12px">Nenhuma tarefa agendada para hoje.</p>`;
+  else html+=`<div class="tw"><table><thead><tr><th>Descrição</th><th>Cliente</th><th>Prioridade</th><th>Status</th><th>Responsável</th><th>📅</th></tr></thead><tbody>${tod.map(t=>`<tr style="opacity:${t.ok?.5:1}"><td>${t.ok?`<s style="color:var(--mu)">${t.desc}</s>`:t.desc}</td><td>${cn(t.cliId)}</td><td>${pbadge(t.prio)}</td><td>${sbadge(t.status)}</td><td>${t.resp}</td><td><button class="btn bca xs" onclick="addToCalendar(${t.id})">📅</button></td></tr>`).join('')}</tbody></table></div>`;
+  html+=`</div>`;
+  const todAg=bk.filter(b=>b.data===td0).sort((a,b_)=>a.hora.localeCompare(b_.hora));
+  if(todAg.length){
+    html+=`<div class="card"><div class="stitle">📋 Agendamentos de Hoje</div>`;
+    todAg.forEach(b=>html+=arw(b));
+    html+=`</div>`;
+  }
+  document.getElementById('admin-cnt').innerHTML=html;
+  if(cht1)cht1.destroy();if(cht2)cht2.destroy();
+  const pByS=['Em andamento','Finalizado','Suspenso'].map(s=>proc.filter(p=>p.status===s).length);
+  cht1=new Chart(document.getElementById('c1'),{type:'doughnut',data:{labels:['Em andamento','Finalizado','Suspenso'],datasets:[{data:pByS,backgroundColor:['#2563eb','#16a34a','#d97706'],borderWidth:0}]},options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{position:'bottom',labels:{font:{size:10},padding:8}}}}});
+  const areas=['Trabalhista','Consumidor','Previdenciário','Cível','Criminal','Família'];
+  cht2=new Chart(document.getElementById('c2'),{type:'bar',data:{labels:areas.map(a=>a.substring(0,8)),datasets:[{data:areas.map(a=>proc.filter(p=>p.tipo===a).length),backgroundColor:'#C8A96A',borderRadius:3}]},options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{display:false}},scales:{x:{ticks:{font:{size:9}}},y:{ticks:{stepSize:1,font:{size:9}}}}}});
+}
+
+// ═══════════════════════════════════════════════════════════════════
+// CLIENTES
+// ═══════════════════════════════════════════════════════════════════
+function renderCli(){
+  const q=(document.getElementById('cli-q')||{value:''}).value.toLowerCase();
+  const filt=cli.filter(c=>!q||c.nome.toLowerCase().includes(q)||c.cpf.includes(q)||(c.tipo||'').toLowerCase().includes(q));
+  const p=perm();
+  let html=`<div class="fbar"><input id="cli-q" style="max-width:260px" placeholder="🔍 Buscar nome, CPF ou tipo..." value="${q}" oninput="renderCli()">${p.e?`<button class="btn bp" onclick="openCliModal()">+ Novo Cliente</button>`:''}<span style="font-size:11px;color:var(--mu)">${filt.length} registro(s)</span></div>
+  <div class="card"><div class="tw"><table>
+    <thead><tr><th>Nome</th><th>CPF/CNPJ</th><th>Telefone</th><th>E-mail</th><th>Tipo</th><th>Observações</th><th>Comunicação</th>${p.e?'<th>Ações</th>':''}</tr></thead>
+    <tbody>${filt.map(c=>`<tr>
+      <td style="font-weight:600;white-space:nowrap">${c.nome}</td>
+      <td class="mono">${c.cpf}</td>
+      <td style="white-space:nowrap;font-size:12px">${c.tel}</td>
+      <td style="color:#2563eb;font-size:11px">${c.email||'—'}</td>
+      <td>${tbadge(c.tipo)}</td>
+      <td class="eli" style="font-size:11px;color:var(--mu)">${c.obs||'—'}</td>
+      <td><div style="display:flex;gap:3px"><button class="btn bwa xs" onclick="openWA(${c.id})">📱 WA</button><button class="btn bma xs" onclick="openEmailModal(${c.id})">✉️</button></div></td>
+      ${p.e?`<td><div style="display:flex;gap:3px"><button class="btn bgh xs" onclick="editCli(${c.id})">✏️</button>${p.del?`<button class="btn bd_ xs" onclick="delCli(${c.id})">🗑️</button>`:''}</div></td>`:''}</tr>`).join('')}
+    </tbody></table></div></div>`;
+  document.getElementById('admin-cnt').innerHTML=html;
+}
+function openCliModal(id){
+  document.getElementById('cli-id').value=id||'';
+  document.getElementById('m-cli-t').textContent=id?'Editar Cliente':'Novo Cliente';
+  if(id){const c=cli.find(x=>x.id===id);['nome','cpf','tel','email','end','obs'].forEach(f=>document.getElementById('cli-'+f).value=c[f]||'');document.getElementById('cli-tipo').value=c.tipo;}
+  else{['nome','cpf','tel','email','end','obs'].forEach(f=>document.getElementById('cli-'+f).value='');document.getElementById('cli-tipo').value='Novo';}
+  openMo('m-cli');
+}
+const editCli=id=>openCliModal(id);
+function saveCli(){
+  const nome=document.getElementById('cli-nome').value.trim();if(!nome)return alert('Informe o nome.');
+  const id=+document.getElementById('cli-id').value;
+  const o={nome,cpf:document.getElementById('cli-cpf').value.trim(),tel:document.getElementById('cli-tel').value.replace(/\D/g,''),email:document.getElementById('cli-email').value.trim(),end:document.getElementById('cli-end').value.trim(),tipo:document.getElementById('cli-tipo').value,obs:document.getElementById('cli-obs').value.trim()};
+  id?cli.splice(cli.findIndex(c=>c.id===id),1,{...o,id}):cli.push({...o,id:gid2()});
+  save();closeMo('m-cli');renderCli();
+}
+function delCli(id){if(confirm('Excluir este cliente?')){cli=cli.filter(c=>c.id!==id);save();renderCli();}}
+
+// ═══════════════════════════════════════════════════════════════════
+// PROCESSOS
+// ═══════════════════════════════════════════════════════════════════
+function renderProc(){
+  const q=(document.getElementById('proc-q')||{value:''}).value.toLowerCase();
+  const sf=(document.getElementById('proc-sf')||{value:'Todos'}).value;
+  const filt=proc.filter(p=>{const m=!q||p.num.includes(q)||cn(p.cliId).toLowerCase().includes(q);return m&&(sf==='Todos'||p.status===sf);});
+  const p=perm();
+  let html=`<div class="fbar">
+    <input id="proc-q" style="max-width:230px" placeholder="🔍 Número ou cliente..." value="${q}" oninput="renderProc()">
+    <select id="proc-sf" onchange="renderProc()" style="max-width:160px"><option>Todos</option><option>Em andamento</option><option>Finalizado</option><option>Suspenso</option></select>
+    <span style="font-size:11px;color:var(--mu)">${filt.length} processo(s)</span>
+    ${p.e?`<button class="btn bp" onclick="openProcModal()">+ Novo Processo</button>`:''}
+  </div>
+  <div class="card"><div style="font-size:11px;color:var(--mu);margin-bottom:7px">🔴 Atrasado | 🟡 Vence ≤7 dias | 🟢 OK</div>
+  <div class="tw"><table>
+    <thead><tr><th>Nº Processo</th><th>Cliente</th><th>Área</th><th>Vara</th><th>Status</th><th>Início</th><th>Próx. Mov.</th><th>Advogado</th><th>Obs.</th><th>Ações</th></tr></thead>
+    <tbody>${filt.map(r=>`<tr class="${isPast(r.prox)&&r.status==='Em andamento'?'late':''}">
+      <td class="mono">${r.num}</td><td style="font-weight:600;white-space:nowrap">${cn(r.cliId)}</td>
+      <td>${badge(r.tipo,'bb')}</td><td style="font-size:11px">${r.vara}</td>
+      <td>${sbadge(r.status)}</td><td style="font-size:11px;white-space:nowrap">${fmtD(r.ini)}</td>
+      <td style="white-space:nowrap">${dcolor(r.prox,r.status==='Em andamento')}</td>
+      <td style="font-size:11px;white-space:nowrap">${r.adv}</td>
+      <td class="eli" style="font-size:11px;color:var(--mu)">${r.obs||'—'}</td>
+      <td><div style="display:flex;gap:3px">
+        ${r.prox?`<button class="btn bca xs" onclick="addProcToCalendar(${r.id})">📅</button>`:''}
+        <button class="btn bsa xs" onclick="searchProcNum('${r.num}','${r.vara}')">🔍</button>
+        ${p.e?`<button class="btn bgh xs" onclick="editProc(${r.id})">✏️</button>`:''}
+        ${p.del?`<button class="btn bd_ xs" onclick="delProc(${r.id})">🗑️</button>`:''}
+      </div></td></tr>`).join('')}
+    </tbody></table></div></div>`;
+  document.getElementById('admin-cnt').innerHTML=html;
+}
+function openProcModal(id){
+  document.getElementById('proc-id').value=id||'';
+  document.getElementById('m-proc-t').textContent=id?'Editar Processo':'Novo Processo';
+  buildCliSelect('proc-cli',id?(proc.find(x=>x.id===id)||{}).cliId:'');
+  buildAdvSelect('proc-adv',id?(proc.find(x=>x.id===id)||{}).adv:'');
+  if(id){const r=proc.find(x=>x.id===id);['num','vara','obs'].forEach(f=>document.getElementById('proc-'+f).value=r[f]||'');document.getElementById('proc-tipo').value=r.tipo;document.getElementById('proc-status').value=r.status;document.getElementById('proc-ini').value=r.ini||'';document.getElementById('proc-prox').value=r.prox||'';}
+  else{['num','vara','obs'].forEach(f=>document.getElementById('proc-'+f).value='');document.getElementById('proc-ini').value=td0;document.getElementById('proc-prox').value='';document.getElementById('proc-status').value='Em andamento';}
+  openMo('m-proc');
+}
+const editProc=id=>openProcModal(id);
+function saveProc(){
+  const num=document.getElementById('proc-num').value.trim();if(!num)return alert('Informe o número do processo.');
+  const cliId=+document.getElementById('proc-cli').value;if(!cliId)return alert('Selecione o cliente.');
+  const id=+document.getElementById('proc-id').value;
+  const o={num,cliId,tipo:document.getElementById('proc-tipo').value,vara:document.getElementById('proc-vara').value.trim(),status:document.getElementById('proc-status').value,ini:document.getElementById('proc-ini').value,prox:document.getElementById('proc-prox').value,adv:document.getElementById('proc-adv').value,obs:document.getElementById('proc-obs').value.trim()};
+  id?proc.splice(proc.findIndex(p=>p.id===id),1,{...o,id}):proc.push({...o,id:gid2()});
+  save();closeMo('m-proc');renderProc();
+}
+function delProc(id){if(confirm('Excluir este processo?')){proc=proc.filter(p=>p.id!==id);save();renderProc();}}
+function addProcToCalendar(id){const r=proc.find(p=>p.id===id);if(!r||!r.prox)return;window.open(gcalUrl('⚖️ Movimentação: '+r.num.substring(0,20),r.prox,r.prox,'Processo: '+r.num+'\nCliente: '+cn(r.cliId)+'\nAdvogado: '+r.adv,r.vara),'_blank');}
+function searchProcNum(num,vara){
+  const t=vara.toLowerCase();let url;
+  if(t.includes('tjrj')||t.includes('vara')||t.includes('jec'))url='https://www3.tjrj.jus.br/consultaprocessual/#/consultapornumero?numProcesso='+encodeURIComponent(num);
+  else if(t.includes('trf'))url='https://portal.trf2.jus.br/portal/processo/consulta?numprocesso='+encodeURIComponent(num);
+  else if(t.includes('tst'))url='https://consultaprocessual.tst.jus.br/consultaProcessual/servlet/consulta?consulta=avancada&numeroInt='+encodeURIComponent(num);
+  else url='https://www.cnj.jus.br/pjecnj/ConsultaPublica/listView.seam?numero='+encodeURIComponent(num);
+  window.open(url,'_blank');
+}
+
+// ═══════════════════════════════════════════════════════════════════
+// TAREFAS
+// ═══════════════════════════════════════════════════════════════════
+const TAR_FILS=['Todas','Hoje','Atrasadas','Pendentes','Concluídas'];
+function renderTar(){
+  const q=(document.getElementById('tar-q')||{value:''}).value.toLowerCase();
+  const filt=tar.filter(t=>{
+    const m=!q||t.desc.toLowerCase().includes(q)||cn(t.cliId).toLowerCase().includes(q);
+    const f=tarFil==='Todas'||(tarFil==='Hoje'&&t.data===td0)||(tarFil==='Atrasadas'&&t.data<td0&&!t.ok)||(tarFil==='Pendentes'&&!t.ok)||(tarFil==='Concluídas'&&t.ok);
+    return m&&f;
+  }).sort((a,b)=>a.data.localeCompare(b.data));
+  const p=perm();
+  let html=`<div class="fbar">
+    <input id="tar-q" style="max-width:220px" placeholder="🔍 Buscar tarefa..." value="${q}" oninput="renderTar()">
+    <div style="display:flex;gap:4px;flex-wrap:wrap">${TAR_FILS.map(f=>`<button class="btn ${f===tarFil?'bp':'bgh'} bsm" onclick="setTarF('${f}')">${f}</button>`).join('')}</div>
+    ${p.e?`<button class="btn bp" onclick="openTarModal()">+ Nova Tarefa</button>`:''}
+  </div>
+  <div class="card"><div class="tw"><table>
+    <thead><tr><th>✓</th><th>Data</th><th>Descrição</th><th>Cliente</th><th>Prioridade</th><th>Status</th><th>Responsável</th><th>Ações</th></tr></thead>
+    <tbody>${filt.map(t=>`<tr class="${!t.ok&&isPast(t.data)?'late':''}" style="opacity:${t.ok?.55:1}">
+      <td><input type="checkbox" ${t.ok?'checked':''} onchange="togTar(${t.id})"></td>
+      <td style="white-space:nowrap;font-size:11px" class="${!t.ok?(isPast(t.data)?'dr':t.data===td0?'dy':''):''}">
+        ${!t.ok&&isPast(t.data)?'🔴 ':!t.ok&&t.data===td0?'📌 ':''}${fmtD(t.data)}</td>
+      <td>${t.ok?`<s style="color:var(--mu)">${t.desc}</s>`:t.desc}</td>
+      <td style="white-space:nowrap;font-size:11px">${cn(t.cliId)}</td>
+      <td>${pbadge(t.prio)}</td><td>${sbadge(t.status)}</td>
+      <td style="font-size:11px;white-space:nowrap">${t.resp}</td>
+      <td><div style="display:flex;gap:3px">
+        <button class="btn bca xs" onclick="addToCalendar(${t.id})">📅</button>
+        ${p.e?`<button class="btn bgh xs" onclick="editTar(${t.id})">✏️</button>`:''}
+        ${p.del?`<button class="btn bd_ xs" onclick="delTar(${t.id})">🗑️</button>`:''}
+      </div></td></tr>`).join('')}
+    </tbody></table></div></div>`;
+  document.getElementById('admin-cnt').innerHTML=html;
+}
+function setTarF(f){tarFil=f;renderTar();}
+function togTar(id){const i=tar.findIndex(t=>t.id===id);tar[i].ok=!tar[i].ok;tar[i].status=tar[i].ok?'Concluído':'Pendente';save();renderTar();}
+function updTarProc(){const cId=+document.getElementById('tar-cli').value;const s=document.getElementById('tar-proc');s.innerHTML='<option value="">— Selecionar —</option>'+proc.filter(p=>!cId||p.cliId===cId).map(p=>`<option value="${p.id}">${p.num.substring(0,28)}…</option>`).join('');}
+function openTarModal(id){
+  document.getElementById('tar-id').value=id||'';
+  document.getElementById('m-tar-t').textContent=id?'Editar Tarefa':'Nova Tarefa';
+  document.getElementById('tar-resp').innerHTML='<option value="">— Selecionar —</option>'+users.filter(u=>u.ativo).map(u=>`<option value="${u.nome}">${u.nome}</option>`).join('');
+  buildCliSelect('tar-cli',id?(tar.find(x=>x.id===id)||{}).cliId:'');
+  if(id){const t=tar.find(x=>x.id===id);document.getElementById('tar-data').value=t.data;document.getElementById('tar-desc').value=t.desc;document.getElementById('tar-prio').value=t.prio;document.getElementById('tar-status').value=t.status;document.getElementById('tar-local').value=t.local||'';document.getElementById('tar-resp').value=t.resp;setTimeout(()=>{updTarProc();document.getElementById('tar-proc').value=t.procId||'';},50);}
+  else{document.getElementById('tar-data').value=td0;['desc','local'].forEach(f=>document.getElementById('tar-'+f).value='');document.getElementById('tar-prio').value='Alta';document.getElementById('tar-status').value='Pendente';document.getElementById('tar-resp').value=currentUser.nome;document.getElementById('tar-proc').innerHTML='<option value="">— Selecionar —</option>';}
+  openMo('m-tar');
+}
+const editTar=id=>openTarModal(id);
+function saveTar(openCal){
+  const desc=document.getElementById('tar-desc').value.trim();if(!desc)return alert('Informe a descrição.');
+  const id=+document.getElementById('tar-id').value;
+  const o={data:document.getElementById('tar-data').value,desc,cliId:+document.getElementById('tar-cli').value||'',procId:+document.getElementById('tar-proc').value||'',prio:document.getElementById('tar-prio').value,status:document.getElementById('tar-status').value,resp:document.getElementById('tar-resp').value,local:document.getElementById('tar-local').value.trim(),ok:document.getElementById('tar-status').value==='Concluído'};
+  id?tar.splice(tar.findIndex(t=>t.id===id),1,{...o,id}):tar.push({...o,id:gid2()});
+  save();closeMo('m-tar');renderTar();
+  if(openCal&&o.data)window.open(gcalUrl(o.desc,o.data,o.data,'Responsável: '+o.resp+(o.procId?'\nProcesso: '+proc.find(p=>p.id===o.procId)?.num:''),o.local),'_blank');
+}
+function calFromTar(){saveTar(true);}
+function delTar(id){if(confirm('Excluir esta tarefa?')){tar=tar.filter(t=>t.id!==id);save();renderTar();}}
+function addToCalendar(id){const t=tar.find(x=>x.id===id);if(!t)return;window.open(gcalUrl(t.desc,t.data,t.data,'Responsável: '+t.resp+(t.procId?'\nProcesso: '+proc.find(p=>p.id===t.procId)?.num:''),t.local),'_blank');}
+
+// ═══════════════════════════════════════════════════════════════════
+// SEMANA
+// ═══════════════════════════════════════════════════════════════════
+function renderSem(){
+  const tot=tar.filter(t=>t.data>=td0&&t.data<=dt(7)).length;
+  const ok=tar.filter(t=>t.data>=td0&&t.data<=dt(7)&&t.ok).length;
+  const pct=tot>0?Math.round(ok/tot*100):0;
+  let html=`<div class="krow">${kc('#eff6ff',tot,'#2563eb','Tarefas')}${kc('#f0fdf4',ok,'#16a34a','Concluídas')}${kc('#faf5ff',tot-ok,'#7c3aed','Pendentes')}${kc('#f8fafc',pct+'%',pct>70?'#16a34a':pct>40?'#d97706':'#dc2626','Produtividade')}</div>`;
+  html+=`<div class="card" style="margin-bottom:13px"><div style="display:flex;justify-content:space-between;font-size:12px;margin-bottom:5px"><span style="font-weight:700">Progresso da Semana</span><span style="color:var(--mu)">${ok}/${tot}</span></div><div class="pb"><div class="pf" style="width:${pct}%;background:${pct>70?'#16a34a':pct>40?'#d97706':'#ef4444'}"></div></div></div>`;
+  const days=Array.from({length:7},(_,i)=>{const d=new Date();d.setDate(d.getDate()+i);const ds=d.toISOString().split('T')[0];return{ds,lbl:d.toLocaleDateString('pt-BR',{weekday:'short',day:'2-digit',month:'short'}),tasks:tar.filter(t=>t.data===ds),isT:i===0};});
+  html+=`<div class="wgrid">${days.map(({ds,lbl,tasks,isT})=>`<div class="wcard ${isT?'tod':''}"><div class="wday" style="color:${isT?'#2563eb':'var(--tx)'}">📌 ${isT?'HOJE — ':''}${lbl}</div>${!tasks.length?`<div style="color:var(--mu);font-size:11px;font-style:italic">Sem tarefas</div>`:tasks.map(t=>`<div class="titem"><input type="checkbox" ${t.ok?'checked':''} onchange="togTar(${t.id})"><div style="flex:1"><div style="${t.ok?'text-decoration:line-through;color:var(--mu);':''}font-size:11px;font-weight:600">${t.desc}</div><div style="color:var(--mu);font-size:10px">${cn(t.cliId)}</div></div></div>`).join('')}</div>`).join('')}</div>`;
+  document.getElementById('admin-cnt').innerHTML=html;
+}
+
+// ═══════════════════════════════════════════════════════════════════
+// CALENDÁRIO MENSAL (gestão)
+// ═══════════════════════════════════════════════════════════════════
+function renderCal(){
+  const mn=new Date(calYB,calMB).toLocaleDateString('pt-BR',{month:'long',year:'numeric'});
+  const fd=new Date(calYB,calMB,1).getDay(),dim=new Date(calYB,calMB+1,0).getDate();
+  const tbD={},pxD={};
+  tar.forEach(t=>{const d=new Date(t.data+'T00:00:00');if(d.getMonth()===calMB&&d.getFullYear()===calYB){const k=d.getDate();if(!tbD[k])tbD[k]=[];tbD[k].push(t);}});
+  proc.forEach(r=>{if(!r.prox)return;const d=new Date(r.prox+'T00:00:00');if(d.getMonth()===calMB&&d.getFullYear()===calYB){const k=d.getDate();if(!pxD[k])pxD[k]=[];pxD[k].push(r);}});
+  const cells=[...Array(fd).fill(null),...Array.from({length:dim},(_,i)=>i+1)];
+  const todD=new Date().getDate(),isCM=calMB===new Date().getMonth()&&calYB===new Date().getFullYear();
+  let html=`<div style="display:flex;align-items:center;gap:9px;margin-bottom:12px"><button class="btn bgh" onclick="calPrev()">◀</button><h3 style="flex:1;text-align:center;font-size:14px;font-weight:700;text-transform:capitalize">${mn}</h3><button class="btn bgh" onclick="calNext()">▶</button></div>`;
+  html+=`<div class="card"><div class="cgrid">${['Dom','Seg','Ter','Qua','Qui','Sex','Sáb'].map(d=>`<div style="text-align:center;padding:4px;font-size:10px;font-weight:700;color:var(--mu)">${d}</div>`).join('')}</div><div class="cgrid" style="margin-top:2px">${cells.map(day=>{if(!day)return'<div></div>';const ts=tbD[day]||[],ps=pxD[day]||[],isT=isCM&&day===todD;return`<div class="cday-full ${isT?'tod':ps.length?'hdl':''}"><div style="font-size:11px;font-weight:${isT?'700':'400'};color:${isT?'#2563eb':'var(--tx)'};">${day}</div>${ts.slice(0,2).map(t=>`<div class="cdot ${t.ok?'dot-ok':t.prio==='Alta'?'dot-a':'dot-m'}">${t.ok?'✓ ':'• '}${t.desc.substring(0,13)}</div>`).join('')}${ps.slice(0,1).map(p=>`<div class="cdot dot-p">⚖️ ${p.tipo}</div>`).join('')}</div>`;}).join('')}</div></div>`;
+  html+=`<div class="card" style="font-size:11px;color:var(--mu);display:flex;gap:12px;flex-wrap:wrap"><span style="color:#2563eb">🔵 Hoje</span><span style="color:#b91c1c">🔴 Alta prioridade</span><span style="color:#b45309">🟡 Média</span><span style="color:#15803d">✓ Concluída</span><span style="color:#92400e">⚖️ Movimentação</span></div>`;
+  document.getElementById('admin-cnt').innerHTML=html;
+}
+function calPrev(){if(calMB===0){calMB=11;calYB--;}else calMB--;renderCal();}
+function calNext(){if(calMB===11){calMB=0;calYB++;}else calMB++;renderCal();}
+
+// ═══════════════════════════════════════════════════════════════════
+// FINANCEIRO
+// ═══════════════════════════════════════════════════════════════════
+function renderFin(){
+  const p=perm();if(!p.fin&&!p.e){document.getElementById('admin-cnt').innerHTML='<div class="card"><p style="color:var(--mu)">Acesso restrito ao módulo financeiro.</p></div>';return;}
+  const q=(document.getElementById('fin-q')||{value:''}).value.toLowerCase();
+  const filt=fin.filter(f=>!q||f.desc.toLowerCase().includes(q)||cn(f.cliId).toLowerCase().includes(q));
+  const totC=fin.reduce((s,f)=>s+(+f.ct||0),0),totR=fin.reduce((s,f)=>s+(+f.rc||0),0),totP=totC-totR;
+  let html=`<div class="krow">${kc('#eff6ff',fmt(totC),'#2563eb','Total Contratado')}${kc('#f0fdf4',fmt(totR),'#16a34a','Total Recebido')}${kc(totP>0?'#fef2f2':'#f8fafc',fmt(totP),totP>0?'#dc2626':'#94a3b8','A Receber')}${kc('#faf5ff',(totC>0?Math.round(totR/totC*100):0)+'%','#7c3aed','Taxa Recebimento')}</div>`;
+  html+=`<div class="fbar"><input id="fin-q" style="max-width:240px" placeholder="🔍 Buscar..." value="${q}" oninput="renderFin()">${p.e?`<button class="btn bp" onclick="openFinModal()">+ Novo Lançamento</button>`:''}</div>`;
+  html+=`<div class="card"><div class="tw"><table><thead><tr><th>Cliente</th><th>Descrição</th><th>Data</th><th>Contratado</th><th>Recebido</th><th>Pendente</th><th>Pagamento</th><th>Status</th>${p.e?'<th>Ações</th>':''}</tr></thead><tbody>${filt.map(f=>{const pen=(+f.ct||0)-(+f.rc||0);return`<tr><td style="font-weight:600;white-space:nowrap">${cn(f.cliId)}</td><td>${f.desc}</td><td style="white-space:nowrap;font-size:11px">${fmtD(f.data)}</td><td style="font-weight:600;white-space:nowrap">${fmt(f.ct||0)}</td><td style="color:#16a34a;font-weight:600;white-space:nowrap">${fmt(f.rc||0)}</td><td style="color:${pen>0?'#dc2626':'#16a34a'};font-weight:600;white-space:nowrap">${fmt(pen)}</td><td>${f.pg}</td><td>${fsbadge(f.st)}</td>${p.e?`<td><div style="display:flex;gap:3px"><button class="btn bgh xs" onclick="editFin(${f.id})">✏️</button>${p.del?`<button class="btn bd_ xs" onclick="delFin(${f.id})">🗑️</button>`:''}</div></td>`:''}</tr>`;}).join('')}<tr style="background:#f1f5f9;font-weight:700"><td colspan="3">TOTAIS</td><td style="color:#2563eb;white-space:nowrap">${fmt(totC)}</td><td style="color:#16a34a;white-space:nowrap">${fmt(totR)}</td><td style="color:${totP>0?'#dc2626':'#16a34a'};white-space:nowrap">${fmt(totP)}</td><td colspan="${p.e?3:2}"></td></tr></tbody></table></div></div>`;
+  document.getElementById('admin-cnt').innerHTML=html;
+}
+function openFinModal(id){
+  document.getElementById('fin-id').value=id||'';
+  document.getElementById('m-fin-t').textContent=id?'Editar Lançamento':'Novo Lançamento';
+  buildCliSelect('fin-cli',id?(fin.find(x=>x.id===id)||{}).cliId:'');
+  if(id){const f=fin.find(x=>x.id===id);document.getElementById('fin-desc').value=f.desc;document.getElementById('fin-data').value=f.data||'';document.getElementById('fin-ct').value=f.ct||0;document.getElementById('fin-rc').value=f.rc||0;document.getElementById('fin-pg').value=f.pg;document.getElementById('fin-st').value=f.st;}
+  else{document.getElementById('fin-desc').value='';document.getElementById('fin-data').value=td0;document.getElementById('fin-ct').value=0;document.getElementById('fin-rc').value=0;document.getElementById('fin-pg').value='PIX';document.getElementById('fin-st').value='Pendente';}
+  openMo('m-fin');
+}
+const editFin=id=>openFinModal(id);
+function saveFin(){
+  const desc=document.getElementById('fin-desc').value.trim();const cliId=+document.getElementById('fin-cli').value;
+  if(!desc||!cliId)return alert('Preencha cliente e descrição.');
+  const id=+document.getElementById('fin-id').value;
+  const o={cliId,desc,ct:+document.getElementById('fin-ct').value||0,rc:+document.getElementById('fin-rc').value||0,pg:document.getElementById('fin-pg').value,st:document.getElementById('fin-st').value,data:document.getElementById('fin-data').value};
+  id?fin.splice(fin.findIndex(f=>f.id===id),1,{...o,id}):fin.push({...o,id:gid2()});
+  save();closeMo('m-fin');renderFin();
+}
+function delFin(id){if(confirm('Excluir este lançamento?')){fin=fin.filter(f=>f.id!==id);save();renderFin();}}
+
+// ═══════════════════════════════════════════════════════════════════
+// COMUNICAÇÕES
+// ═══════════════════════════════════════════════════════════════════
+const WA_TPLS={
+  audiencia:n=>`Prezado(a) ${n},\n\nLembramos que sua audiência está agendada em nosso escritório. Por favor, confirme sua presença ou entre em contato.\n\n*Souza Advocacia*\n📞 (21) 99752-9727`,
+  prazo:n=>`Prezado(a) ${n},\n\nInformamos que há um prazo processual importante se aproximando em seu processo. Entre em contato com urgência.\n\n*Souza Advocacia*\n📞 (21) 99752-9727`,
+  docs:n=>`Prezado(a) ${n},\n\nPrecisamos de alguns documentos para dar continuidade ao seu processo. Entre em contato para obter a lista completa.\n\n*Souza Advocacia*\n📞 (21) 99752-9727`,
+  cobranca:n=>`Prezado(a) ${n},\n\nHá honorários advocatícios pendentes em aberto. Por favor, entre em contato para regularização.\n\n*Souza Advocacia*\n📞 (21) 99752-9727`,
+  update:n=>`Prezado(a) ${n},\n\nTemos novidades sobre o andamento do seu processo. Entre em contato para uma atualização completa.\n\n*Souza Advocacia*\n📞 (21) 99752-9727`,
+};
+const EMAIL_TPLS={
+  audiencia:{sub:'Lembrete de Audiência — Souza Advocacia',body:n=>`Prezado(a) ${n},\n\nEste é um lembrete referente à audiência agendada no seu processo.\n\nAtenciosamente,\nSouza Advocacia\nOAB/RJ 250.430 · 160.689\n(21) 99752-9727 | souzaadvogadosa@gmail.com`},
+  prazo:{sub:'Alerta de Prazo Processual — Souza Advocacia',body:n=>`Prezado(a) ${n},\n\nInformamos que há um prazo processual importante se aproximando em seu processo. Entre em contato com urgência.\n\nAtenciosamente,\nSouza Advocacia`},
+  docs:{sub:'Solicitação de Documentos — Souza Advocacia',body:n=>`Prezado(a) ${n},\n\nPara dar continuidade ao seu processo, necessitamos que nos envie alguns documentos.\n\nAtenciosamente,\nSouza Advocacia`},
+  cobranca:{sub:'Honorários Advocatícios Pendentes — Souza Advocacia',body:n=>`Prezado(a) ${n},\n\nHá honorários advocatícios em aberto. Solicitamos a regularização.\n\nAtenciosamente,\nSouza Advocacia`},
+  update:{sub:'Atualização do Seu Processo — Souza Advocacia',body:n=>`Prezado(a) ${n},\n\nTemos novidades sobre o andamento do seu processo. Por favor, entre em contato.\n\nAtenciosamente,\nSouza Advocacia`},
+};
+function renderCom(){
+  let html=`<div class="ccrow">
+  <div class="card cc">
+    <div class="stitle">📱 WhatsApp em Massa</div>
+    <select id="wa-group" style="margin-bottom:8px;width:100%"><option value="ativos">Todos os Clientes Ativos</option><option value="novos">Clientes Novos</option><option value="inativos">Clientes Inativos</option></select>
+    <select id="wa-tpl-mass" style="margin-bottom:8px;width:100%"><option value="audiencia">Lembrete de Audiência</option><option value="prazo">Prazo Processual</option><option value="docs">Solicitar Documentos</option><option value="cobranca">Cobrança de Honorários</option><option value="update">Atualização do Processo</option></select>
+    <button class="btn bwa" style="width:100%" onclick="openWAMass()">📱 Gerar Links WhatsApp</button>
+    <div id="wa-mass-list" style="margin-top:10px"></div>
+  </div>
+  <div class="card cc">
+    <div class="stitle">✉️ E-mail em Massa</div>
+    <select id="email-group" style="margin-bottom:8px;width:100%"><option value="ativos">Todos os Clientes Ativos</option><option value="novos">Clientes Novos</option><option value="inativos">Clientes Inativos</option></select>
+    <select id="email-tpl-mass" style="margin-bottom:8px;width:100%"><option value="audiencia">Notificação de Audiência</option><option value="prazo">Alerta de Prazo</option><option value="docs">Solicitação de Documentos</option><option value="cobranca">Cobrança de Honorários</option><option value="update">Atualização Processual</option></select>
+    <button class="btn bma" style="width:100%" onclick="openEmailMass()">✉️ Abrir E-mail em Massa</button>
+  </div>
+  <div class="card cc">
+    <div class="stitle">📅 Google Agenda</div>
+    <button class="btn bca" style="width:100%;margin-bottom:7px" onclick="exportAllCal()">📅 Exportar tarefas (.ics)</button>
+    <button class="btn bca" style="width:100%;margin-bottom:7px" onclick="exportPrazos()">⚖️ Exportar prazos (.ics)</button>
+    <div style="font-size:11px;color:var(--mu);margin-top:8px;padding:8px;background:#f8fafc;border-radius:8px"><strong>Como usar:</strong><br>1. Clique exportar<br>2. Google Agenda → Outros calendários → Importar</div>
+  </div>
+  </div>
+  <div class="card"><div class="stitle">📋 Comunicações Individuais</div>
+  <div class="tw"><table><thead><tr><th>Cliente</th><th>Telefone</th><th>E-mail</th><th>Tipo</th><th>WhatsApp</th><th>E-mail</th></tr></thead><tbody>${cli.map(c=>`<tr><td style="font-weight:600">${c.nome}</td><td>${c.tel||'—'}</td><td style="color:#2563eb;font-size:11px">${c.email||'—'}</td><td>${tbadge(c.tipo)}</td><td>${c.tel?`<button class="btn bwa xs" onclick="openWA(${c.id})">📱 WhatsApp</button>`:'—'}</td><td>${c.email?`<button class="btn bma xs" onclick="openEmailModal(${c.id})">✉️ E-mail</button>`:'—'}</td></tr>`).join('')}</tbody></table></div></div>`;
+  document.getElementById('admin-cnt').innerHTML=html;
+}
+function openWA(cliId){waCliId=cliId;const c=cli.find(x=>x.id===cliId);document.getElementById('wa-cliinfo').innerHTML=`<strong>${c.nome}</strong><br>📱 ${c.tel||'Sem telefone cadastrado'}`;document.getElementById('wa-msg').value=WA_TPLS.audiencia(c.nome.split(' ')[0]);openMo('m-wa');}
+function setWAMsg(btn,tpl){const c=cli.find(x=>x.id===waCliId);if(!c)return;document.getElementById('wa-msg').value=WA_TPLS[tpl](c.nome.split(' ')[0]);}
+function sendWA(){const c=cli.find(x=>x.id===waCliId);if(!c||!c.tel)return alert('Cliente sem telefone.');const num='55'+c.tel.replace(/\D/g,'');const msg=encodeURIComponent(document.getElementById('wa-msg').value);window.open(`https://wa.me/${num}?text=${msg}`,'_blank');closeMo('m-wa');}
+function openEmailModal(cliId){emailCliId=cliId;const c=cli.find(x=>x.id===cliId);document.getElementById('email-cliinfo').innerHTML=`<strong>${c.nome}</strong><br>✉️ ${c.email||'Sem e-mail cadastrado'}`;setEmailTpl('audiencia');openMo('m-email');}
+function setEmailTpl(tpl){const c=cli.find(x=>x.id===emailCliId);if(!c)return;const t=EMAIL_TPLS[tpl];document.getElementById('email-sub').value=t.sub;document.getElementById('email-body').value=t.body(c.nome.split(' ')[0]);}
+function sendEmail(){const c=cli.find(x=>x.id===emailCliId);if(!c||!c.email)return alert('Cliente sem e-mail.');const sub=encodeURIComponent(document.getElementById('email-sub').value);const body=encodeURIComponent(document.getElementById('email-body').value);window.location.href=`mailto:${c.email}?subject=${sub}&body=${body}`;closeMo('m-email');}
+function openWAMass(){const grp=document.getElementById('wa-group').value;const tpl=document.getElementById('wa-tpl-mass').value;const filt=cli.filter(c=>grp==='ativos'?c.tipo==='Ativo':grp==='novos'?c.tipo==='Novo':c.tipo==='Inativo');let html='';filt.forEach(c=>{if(!c.tel)return;const num='55'+c.tel.replace(/\D/g,'');const msg=encodeURIComponent(WA_TPLS[tpl](c.nome.split(' ')[0]));html+=`<div style="display:flex;align-items:center;justify-content:space-between;padding:5px 0;border-bottom:1px solid var(--bd);font-size:12px"><span>${c.nome}</span><a href="https://wa.me/${num}?text=${msg}" target="_blank" class="btn bwa xs">📱</a></div>`;});document.getElementById('wa-mass-list').innerHTML=html||'<p style="color:var(--mu);font-size:11px">Nenhum cliente com telefone neste grupo.</p>';}
+function openEmailMass(){const grp=document.getElementById('email-group').value;const tpl=document.getElementById('email-tpl-mass').value;const filt=cli.filter(c=>(grp==='ativos'?c.tipo==='Ativo':grp==='novos'?c.tipo==='Novo':c.tipo==='Inativo')&&c.email);if(!filt.length)return alert('Nenhum cliente com e-mail neste grupo.');const emails=filt.map(c=>c.email).join(',');const t=EMAIL_TPLS[tpl];window.location.href=`mailto:${emails}?subject=${encodeURIComponent(t.sub)}&body=${encodeURIComponent(t.body('Prezado(a)'))}` ;}
+function exportAllCal(){let events='BEGIN:VCALENDAR\nVERSION:2.0\nPRODID:-//Souza Advocacia//PT\n';tar.filter(t=>!t.ok&&t.data>=td0).forEach(t=>{const s=t.data.replace(/-/g,'')+'T090000Z';events+=`BEGIN:VEVENT\nDTSTART:${s}\nDTEND:${s.replace('090000','100000')}\nSUMMARY:${t.desc}\nDESCRIPTION:Cliente: ${cn(t.cliId)} | Resp: ${t.resp}\nLOCATION:${t.local||''}\nEND:VEVENT\n`;});events+='END:VCALENDAR';const b=new Blob([events],{type:'text/calendar'});const a=document.createElement('a');a.href=URL.createObjectURL(b);a.download='tarefas_souza.ics';a.click();}
+function exportPrazos(){let events='BEGIN:VCALENDAR\nVERSION:2.0\nPRODID:-//Souza Advocacia//PT\n';proc.filter(p=>p.prox&&p.prox>=td0&&p.status==='Em andamento').forEach(p=>{const s=p.prox.replace(/-/g,'')+'T090000Z';events+=`BEGIN:VEVENT\nDTSTART:${s}\nDTEND:${s.replace('090000','100000')}\nSUMMARY:⚖️ Movimentação: ${p.num.substring(0,20)}\nDESCRIPTION:Processo: ${p.num} | Cliente: ${cn(p.cliId)} | Adv: ${p.adv}\nLOCATION:${p.vara||''}\nEND:VEVENT\n`;});events+='END:VCALENDAR';const b=new Blob([events],{type:'text/calendar'});const a=document.createElement('a');a.href=URL.createObjectURL(b);a.download='prazos_souza.ics';a.click();}
+
+// ═══════════════════════════════════════════════════════════════════
+// AGENDA HOJE (agendamentos)
+// ═══════════════════════════════════════════════════════════════════
+function renderAgenda(){
+  const tb=bk.filter(b=>b.data===td0).sort((a,b_)=>a.hora.localeCompare(b_.hora));
+  const pen=bk.filter(b=>b.status==='solicitado');
+  const now=new Date(),nowM=(now.getHours()-10)*60+now.getMinutes();
+  let h=`<div class="sgrid">
+    <div class="sc2"><div class="sn" style="color:var(--n)">${tb.length}</div><div class="sl">Hoje</div></div>
+    <div class="sc2"><div class="sn" style="color:var(--am)">${pen.length}</div><div class="sl">Pendentes</div></div>
+    <div class="sc2"><div class="sn" style="color:var(--gr)">${bk.filter(b=>b.status==='confirmado').length}</div><div class="sl">Confirmados</div></div>
+    <div class="sc2"><div class="sn" style="color:var(--gd)">${bk.filter(b=>b.status==='contratado').length}</div><div class="sl">Convertidos</div></div>
+  </div>`;
+  if(pen.length)h+=`<div class="al al-warn">⚠️ <strong>${pen.length}</strong> agendamento(s) aguardando confirmação.</div>`;
+  h+=`<div class="stit">Agenda de Hoje — ${fdl(td0)}</div><div class="card" style="padding:11px"><div class="tl">`;
+  if(now.getHours()>=10&&now.getHours()<18)h+=`<div class="tlnow" style="top:${nowM}px"></div>`;
+  for(let hr=10;hr<=17;hr++){
+    const hs=String(hr).padStart(2,'0')+':00';
+    const slB=tb.filter(b=>+b.hora.split(':')[0]===hr);
+    h+=`<div class="tlh"><div class="tll">${hs}</div>`;
+    if(slB.length)slB.forEach(b=>{const[,bm]=b.hora.split(':').map(Number),top=bm;h+=`<div class="tls" style="top:${top}px;height:${BT[b.type].d-3}px;background:${TC[b.type]}18;border-left:3px solid ${TC[b.type]}" onclick="showDet('${b.id}')"><strong>${b.nome}</strong> · ${b.hora} · ${bdg(b.status)}</div>`;});
+    h+=`</div>`;
+  }
+  h+=`</div></div>`;
+  if(!tb.length)h+=`<div class="al al-info">Nenhum atendimento agendado para hoje.</div>`;
+  const up=bk.filter(b=>b.data>td0&&b.status!=='cancelado').sort((a,b_)=>a.data.localeCompare(b_.data)||a.hora.localeCompare(b_.hora)).slice(0,3);
+  if(up.length){h+=`<div class="stit">Próximos</div>`;up.forEach(b=>h+=arw(b));}
+  document.getElementById('admin-cnt').innerHTML=h;
+}
+
+// ═══════════════════════════════════════════════════════════════════
+// CALENDÁRIO DE AGENDAMENTOS
+// ═══════════════════════════════════════════════════════════════════
+function renderAgCal(){
+  const y=calV.getFullYear(),m=calV.getMonth();
+  const mn=new Date(y,m).toLocaleDateString('pt-BR',{month:'long',year:'numeric'});
+  const fd_=new Date(y,m,1).getDay(),dim=new Date(y,m+1,0).getDate();
+  const cells=[...Array(fd_).fill(null),...Array.from({length:dim},(_,i)=>i+1)];
+  let h=`<div class="cnav"><button class="cnb" onclick="acPrev()">‹</button><h3>${mn}</h3><button class="cnb" onclick="acNext()">›</button></div>`;
+  h+=`<div class="cgrid" style="margin-bottom:2px">${['D','S','T','Q','Q','S','S'].map(d=>`<div class="chdr">${d}</div>`).join('')}</div><div class="cgrid">`;
+  cells.forEach(day=>{
+    if(!day){h+=`<div></div>`;return;}
+    const ds=`${y}-${String(m+1).padStart(2,'0')}-${String(day).padStart(2,'0')}`;
+    const db=bk.filter(b=>b.data===ds),isT=ds===td0,isSel=ds===selD;
+    h+=`<div class="cday-full ${isT?'tod':''} ${isSel?'sel':''}" style="cursor:pointer;border:1px solid ${isSel?'var(--g)':'var(--bd)'};background:${isSel?'var(--gb)':''}" onclick="aCalDay('${ds}')"><div style="font-size:11px;font-weight:${isT?'800':'600'};color:${isT?'var(--gd)':'var(--tx)'}">${day}</div>${db.slice(0,2).map(b=>`<div style="font-size:9px;padding:1px 2px;border-radius:3px;background:${TC[b.type]}18;color:${TC[b.type]};overflow:hidden;text-overflow:ellipsis;white-space:nowrap">${BT[b.type].i} ${b.nome.split(' ')[0]}</div>`).join('')}</div>`;
+  });
+  h+=`</div>`;
+  if(selD){const sb=bk.filter(b=>b.data===selD).sort((a,b_)=>a.hora.localeCompare(b_.hora));h+=`<div class="divider"></div><div class="stit">${fdl(selD)}</div>`;if(sb.length)sb.forEach(b=>h+=arw(b));else h+=`<div class="al al-info">Nenhum agendamento nesta data.</div>`;}
+  document.getElementById('admin-cnt').innerHTML=h;
+}
+function acPrev(){if(calV.getMonth()===0){calV=new Date(calV.getFullYear()-1,11,1);}else{calV=new Date(calV.getFullYear(),calV.getMonth()-1,1);}renderAgCal();}
+function acNext(){if(calV.getMonth()===11){calV=new Date(calV.getFullYear()+1,0,1);}else{calV=new Date(calV.getFullYear(),calV.getMonth()+1,1);}renderAgCal();}
+function aCalDay(ds){selD=ds===selD?null:ds;renderAgCal();}
+
+// ═══════════════════════════════════════════════════════════════════
+// KANBAN (agendamentos)
+// ═══════════════════════════════════════════════════════════════════
+function renderKanban(){
+  const cols=[{k:'solicitado'},{k:'confirmado'},{k:'aguardando_docs'},{k:'realizado'},{k:'contratado'},{k:'cancelado'}];
+  let h=`<div style="font-size:11px;color:var(--mu);margin-bottom:8px">Toque no card para ver detalhes e alterar o status.</div><div class="kb">`;
+  cols.forEach(({k})=>{
+    const s=SS[k],col=bk.filter(b=>b.status===k);
+    h+=`<div class="kbc"><div class="kbh" style="background:${s.kb==='#0B1A3B'?'var(--n)':s.kb};color:${s.kb==='#0B1A3B'?'var(--g)':s.kt}">${s.l} <span style="background:rgba(0,0,0,.12);padding:1px 7px;border-radius:10px;font-size:10px">${col.length}</span></div><div class="kbb">`;
+    if(!col.length)h+=`<div style="text-align:center;padding:12px;font-size:11px;color:var(--mu);font-style:italic">Vazio</div>`;
+    col.sort((a,b_)=>a.data.localeCompare(b_.data)).forEach(b=>{h+=`<div class="kbc2" onclick="showDet('${b.id}')"><div style="font-size:11px;font-weight:700;color:var(--n)">${b.nome.split(' ').slice(0,2).join(' ')}</div><div style="font-size:10px;color:var(--mu)">📅 ${fd(b.data)} ⏰ ${b.hora}</div><div style="font-size:10px;color:${TC[b.type]};margin-top:3px">${BT[b.type].i} ${BT[b.type].n}</div></div>`;});
+    h+=`</div></div>`;
+  });
+  h+=`</div>`;
+  document.getElementById('admin-cnt').innerHTML=h;
+}
+
+// ═══════════════════════════════════════════════════════════════════
+// AGENDAMENTOS (lista)
+// ═══════════════════════════════════════════════════════════════════
+function renderAgendamentos(){
+  let filt=bk;
+  if(fSt.q)filt=filt.filter(b=>b.nome.toLowerCase().includes(fSt.q.toLowerCase())||b.area.toLowerCase().includes(fSt.q.toLowerCase())||b.id.includes(fSt.q));
+  if(fSt.status)filt=filt.filter(b=>b.status===fSt.status);
+  if(fSt.type)filt=filt.filter(b=>b.type===fSt.type);
+  if(fSt.dFrom)filt=filt.filter(b=>b.data>=fSt.dFrom);
+  if(fSt.dTo)filt=filt.filter(b=>b.data<=fSt.dTo);
+  filt=filt.sort((a,b_)=>b_.createdAt.localeCompare(a.createdAt));
+  let h=`<div class="fbarx">
+    <div class="fbr"><div class="fbi" style="flex:3"><label>Buscar</label><input type="search" placeholder="Nome, área ou protocolo..." value="${fSt.q}" oninput="fSt.q=this.value;renderAgendamentos()"></div><div class="fbi"><label>Status</label><select onchange="fSt.status=this.value;renderAgendamentos()"><option value="">Todos</option>${Object.entries(SS).map(([k,v])=>`<option value="${k}" ${fSt.status===k?'selected':''}>${v.l}</option>`).join('')}</select></div></div>
+    <div class="fbr"><div class="fbi"><label>Tipo</label><select onchange="fSt.type=this.value;renderAgendamentos()"><option value="">Todos</option>${Object.entries(BT).map(([k,v])=>`<option value="${k}" ${fSt.type===k?'selected':''}>${v.i} ${v.n}</option>`).join('')}</select></div><div class="fbi"><label>De</label><input type="date" value="${fSt.dFrom}" onchange="fSt.dFrom=this.value;renderAgendamentos()"></div><div class="fbi"><label>Até</label><input type="date" value="${fSt.dTo}" onchange="fSt.dTo=this.value;renderAgendamentos()"></div></div>
+    <div style="display:flex;justify-content:space-between;align-items:center;margin-top:6px"><span style="font-size:11px;color:var(--mu)">${filt.length} resultado(s)</span><div style="display:flex;gap:5px"><button class="btn bghost bsm" onclick="fSt={q:'',status:'',type:'',dFrom:'',dTo:''};renderAgendamentos()">🔄 Limpar</button><button class="btn bnav bsm" onclick="expCSV()">📥 CSV</button><button class="btn bblue bsm" onclick="expICS()">📅 ICS</button></div></div>
+  </div>`;
+  if(!filt.length)h+=`<div class="empty"><div class="ei">🔍</div><p>Nenhum resultado encontrado.</p></div>`;
+  else filt.forEach(b=>h+=arw(b));
+  document.getElementById('admin-cnt').innerHTML=h;
+}
+
+// ═══════════════════════════════════════════════════════════════════
+// MÉTRICAS (agendamentos)
+// ═══════════════════════════════════════════════════════════════════
+function renderMetricas(){
+  const tot=bk.length;
+  const bT={},bS={},bA={},bM={};
+  bk.forEach(b=>{bT[b.type]=(bT[b.type]||0)+1;bS[b.status]=(bS[b.status]||0)+1;if(b.area)bA[b.area]=(bA[b.area]||0)+1;bM[b.modal]=(bM[b.modal]||0)+1;});
+  const mxT=Math.max(1,...Object.values(bT)),mxA=Math.max(1,...Object.values(bA));
+  const mmap={videoconferencia:'📹 Videoconf.',ligacao:'📞 Ligação',whatsapp:'💬 WhatsApp'};
+  let h=`<div class="sgrid"><div class="sc2"><div class="sn" style="color:var(--n)">${tot}</div><div class="sl">Total</div></div><div class="sc2"><div class="sn" style="color:var(--gr)">${Math.round((bS.contratado||0)/Math.max(1,tot)*100)}%</div><div class="sl">Conversão</div></div><div class="sc2"><div class="sn" style="color:var(--re)">${Math.round((bS.cancelado||0)/Math.max(1,tot)*100)}%</div><div class="sl">Cancelamento</div></div><div class="sc2"><div class="sn" style="color:var(--gd)">${bk.filter(b=>b.data===td0).length}</div><div class="sl">Hoje</div></div></div>`;
+  h+=`<div class="card"><div class="stit">Tipos de Atendimento</div>${Object.entries(bT).sort((a,b_)=>b_[1]-a[1]).map(([k,v])=>`<div class="br2"><div class="bl2">${BT[k].i} ${BT[k].n.split(' ')[0]}</div><div class="bt"><div class="bf" style="width:${Math.round(v/mxT*100)}%;background:linear-gradient(90deg,${TC[k]},${TC[k]}aa)">${v}</div></div></div>`).join('')}</div>`;
+  h+=`<div class="card"><div class="stit">Status dos Agendamentos</div>${Object.entries(bS).sort((a,b_)=>b_[1]-a[1]).map(([k,v])=>`<div class="br2"><div class="bl2">${SS[k]?.l||k}</div><div class="bt"><div class="bf" style="width:${Math.round(v/Math.max(1,tot)*100)}%">${v}</div></div></div>`).join('')}</div>`;
+  h+=`<div class="card"><div class="stit">Áreas Jurídicas</div>${Object.entries(bA).sort((a,b_)=>b_[1]-a[1]).slice(0,6).map(([k,v])=>`<div class="br2"><div class="bl2" title="${k}">${k.replace('Direito ','')}</div><div class="bt"><div class="bf" style="width:${Math.round(v/mxA*100)}%">${v}</div></div></div>`).join('')}</div>`;
+  h+=`<div class="card"><div class="stit">Modalidade</div>${Object.entries(bM).map(([k,v])=>`<div class="br2"><div class="bl2">${mmap[k]||k}</div><div class="bt"><div class="bf" style="width:${Math.round(v/Math.max(1,tot)*100)}%">${v}</div></div></div>`).join('')}</div>`;
+  document.getElementById('admin-cnt').innerHTML=h;
+}
+
+// ═══════════════════════════════════════════════════════════════════
+// BUSCA PROCESSUAL — DATAJUD API PÚBLICA CNJ (Resolução CNJ 331/2020)
+// ═══════════════════════════════════════════════════════════════════
+
+// ── Configuração ──────────────────────────────────────────────────
+const DATAJUD_KEY  = 'cDZHYzlZa0JadVREZDJCendQbXY6SkJlTzNjLV9TRENyQk1RdnFKZGRQdw==';
+const DATAJUD_BASE = 'https://api-publica.datajud.cnj.jus.br/';
+
+// ── Mapa tribunal → alias endpoint ────────────────────────────────
+const DJ_ENDPOINTS = {
+  // Estaduais
+  tjac:'api_publica_tjac', tjal:'api_publica_tjal', tjam:'api_publica_tjam',
+  tjap:'api_publica_tjap', tjba:'api_publica_tjba', tjce:'api_publica_tjce',
+  tjdft:'api_publica_tjdft', tjes:'api_publica_tjes', tjgo:'api_publica_tjgo',
+  tjma:'api_publica_tjma', tjmg:'api_publica_tjmg', tjms:'api_publica_tjms',
+  tjmt:'api_publica_tjmt', tjpa:'api_publica_tjpa', tjpb:'api_publica_tjpb',
+  tjpr:'api_publica_tjpr', tjpe:'api_publica_tjpe', tjpi:'api_publica_tjpi',
+  tjrj:'api_publica_tjrj', tjrn:'api_publica_tjrn', tjrs:'api_publica_tjrs',
+  tjro:'api_publica_tjro', tjrr:'api_publica_tjrr', tjsc:'api_publica_tjsc',
+  tjse:'api_publica_tjse', tjsp:'api_publica_tjsp', tjto:'api_publica_tjto',
+  // Federais
+  trf1:'api_publica_trf1', trf2:'api_publica_trf2', trf3:'api_publica_trf3',
+  trf4:'api_publica_trf4', trf5:'api_publica_trf5', trf6:'api_publica_trf6',
+  // Trabalho
+  trt1:'api_publica_trt1',   trt2:'api_publica_trt2',   trt3:'api_publica_trt3',
+  trt4:'api_publica_trt4',   trt5:'api_publica_trt5',   trt6:'api_publica_trt6',
+  trt7:'api_publica_trt7',   trt8:'api_publica_trt8',   trt9:'api_publica_trt9',
+  trt10:'api_publica_trt10', trt11:'api_publica_trt11', trt12:'api_publica_trt12',
+  trt13:'api_publica_trt13', trt14:'api_publica_trt14', trt15:'api_publica_trt15',
+  trt16:'api_publica_trt16', trt17:'api_publica_trt17', trt18:'api_publica_trt18',
+  trt19:'api_publica_trt19', trt20:'api_publica_trt20', trt21:'api_publica_trt21',
+  trt22:'api_publica_trt22', trt23:'api_publica_trt23', trt24:'api_publica_trt24',
+  // Superiores / Eleitorais / Militar
+  tst:'api_publica_tst', stj:'api_publica_stj', tse:'api_publica_tse', stm:'api_publica_stm',
+  'tre-rj':'api_publica_tre-rj', 'tre-sp':'api_publica_tre-sp',
+};
+
+// ── Auto-detecção do tribunal pelo número CNJ ──────────────────────
+// Estrutura: NNNNNNN DD AAAA J TT OOOO  (20 dígitos sem formatação)
+// Posição 13 = segmento de justiça; 14-15 = código do tribunal
+function detectTribunalCNJ(num) {
+  const d = num.replace(/\D/g,'');
+  if (d.length !== 20) return null;
+  const seg = d[13];
+  const tt  = d.substring(14,16);
+  const mapa = {
+    '8': {'01':'tjac','02':'tjal','03':'tjam','04':'tjap','05':'tjba','06':'tjce',
+          '07':'tjdft','08':'tjes','09':'tjgo','10':'tjma','11':'tjmt','12':'tjms',
+          '13':'tjmg','14':'tjpa','15':'tjpb','16':'tjpr','17':'tjpe','18':'tjpi',
+          '19':'tjrj','20':'tjrn','21':'tjrs','22':'tjro','23':'tjrr','24':'tjsc',
+          '25':'tjse','26':'tjsp','27':'tjto'},
+    '9': {'01':'trt1','02':'trt2','03':'trt3','04':'trt4','05':'trt5','06':'trt6',
+          '07':'trt7','08':'trt8','09':'trt9','10':'trt10','11':'trt11','12':'trt12',
+          '13':'trt13','14':'trt14','15':'trt15','16':'trt16','17':'trt17','18':'trt18',
+          '19':'trt19','20':'trt20','21':'trt21','22':'trt22','23':'trt23','24':'trt24',
+          '00':'tst'},
+    '4': {'01':'trf1','02':'trf2','03':'trf3','04':'trf4','05':'trf5','06':'trf6'},
+    '3': {'00':'stj'},
+    '2': {'00':'tse'},
+    '6': {'00':'stm'},
+  };
+  return (mapa[seg] && mapa[seg][tt]) || null;
+}
+
+// ── Helpers ────────────────────────────────────────────────────────
+function numRaw(n){ return String(n||'').replace(/\D/g,''); }
+
+function fmtDJ(s){
+  if(!s) return '—';
+  if(/^\d{14}$/.test(String(s))){
+    const v=String(s); return `${v.slice(6,8)}/${v.slice(4,6)}/${v.slice(0,4)}`;
+  }
+  try { return new Date(s).toLocaleDateString('pt-BR',{day:'2-digit',month:'2-digit',year:'numeric'}); }
+  catch(e){ return String(s); }
+}
+
+// Normaliza assuntos: a API pode retornar array de arrays ou array de objetos
+function djAssuntos(raw){
+  if(!raw||!raw.length) return [];
+  const flat = [];
+  raw.forEach(a=>{
+    if(Array.isArray(a)) a.forEach(x=>{ if(x&&x.nome) flat.push(x); });
+    else if(a&&a.nome) flat.push(a);
+  });
+  return flat;
+}
+
+// ── Chamada HTTP à API (padrão POST conforme documentação CNJ) ─────
+async function djSearch(alias, body) {
+  const url = `${DATAJUD_BASE}${alias}/_search`;
+  const r = await fetch(url, {
+    method: 'POST',
+    headers: {
+      'Authorization': `APIKey ${DATAJUD_KEY}`,
+      'Content-Type': 'application/json',
+    },
+    body: JSON.stringify(body),
+  });
+  if(!r.ok){
+    let msg = `HTTP ${r.status}`;
+    try { const j=await r.json(); msg = j.error?.reason || msg; } catch(e){}
+    throw new Error(msg);
+  }
+  return r.json();
+}
+
+// ── Estado global da aba ───────────────────────────────────────────
+let djLastResult  = null;   // último processo consultado
+let djSearchAfter = null;   // ponteiro de paginação
+let djCurrentAlias= null;   // alias da busca avançada atual
+let djCurrentQuery= null;   // query da busca avançada atual
+let djCurrentPage = 0;      // página atual da busca avançada
+let djCurrentTotal= 0;      // total de resultados da busca avançada
+
+// ── CSS inline da aba ──────────────────────────────────────────────
+const DJ_CSS = `
+<style id="dj-styles">
+.dj-tabs{display:flex;gap:4px;margin-bottom:12px;border-bottom:2px solid var(--bo);padding-bottom:0;}
+.dj-tab{padding:7px 16px;border-radius:6px 6px 0 0;font-size:12px;font-weight:600;cursor:pointer;
+  color:var(--mu);background:transparent;border:none;transition:.15s;}
+.dj-tab.on{background:var(--ac);color:#fff;}
+.dj-panel{display:none;} .dj-panel.on{display:block;}
+.dj-card{background:var(--c);border:1px solid var(--bo);border-radius:10px;padding:16px;margin-bottom:12px;}
+.dj-tag{display:inline-block;padding:2px 8px;border-radius:4px;font-size:11px;font-weight:600;margin:2px;}
+.dj-tag.cls{background:#1a3320;color:#86efac;}
+.dj-tag.grau{background:#1e3a5f;color:#7dd3fc;}
+.dj-tag.sub{background:#2d1b4e;color:#c4b5fd;}
+.dj-tag.mov{background:#1a2e1a;color:#4ade80;}
+.dj-grid{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin:10px 0;}
+.dj-field{background:var(--bg);border-radius:6px;padding:8px;}
+.dj-field-l{font-size:10px;text-transform:uppercase;color:var(--mu);margin-bottom:2px;}
+.dj-field-v{font-size:13px;font-weight:600;color:var(--ft);}
+.dj-mov-list{max-height:360px;overflow-y:auto;padding-right:4px;}
+.dj-mov-row{display:flex;gap:8px;align-items:flex-start;padding:7px 0;border-bottom:1px solid var(--bo);}
+.dj-mov-row:last-child{border:none;}
+.dj-mov-dt{font-size:11px;color:var(--mu);min-width:85px;padding-top:1px;}
+.dj-mov-nm{font-size:12px;color:var(--ft);flex:1;line-height:1.4;}
+.dj-mov-comp{font-size:10px;color:var(--mu);display:block;margin-top:2px;}
+.dj-mov-org{font-size:10px;color:var(--mu);min-width:100px;text-align:right;padding-top:1px;}
+.dj-proc-num{font-size:14px;font-weight:700;font-family:monospace;color:var(--ac);letter-spacing:.5px;}
+.dj-badge-trib{background:var(--ac);color:#fff;border-radius:4px;padding:3px 10px;font-size:11px;font-weight:700;}
+.dj-loading{text-align:center;padding:40px;color:var(--mu);font-size:13px;}
+.dj-err{background:#3b1515;border:1px solid #dc2626;border-radius:8px;padding:14px;color:#fca5a5;margin:10px 0;font-size:13px;}
+.dj-ok{background:#0f2e18;border:1px solid #16a34a;border-radius:8px;padding:10px 14px;color:#86efac;font-size:12px;margin:6px 0;}
+.dj-adv-result{border:1px solid var(--bo);border-radius:8px;overflow:hidden;margin-top:10px;}
+.dj-adv-row{display:grid;grid-template-columns:1fr 1fr 1fr 1fr;gap:6px;padding:8px 10px;border-bottom:1px solid var(--bo);font-size:12px;cursor:pointer;transition:.1s;}
+.dj-adv-row:hover{background:var(--bg);}
+.dj-adv-row:last-child{border:none;}
+.dj-adv-head{background:var(--bg);font-size:10px;font-weight:700;text-transform:uppercase;color:var(--mu);}
+.dj-pag{display:flex;gap:8px;align-items:center;margin-top:10px;flex-wrap:wrap;}
+.dj-sync-cell{font-size:11px;}
+</style>`;
+
+// ══════════════════════════════════════════════════════════════════
+// RENDER PRINCIPAL DA ABA
+// ══════════════════════════════════════════════════════════════════
+function renderBusca(){
+  const procAtivos = proc.filter(p=>p.status!=='Finalizado');
+
+  const selectTrib = (id, defVal='tjrj') => `<select id="${id}">
+    <optgroup label="── Estaduais ──">
+      <option value="tjrj" ${defVal==='tjrj'?'selected':''}>TJRJ — Rio de Janeiro</option>
+      <option value="tjsp">TJSP — São Paulo</option>
+      <option value="tjmg">TJMG — Minas Gerais</option>
+      <option value="tjrs">TJRS — Rio Grande do Sul</option>
+      <option value="tjpr">TJPR — Paraná</option>
+      <option value="tjba">TJBA — Bahia</option>
+      <option value="tjsc">TJSC — Santa Catarina</option>
+      <option value="tjgo">TJGO — Goiás</option>
+      <option value="tjpe">TJPE — Pernambuco</option>
+      <option value="tjce">TJCE — Ceará</option>
+      <option value="tjma">TJMA — Maranhão</option>
+      <option value="tjes">TJES — Espírito Santo</option>
+      <option value="tjdft">TJDFT — DF e Territórios</option>
+      <option value="tjpa">TJPA — Pará</option>
+      <option value="tjam">TJAM — Amazonas</option>
+      <option value="tjmt">TJMT — Mato Grosso</option>
+      <option value="tjms">TJMS — Mato Grosso do Sul</option>
+    </optgroup>
+    <optgroup label="── Federais ──">
+      <option value="trf1">TRF1 — 1ª Região</option>
+      <option value="trf2">TRF2 — 2ª Região (RJ/ES)</option>
+      <option value="trf3">TRF3 — 3ª Região (SP/MS)</option>
+      <option value="trf4">TRF4 — 4ª Região (Sul)</option>
+      <option value="trf5">TRF5 — 5ª Região (NE)</option>
+      <option value="trf6">TRF6 — 6ª Região (MG)</option>
+    </optgroup>
+    <optgroup label="── Trabalho ──">
+      <option value="trt1">TRT1 — 1ª Região (RJ)</option>
+      <option value="trt2">TRT2 — 2ª Região (SP)</option>
+      <option value="trt3">TRT3 — 3ª Região (MG)</option>
+      <option value="trt4">TRT4 — 4ª Região (RS)</option>
+      <option value="trt5">TRT5 — 5ª Região (BA)</option>
+      <option value="trt6">TRT6 — 6ª Região (PE)</option>
+      <option value="trt7">TRT7 — 7ª Região (CE)</option>
+      <option value="trt8">TRT8 — 8ª Região (PA/AP)</option>
+      <option value="trt9">TRT9 — 9ª Região (PR)</option>
+      <option value="trt10">TRT10 — 10ª Região (DF/TO)</option>
+      <option value="trt15">TRT15 — 15ª Região (Campinas)</option>
+      <option value="trt17">TRT17 — 17ª Região (ES)</option>
+    </optgroup>
+    <optgroup label="── Superiores ──">
+      <option value="tst">TST</option>
+      <option value="stj">STJ</option>
+      <option value="tse">TSE</option>
+      <option value="stm">STM</option>
+    </optgroup>
+  </select>`;
+
+  document.getElementById('admin-cnt').innerHTML = DJ_CSS + `
+  <div class="dj-tabs">
+    <button class="dj-tab on" onclick="djTab('num',this)">🔢 Por Número</button>
+    <button class="dj-tab"    onclick="djTab('adv',this)">⚖️ Busca Avançada</button>
+    <button class="dj-tab"    onclick="djTab('sync',this)">🔄 Sincronizar</button>
+    <button class="dj-tab"    onclick="djTab('portais',this)">🔗 Portais</button>
+  </div>
+
+  <!-- PAINEL 1: Por Número ────────────────────────────────────────── -->
+  <div class="dj-panel on" id="djp-num">
+    <div class="card hi" style="margin-bottom:0">
+      <div class="stitle">⚡ Consulta por Número — API Datajud CNJ</div>
+      <div style="font-size:12px;color:var(--mu);margin-bottom:14px">
+        Busca direta por número CNJ. O tribunal é detectado automaticamente — sem precisar selecionar.
+      </div>
+      <div class="frow" style="align-items:flex-end;gap:10px;flex-wrap:wrap">
+        <div class="ff" style="flex:3;min-width:200px">
+          <div class="fl">Número do Processo (com ou sem formatação)</div>
+          <input id="dj-num" placeholder="0000000-00.0000.8.19.0001"
+            oninput="djAutoDetect()" onkeydown="if(event.key==='Enter')djBuscarNum()">
+        </div>
+        <div class="ff" style="flex:1.5;min-width:160px">
+          <div class="fl">Tribunal <span id="dj-trib-det" style="color:#22c55e;font-size:10px"></span></div>
+          ${selectTrib('dj-trib')}
+        </div>
+        <div style="display:flex;gap:8px;padding-bottom:2px">
+          <button class="btn bp" id="dj-btn-num" onclick="djBuscarNum()">⚡ Consultar</button>
+          <button class="btn bsa" onclick="djLimparNum()">✕</button>
+        </div>
+      </div>
+      <div id="dj-result-num" style="margin-top:14px"></div>
+    </div>
+  </div>
+
+  <!-- PAINEL 2: Busca Avançada ────────────────────────────────────── -->
+  <div class="dj-panel" id="djp-adv">
+    <div class="card hi" style="margin-bottom:12px">
+      <div class="stitle">🔍 Busca Avançada — Query DSL Datajud</div>
+      <div style="font-size:12px;color:var(--mu);margin-bottom:14px">
+        Combine filtros por classe processual, órgão julgador, assunto, grau e data.
+        Suporta paginação com <code>search_after</code> para grandes volumes (até 10.000/página).
+      </div>
+      <div class="frow" style="flex-wrap:wrap;gap:10px">
+        <div class="ff" style="flex:2;min-width:180px">
+          <div class="fl">Tribunal</div>
+          ${selectTrib('dj-adv-trib')}
+        </div>
+        <div class="ff" style="flex:1;min-width:120px">
+          <div class="fl">Grau</div>
+          <select id="dj-adv-grau">
+            <option value="">Todos</option>
+            <option value="G1">G1 — 1º Grau</option>
+            <option value="G2">G2 — 2º Grau</option>
+            <option value="JE">JE — Juizado Especial</option>
+            <option value="TR">TR — Turma Recursal</option>
+            <option value="SU">SU — Superior</option>
+          </select>
+        </div>
+        <div class="ff" style="flex:1;min-width:120px">
+          <div class="fl">Cód. Classe (TPU)</div>
+          <input id="dj-adv-classe" placeholder="ex: 1116 = Exec.Fiscal" type="number">
+        </div>
+        <div class="ff" style="flex:1;min-width:120px">
+          <div class="fl">Cód. Órgão Julgador</div>
+          <input id="dj-adv-orgao" placeholder="ex: 13597" type="number">
+        </div>
+        <div class="ff" style="flex:1;min-width:120px">
+          <div class="fl">Cód. Assunto (TPU)</div>
+          <input id="dj-adv-assunto" placeholder="ex: 10263" type="number">
+        </div>
+        <div class="ff" style="flex:1;min-width:110px">
+          <div class="fl">Resultados/pág.</div>
+          <select id="dj-adv-size">
+            <option value="10">10</option>
+            <option value="25" selected>25</option>
+            <option value="50">50</option>
+            <option value="100">100</option>
+          </select>
+        </div>
+      </div>
+      <div class="frow" style="gap:10px;margin-top:8px;flex-wrap:wrap">
+        <div class="ff">
+          <div class="fl">Data Ajuizamento — De</div>
+          <input id="dj-adv-dt-ini" type="date">
+        </div>
+        <div class="ff">
+          <div class="fl">Data Ajuizamento — Até</div>
+          <input id="dj-adv-dt-fim" type="date">
+        </div>
+        <div class="ff" style="flex:3">
+          <div class="fl">Número do Processo (opcional)</div>
+          <input id="dj-adv-num" placeholder="Busca full-text no número">
+        </div>
+      </div>
+      <div style="display:flex;gap:8px;margin-top:12px;align-items:center;flex-wrap:wrap">
+        <button class="btn bp" id="dj-btn-adv" onclick="djBuscarAdv(false)">🔍 Buscar</button>
+        <button class="btn bsa" onclick="djLimparAdv()">✕ Limpar</button>
+        <span id="dj-adv-info" style="font-size:11px;color:var(--mu)"></span>
+      </div>
+    </div>
+    <div id="dj-result-adv"></div>
+  </div>
+
+  <!-- PAINEL 3: Sincronizar ──────────────────────────────────────── -->
+  <div class="dj-panel" id="djp-sync">
+    <div class="card hi" style="margin-bottom:0">
+      <div class="stitle">🔄 Sincronizar Processos do Escritório</div>
+      <div style="font-size:12px;color:var(--mu);margin-bottom:14px">
+        Consulta cada processo ativo no Datajud e exibe o último movimento registrado na base nacional.
+        Delay de 400ms entre chamadas para respeitar o rate limit da API.
+      </div>
+      <div style="display:flex;gap:8px;margin-bottom:14px;flex-wrap:wrap">
+        <button class="btn bp" onclick="djSyncAll()">⚡ Sincronizar Todos</button>
+        <span id="dj-sync-status" style="font-size:11px;color:var(--mu);align-self:center"></span>
+      </div>
+      <div class="tw"><table><thead><tr>
+        <th style="width:180px">Número</th>
+        <th>Cliente</th>
+        <th>Área</th>
+        <th>Status Local</th>
+        <th>Último Mov. Datajud</th>
+        <th>Atualização</th>
+        <th>⚡</th>
+      </tr></thead><tbody id="dj-proc-list">
+      ${procAtivos.map(p=>`<tr id="djrow-${p.id}">
+        <td class="mono" style="font-size:10px">${p.num}</td>
+        <td style="font-size:12px">${cn(p.cliId)||'—'}</td>
+        <td>${badge(p.tipo,'bb')}</td>
+        <td>${sbadge(p.status)}</td>
+        <td id="djcell-mov-${p.id}" class="dj-sync-cell" style="color:var(--mu)">—</td>
+        <td id="djcell-dt-${p.id}"  class="dj-sync-cell" style="color:var(--mu)">—</td>
+        <td><button class="btn bsa xs" onclick="djSyncProc(${p.id},'${p.num}')" title="Consultar no Datajud">⚡</button></td>
+      </tr>`).join('')}
+      </tbody></table></div>
+    </div>
+  </div>
+
+  <!-- PAINEL 4: Portais ──────────────────────────────────────────── -->
+  <div class="dj-panel" id="djp-portais">
+    <div class="stitle" style="margin-bottom:10px">🔗 Portais de Consulta Direta</div>
+    <div class="trib-grid">
+      ${[
+        {ico:'⚡',n:'Datajud CNJ',d:'API Pública Nacional',u:'https://datajud-wiki.cnj.jus.br/api-publica/'},
+        {ico:'⚖️',n:'TJRJ',d:'Tribunal de Justiça do RJ',u:'https://www3.tjrj.jus.br/consultaprocessual/'},
+        {ico:'🏛️',n:'TRF2',d:'Tribunal Regional Federal 2ª',u:'https://portal.trf2.jus.br/portal/processo/consulta'},
+        {ico:'👷',n:'TRT1',d:'Trabalho — 1ª Região RJ',u:'https://consultaprocessual.tst.jus.br/'},
+        {ico:'📖',n:'STJ',d:'Superior Tribunal de Justiça',u:'https://processo.stj.jus.br/processo/pesquisa/'},
+        {ico:'🇧🇷',n:'STF',d:'Supremo Tribunal Federal',u:'https://portal.stf.jus.br/processos/pesquisar.asp'},
+        {ico:'📋',n:'PJe RJ',d:'Processo Judicial Eletrônico',u:'https://pje.tjrj.jus.br/consultapublica/'},
+        {ico:'🏢',n:'CNA/OAB',d:'Cadastro Nacional de Advogados',u:'https://cna.oab.org.br/'},
+        {ico:'📁',n:'eCAC',d:'Portal do Contribuinte — Receita',u:'https://cav.receita.fazenda.gov.br/autenticacao/login'},
+        {ico:'💼',n:'PROJUDI',d:'Processo Judicial Digital RJ',u:'https://projudi.tjrj.jus.br/projudi/'},
+        {ico:'🔐',n:'Gov.br',d:'Portal de Serviços Federais',u:'https://www.gov.br/pt-br'},
+        {ico:'📊',n:'Wiki Datajud',d:'Documentação oficial da API',u:'https://datajud-wiki.cnj.jus.br/'},
+      ].map(t=>`<div class="trib-c" onclick="window.open('${t.u}','_blank')">
+        <div class="ti">${t.ico}</div><h4>${t.n}</h4><p>${t.d}</p></div>`).join('')}
+    </div>
+  </div>`;
+}
+
+// ── Troca de painel ────────────────────────────────────────────────
+function djTab(id, btn){
+  document.querySelectorAll('.dj-tab').forEach(b=>b.classList.remove('on'));
+  document.querySelectorAll('.dj-panel').forEach(p=>p.classList.remove('on'));
+  btn.classList.add('on');
+  const p = document.getElementById('djp-'+id);
+  if(p) p.classList.add('on');
+}
+
+// ══════════════════════════════════════════════════════════════════
+// PAINEL 1 — BUSCA POR NÚMERO
+// ══════════════════════════════════════════════════════════════════
+
+function djAutoDetect(){
+  const num  = document.getElementById('dj-num').value.trim();
+  const trib = detectTribunalCNJ(num);
+  const det  = document.getElementById('dj-trib-det');
+  const sel  = document.getElementById('dj-trib');
+  if(trib && DJ_ENDPOINTS[trib]){
+    if(sel.querySelector(`option[value="${trib}"]`)) sel.value = trib;
+    det.textContent = `✅ ${trib.toUpperCase()} detectado`;
+    det.style.color = '#22c55e';
+  } else {
+    det.textContent = num.replace(/\D/g,'').length > 5 ? '⚠️ manual' : '';
+    det.style.color = '#f59e0b';
+  }
+}
+
+async function djBuscarNum(){
+  const numInput = document.getElementById('dj-num').value.trim();
+  const tribKey  = document.getElementById('dj-trib').value;
+  const alias    = DJ_ENDPOINTS[tribKey];
+  const res      = document.getElementById('dj-result-num');
+  const btn      = document.getElementById('dj-btn-num');
+
+  if(!numInput){ alert('Informe o número do processo.'); return; }
+  if(!alias){
+    res.innerHTML=`<div class="dj-err">Tribunal não mapeado: <b>${tribKey}</b></div>`; return;
+  }
+
+  const numClean = numRaw(numInput);
+  res.innerHTML  = `<div class="dj-loading">⏳ Consultando ${tribKey.toUpperCase()} no Datajud...</div>`;
+  btn.disabled   = true;
+
+  try {
+    // Estratégia dupla: match (documentação oficial) + term.keyword (precisão)
+    // O match funciona mesmo se o número estiver formatado no índice
+    const body = {
+      size: 1,
+      query: {
+        bool: {
+          should: [
+            { match:  { numeroProcesso: numClean } },
+            { term:   { 'numeroProcesso.keyword': numClean } }
+          ],
+          minimum_should_match: 1
+        }
+      }
+    };
+    const data = await djSearch(alias, body);
+    btn.disabled = false;
+    const hits = (data && data.hits && data.hits.hits) || [];
+
+    if(!hits.length){
+      res.innerHTML=`<div class="dj-err">
+        <b>Processo não encontrado no Datajud.</b><br>
+        Consultado: <code style="font-family:monospace">${numClean}</code> — Tribunal: <b>${tribKey.toUpperCase()}</b><br>
+        <span style="font-size:11px;opacity:.8">Possíveis causas: processo em segredo de justiça (nivelSigilo > 0),
+        tribunal incorreto, número divergente, ou dado ainda não indexado pelo CNJ.</span>
+      </div>`;
+      return;
+    }
+    const s = hits[0]._source;
+    djLastResult = s;
+    res.innerHTML = djRenderProcesso(s, tribKey);
+
+  } catch(e){
+    btn.disabled = false;
+    res.innerHTML=`<div class="dj-err">
+      <b>Erro na consulta:</b> ${esc(e.message)}<br>
+      <span style="font-size:11px;opacity:.8">Verifique sua conexão ou tente novamente.</span>
+    </div>`;
+  }
+}
+
+function djLimparNum(){
+  const n = document.getElementById('dj-num');
+  const r = document.getElementById('dj-result-num');
+  const d = document.getElementById('dj-trib-det');
+  if(n) n.value='';
+  if(r) r.innerHTML='';
+  if(d) d.textContent='';
+  djLastResult = null;
+}
+
+// ── Renderiza card completo de um processo ─────────────────────────
+function djRenderProcesso(s, tribKey){
+  const movs    = (s.movimentos||[]).slice().sort((a,b)=>new Date(b.dataHora)-new Date(a.dataHora));
+  const ultimo  = movs[0] || {};
+  const assuntos = djAssuntos(s.assuntos);
+
+  const grauNome = {G1:'1º Grau',G2:'2º Grau',JE:'Juizado Especial',TR:'Turma Recursal',SU:'Superior'}[s.grau]||s.grau||'—';
+  const sigiloHtml = s.nivelSigilo > 0
+    ? `<span class="dj-tag" style="background:#4b1a1a;color:#fca5a5">🔒 Sigilo ${s.nivelSigilo}</span>` : '';
+
+  const movsHtml = movs.slice(0,50).map(m=>{
+    const comps = (m.complementosTabelados||[]).map(c=>c.nome).filter(Boolean).join(', ');
+    const orgao = m.orgaoJulgador ? (m.orgaoJulgador.nomeOrgao || m.orgaoJulgador.nome || '') : '';
+    return `<div class="dj-mov-row">
+      <div class="dj-mov-dt">${fmtDJ(m.dataHora)}</div>
+      <div class="dj-mov-nm">
+        <span class="dj-tag mov" style="font-size:10px;padding:1px 5px">${m.codigo||''}</span>
+        ${esc(m.nome||'—')}
+        ${comps?`<span class="dj-mov-comp">↳ ${esc(comps)}</span>`:''}
+      </div>
+      <div class="dj-mov-org">${esc(orgao)}</div>
+    </div>`;
+  }).join('');
+
+  return `<div class="dj-card">
+    <div style="display:flex;align-items:flex-start;justify-content:space-between;margin-bottom:12px;gap:8px;flex-wrap:wrap">
+      <div>
+        <div class="dj-proc-num">${esc(s.numeroProcesso)}</div>
+        <div style="margin-top:6px;display:flex;flex-wrap:wrap;gap:4px">
+          <span class="dj-badge-trib">${tribKey.toUpperCase()}</span>
+          <span class="dj-tag cls">${esc(s.classe&&s.classe.nome||'—')}</span>
+          <span class="dj-tag grau">${grauNome}</span>
+          <span class="dj-tag" style="background:#1a2535;color:#94a3b8">${esc(s.formato&&s.formato.nome||'—')}</span>
+          ${sigiloHtml}
+        </div>
+      </div>
+      <button class="btn bp" onclick="djImportarProc()" style="font-size:11px;flex-shrink:0">📥 Importar</button>
+    </div>
+
+    <div class="dj-grid">
+      <div class="dj-field">
+        <div class="dj-field-l">Órgão Julgador</div>
+        <div class="dj-field-v" style="font-size:12px">${esc(s.orgaoJulgador&&s.orgaoJulgador.nome||'—')}</div>
+        ${s.orgaoJulgador&&s.orgaoJulgador.codigoMunicipioIBGE?`<div style="font-size:10px;color:var(--mu)">Cód.IBGE: ${s.orgaoJulgador.codigoMunicipioIBGE}</div>`:''}
+      </div>
+      <div class="dj-field">
+        <div class="dj-field-l">Sistema Processual</div>
+        <div class="dj-field-v">${esc(s.sistema&&s.sistema.nome||'—')}</div>
+      </div>
+      <div class="dj-field">
+        <div class="dj-field-l">Data de Ajuizamento</div>
+        <div class="dj-field-v">${fmtDJ(s.dataAjuizamento)}</div>
+      </div>
+      <div class="dj-field">
+        <div class="dj-field-l">Última Atualização Datajud</div>
+        <div class="dj-field-v">${fmtDJ(s.dataHoraUltimaAtualizacao)}</div>
+      </div>
+      <div class="dj-field">
+        <div class="dj-field-l">Total de Movimentos</div>
+        <div class="dj-field-v">${movs.length}</div>
+      </div>
+      <div class="dj-field">
+        <div class="dj-field-l">ID Datajud</div>
+        <div style="font-size:10px;color:var(--mu);word-break:break-all">${esc(s.id||'—')}</div>
+      </div>
+    </div>
+
+    ${assuntos.length?`<div style="margin:8px 0">
+      <div class="dj-field-l" style="margin-bottom:6px">Assuntos (TPU)</div>
+      ${assuntos.map(a=>`<span class="dj-tag sub">[${a.codigo}] ${esc(a.nome)}</span>`).join(' ')}
+    </div>`:''}
+
+    <div style="margin-top:14px">
+      <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:8px">
+        <b style="font-size:13px">📅 Movimentações — ${movs.length} total${movs.length>50?' (exibindo últimas 50)':''}</b>
+        <span style="font-size:10px;color:var(--mu)">Mais recente primeiro · Código TPU</span>
+      </div>
+      <div class="dj-mov-list">${movsHtml||'<div style="color:var(--mu);font-size:12px;padding:10px">Sem movimentos registrados.</div>'}</div>
+      ${movs.length>50?`<div style="text-align:center;font-size:11px;color:var(--mu);padding:8px;border-top:1px solid var(--bo)">
+        + ${movs.length-50} movimentos anteriores não exibidos</div>`:''}
+    </div>
+
+    <div style="margin-top:12px;padding-top:10px;border-top:1px solid var(--bo);
+      display:flex;gap:8px;flex-wrap:wrap;align-items:center">
+      <span style="font-size:11px;color:var(--mu)">Último movimento:</span>
+      <b style="font-size:11px">${esc(ultimo.nome||'—')}</b>
+      <span style="font-size:11px;color:var(--mu)">em ${fmtDJ(ultimo.dataHora)}</span>
+    </div>
+  </div>`;
+}
+
+// ── Importar processo para o escritório ───────────────────────────
+function djImportarProc(){
+  if(!djLastResult) return;
+  const s = djLastResult;
+  if(proc.find(p=>numRaw(p.num)===s.numeroProcesso)){
+    alert('Processo já cadastrado no escritório.'); return;
+  }
+  const novo = {
+    id:    gid2(),
+    num:   s.numeroProcesso,
+    cliId: 0,
+    tipo:  (s.classe&&s.classe.nome)||'Cível',
+    vara:  (s.orgaoJulgador&&s.orgaoJulgador.nome)||'',
+    status:'Em andamento',
+    ini:   fmtDJ(s.dataAjuizamento),
+    prox:  '',
+    adv:   currentUser.nome,
+    obs:   `Importado via Datajud em ${new Date().toLocaleDateString('pt-BR')}. ID: ${s.id||''}`,
+  };
+  proc.push(novo); save();
+  alert(`Processo ${s.numeroProcesso} importado!\nAbra a aba Processos para vincular ao cliente.`);
+}
+
+// ══════════════════════════════════════════════════════════════════
+// PAINEL 2 — BUSCA AVANÇADA (Query DSL + paginação search_after)
+// ══════════════════════════════════════════════════════════════════
+
+function djBuscarAdv(paginar){
+  const tribKey = document.getElementById('dj-adv-trib').value;
+  const alias   = DJ_ENDPOINTS[tribKey];
+  const res     = document.getElementById('dj-result-adv');
+  const btn     = document.getElementById('dj-btn-adv');
+  const info    = document.getElementById('dj-adv-info');
+
+  if(!alias){ res.innerHTML=`<div class="dj-err">Tribunal não mapeado.</div>`; return; }
+
+  const classe  = document.getElementById('dj-adv-classe').value.trim();
+  const orgao   = document.getElementById('dj-adv-orgao').value.trim();
+  const assunto = document.getElementById('dj-adv-assunto').value.trim();
+  const grau    = document.getElementById('dj-adv-grau').value;
+  const dtIni   = document.getElementById('dj-adv-dt-ini').value;
+  const dtFim   = document.getElementById('dj-adv-dt-fim').value;
+  const numAdv  = document.getElementById('dj-adv-num').value.trim();
+  const size    = parseInt(document.getElementById('dj-adv-size').value)||25;
+
+  // Monta must[] conforme documentação oficial do Datajud
+  const must = [];
+  if(classe)  must.push({match:{'classe.codigo': parseInt(classe)}});
+  if(orgao)   must.push({match:{'orgaoJulgador.codigo': parseInt(orgao)}});
+  if(assunto) must.push({match:{'assuntos.codigo': parseInt(assunto)}});
+  if(grau)    must.push({match:{grau}});
+  if(numAdv)  must.push({match:{numeroProcesso: numRaw(numAdv)}});
+
+  const filter = [];
+  if(dtIni||dtFim){
+    const range = {};
+    if(dtIni) range.gte = dtIni + 'T00:00:00.000Z';
+    if(dtFim) range.lte = dtFim + 'T23:59:59.999Z';
+    filter.push({range:{dataAjuizamento: range}});
+  }
+
+  if(!must.length && !filter.length){
+    alert('Informe ao menos um critério de busca.'); return;
+  }
+
+  const body = {
+    size,
+    query: { bool: { must, filter } },
+    sort: [{'@timestamp':{'order':'asc'}}]  // obrigatório para search_after
+  };
+
+  if(paginar && djSearchAfter){ body.search_after = djSearchAfter; }
+  else { djSearchAfter = null; djCurrentPage = 0; }
+
+  djCurrentAlias = alias;
+  djCurrentQuery = body;
+
+  const loadMsg = paginar
+    ? `⏳ Carregando página ${djCurrentPage+2}...`
+    : `⏳ Consultando ${tribKey.toUpperCase()}...`;
+
+  if(!paginar) res.innerHTML = `<div class="dj-loading">${loadMsg}</div>`;
+  info.textContent = loadMsg;
+  btn.disabled = true;
+
+  djSearch(alias, body).then(data=>{
+    btn.disabled = false;
+    const hits  = (data&&data.hits&&data.hits.hits)||[];
+    const total = data&&data.hits&&data.hits.total&&data.hits.total.value||0;
+
+    if(!paginar) djCurrentTotal = total;
+    djCurrentPage++;
+
+    if(!hits.length && !paginar){
+      res.innerHTML=`<div class="dj-err">Nenhum processo encontrado com os critérios informados.</div>`;
+      info.textContent=''; return;
+    }
+
+    // Extrair search_after do último hit
+    if(hits.length){
+      const lastSort = hits[hits.length-1].sort;
+      djSearchAfter = lastSort || null;
+    } else { djSearchAfter = null; }
+
+    const countSeen = (djCurrentPage-1)*size + hits.length;
+
+    info.textContent = `${countSeen.toLocaleString('pt-BR')} de ${total>=10000?'10.000+':total.toLocaleString('pt-BR')} processos`;
+
+    const linhas = hits.map(h=>{
+      const s = h._source;
+      const assuntosS = djAssuntos(s.assuntos).map(a=>a.nome).join('; ').substring(0,60);
+      return `<div class="dj-adv-row" onclick="djAbrirProcesso('${esc(s.numeroProcesso)}','${tribKey}')">
+        <div style="font-family:monospace;font-size:11px;word-break:break-all">${esc(s.numeroProcesso)}</div>
+        <div style="font-size:11px">${esc((s.classe&&s.classe.nome)||'—')}</div>
+        <div style="font-size:11px">${esc((s.orgaoJulgador&&s.orgaoJulgador.nome)||'—')}</div>
+        <div style="font-size:11px;color:var(--mu)">${fmtDJ(s.dataAjuizamento)}${assuntosS?` · ${assuntosS}`:''}</div>
+      </div>`;
+    }).join('');
+
+    const tabela = `
+      <div class="dj-adv-result">
+        <div class="dj-adv-row dj-adv-head">
+          <div>Número CNJ</div><div>Classe</div><div>Órgão</div><div>Ajuizamento · Assuntos</div>
+        </div>
+        ${linhas}
+      </div>`;
+
+    if(paginar){ 
+      const old = res.querySelector('.dj-adv-result');
+      if(old){ old.insertAdjacentHTML('beforeend', linhas); }
+    } else {
+      res.innerHTML = tabela;
+    }
+
+    // Botão "carregar mais" com search_after
+    let pag = res.querySelector('.dj-pag');
+    if(pag) pag.remove();
+    if(djSearchAfter && hits.length === size){
+      res.insertAdjacentHTML('beforeend',`<div class="dj-pag">
+        <button class="btn bp" onclick="djBuscarAdv(true)">⬇ Carregar mais ${size}</button>
+        <span style="font-size:11px;color:var(--mu)">Página ${djCurrentPage} · ${countSeen.toLocaleString('pt-BR')} carregados</span>
+        <span style="font-size:11px;color:var(--mu)">Clique em um processo para ver detalhes</span>
+      </div>`);
+    }
+
+  }).catch(e=>{
+    btn.disabled = false;
+    info.textContent='';
+    if(!paginar) res.innerHTML=`<div class="dj-err"><b>Erro:</b> ${esc(e.message)}</div>`;
+  });
+}
+
+// Abre processo da busca avançada no painel de número
+function djAbrirProcesso(num, tribKey){
+  // Muda para aba Por Número e preenche
+  document.querySelectorAll('.dj-tab').forEach(b=>b.classList.remove('on'));
+  document.querySelectorAll('.dj-panel').forEach(p=>p.classList.remove('on'));
+  const btn = document.querySelector('.dj-tab');
+  if(btn) btn.classList.add('on');
+  const p = document.getElementById('djp-num');
+  if(p) p.classList.add('on');
+  const inp = document.getElementById('dj-num');
+  const sel = document.getElementById('dj-trib');
+  if(inp) inp.value = num;
+  if(sel && DJ_ENDPOINTS[tribKey] && sel.querySelector(`option[value="${tribKey}"]`)) sel.value = tribKey;
+  djAutoDetect();
+  djBuscarNum();
+}
+
+function djLimparAdv(){
+  ['dj-adv-classe','dj-adv-orgao','dj-adv-assunto','dj-adv-num','dj-adv-dt-ini','dj-adv-dt-fim']
+    .forEach(id=>{ const el=document.getElementById(id); if(el) el.value=''; });
+  const r = document.getElementById('dj-result-adv');
+  const i = document.getElementById('dj-adv-info');
+  if(r) r.innerHTML='';
+  if(i) i.textContent='';
+  djSearchAfter=null; djCurrentPage=0; djCurrentTotal=0;
+}
+
+// ══════════════════════════════════════════════════════════════════
+// PAINEL 3 — SINCRONIZAR PROCESSOS DO ESCRITÓRIO
+// ══════════════════════════════════════════════════════════════════
+
+async function djSyncProc(procId, numProc){
+  const cellMov = document.getElementById(`djcell-mov-${procId}`);
+  const cellDt  = document.getElementById(`djcell-dt-${procId}`);
+  if(!cellMov) return;
+
+  cellMov.innerHTML = '⏳'; if(cellDt) cellDt.innerHTML='';
+
+  const numClean = numRaw(numProc);
+  const trib     = detectTribunalCNJ(numProc);
+  const alias    = trib ? DJ_ENDPOINTS[trib] : null;
+
+  if(!alias){
+    cellMov.innerHTML = '<span style="color:#f59e0b" title="Tribunal não identificado pelo número CNJ — verifique o número">⚠️ Tribunal?</span>';
+    return;
+  }
+
+  try {
+    const data = await djSearch(alias, {
+      size: 1,
+      query: {
+        bool: {
+          should: [
+            {match:{numeroProcesso: numClean}},
+            {term:{'numeroProcesso.keyword': numClean}}
+          ],
+          minimum_should_match: 1
+        }
+      },
+      _source: ['movimentos','dataHoraUltimaAtualizacao','numeroProcesso','grau']
+    });
+
+    const hits = (data&&data.hits&&data.hits.hits)||[];
+    if(!hits.length){
+      cellMov.innerHTML='<span style="color:#ef4444">Não encontrado</span>';
+      return;
+    }
+    const s    = hits[0]._source;
+    const movs = (s.movimentos||[]).sort((a,b)=>new Date(b.dataHora)-new Date(a.dataHora));
+    const ult  = movs[0];
+
+    cellMov.innerHTML = ult
+      ? `<span style="color:#22c55e" title="${esc((ult.nome||''))} — ${fmtDJ(ult.dataHora)}">
+           ✅ ${esc((ult.nome||'').substring(0,28))}
+         </span>`
+      : '<span style="color:var(--mu)">Sem movimentos</span>';
+
+    if(cellDt) cellDt.innerHTML =
+      `<span style="color:var(--mu)">${fmtDJ(s.dataHoraUltimaAtualizacao)}</span>`;
+
+  } catch(e){
+    cellMov.innerHTML = `<span style="color:#ef4444" title="${esc(e.message)}">Erro</span>`;
+  }
+}
+
+async function djSyncAll(){
+  const st       = document.getElementById('dj-sync-status');
+  const procAtivos = proc.filter(p=>p.status!=='Finalizado');
+  if(!procAtivos.length){ if(st) st.textContent='Nenhum processo ativo.'; return; }
+  if(st) st.textContent=`Sincronizando 0/${procAtivos.length}...`;
+
+  for(let i=0; i<procAtivos.length; i++){
+    if(st) st.textContent=`Sincronizando ${i+1}/${procAtivos.length}...`;
+    await djSyncProc(procAtivos[i].id, procAtivos[i].num);
+    await new Promise(r=>setTimeout(r,400)); // rate limit da API
+  }
+  if(st) st.textContent=`✅ Concluído — ${procAtivos.length} processos consultados`;
+}
+
+// ═══════════════════════════════════════════════════════════════════
+// USUÁRIOS
+// ═══════════════════════════════════════════════════════════════════
+function renderUsers(){
+  const p=perm();
+  let html=`<div class="fbar">${p.usr?`<button class="btn bp" onclick="openUserModal()">+ Novo Usuário</button>`:''}</div>`;
+  html+=`<div class="card"><div class="tw"><table><thead><tr><th></th><th>Nome</th><th>E-mail</th><th>OAB</th><th>Cargo</th><th>Função</th><th>Status</th><th>Telefone</th>${p.usr?'<th>Ações</th>':''}</tr></thead><tbody>${users.map(u=>`<tr style="opacity:${u.ativo?1:.55}">
+    <td><div class="av" style="width:32px;height:32px;font-size:12px;background:${ac(u.id)};color:#fff">${initials(u.nome)}</div></td>
+    <td style="font-weight:700">${u.nome}</td><td style="font-size:11px;color:#2563eb">${u.email}</td>
+    <td style="font-size:11px">${u.oab||'—'}</td><td style="font-size:11px">${u.cargo||'—'}</td>
+    <td><span class="urole ${ROLES[u.role]?.cls||'r-colaborador'}">${ROLES[u.role]?.l||u.role}</span></td>
+    <td>${u.ativo?badge('Ativo','bg'):badge('Inativo','bga')}</td>
+    <td style="font-size:11px">${u.tel||'—'}</td>
+    ${p.usr?`<td><div style="display:flex;gap:3px"><button class="btn bgh xs" onclick="editUser(${u.id})">✏️</button>${u.id!==currentUser.id?`<button class="btn ${u.ativo?'bd_':'bg_'} xs" onclick="toggleUser(${u.id})">${u.ativo?'🔒':'🔓'}</button>`:''}</div></td>`:''}</tr>`).join('')}</tbody></table></div></div>`;
+  document.getElementById('admin-cnt').innerHTML=html;
+}
+function openUserModal(id){
+  document.getElementById('user-id').value=id||'';
+  document.getElementById('m-user-t').textContent=id?'Editar Usuário':'Novo Usuário';
+  if(id){const u=users.find(x=>x.id===id);['nome','cargo','email','tel','oab'].forEach(f=>document.getElementById('user-'+f).value=u[f]||'');document.getElementById('user-pwd').value=u.pwd||'';document.getElementById('user-role').value=u.role;document.getElementById('user-ativo').value=u.ativo?'1':'0';}
+  else{['nome','cargo','email','tel','oab','pwd'].forEach(f=>document.getElementById('user-'+f).value='');document.getElementById('user-role').value='advogado';document.getElementById('user-ativo').value='1';}
+  openMo('m-user');
+}
+function populateUserForm(u){['nome','cargo','email','tel','oab'].forEach(f=>document.getElementById('user-'+f).value=u[f]||'');document.getElementById('user-id').value=u.id;document.getElementById('user-pwd').value=u.pwd||'';document.getElementById('user-role').value=u.role;document.getElementById('user-ativo').value=u.ativo?'1':'0';}
+const editUser=id=>openUserModal(id);
+function saveUser(){
+  const nome=document.getElementById('user-nome').value.trim();const email=document.getElementById('user-email').value.trim();const pwd=document.getElementById('user-pwd').value;
+  if(!nome||!email)return alert('Preencha nome e e-mail.');
+  const id=+document.getElementById('user-id').value;
+  if(!id&&!pwd)return alert('Defina uma senha para o novo usuário.');
+  const o={nome,cargo:document.getElementById('user-cargo').value.trim(),email,pwd:pwd||(id?(users.find(u=>u.id===id)||{}).pwd:''),oab:document.getElementById('user-oab').value.trim(),tel:document.getElementById('user-tel').value.trim(),role:document.getElementById('user-role').value,ativo:document.getElementById('user-ativo').value==='1'};
+  if(id){users.splice(users.findIndex(u=>u.id===id),1,{...o,id});}else{users.push({...o,id:gid2()});}
+  save();closeMo('m-user');renderUsers();
+  if(currentUser.id===id){currentUser=users.find(u=>u.id===id);document.getElementById('uname').textContent='Dr. '+currentUser.nome.split(' ').slice(-1)[0];document.getElementById('uav').textContent=initials(currentUser.nome);}
+}
+function toggleUser(id){if(id===currentUser.id)return alert('Não é possível desativar sua própria conta.');const idx=users.findIndex(u=>u.id===id);users[idx].ativo=!users[idx].ativo;save();renderUsers();}
+
+// ═══════════════════════════════════════════════════════════════════
+// GOOGLE CALENDAR
+// ═══════════════════════════════════════════════════════════════════
+function renderGCal(){
+  const isOn=gcfg.on&&gcfg.key;
+  let h=`<div class="al ${isOn?'al-ok':gcfg.key?'al-warn':'al-err'}">${isOn?'✅ Google Calendar conectado e ativo':gcfg.key?'⚠️ API Key cadastrada — verifique o Calendar ID':'🔴 Google Calendar não configurado'}</div>
+  <div class="card gl">
+    <div class="stit">Configuração da API</div>
+    <div class="fg"><div class="fl">Google Calendar API Key</div><input class="fi" id="gc-key" value="${gcfg.key}" placeholder="AIzaSy..." style="font-family:monospace;font-size:12px"></div>
+    <div class="fg"><div class="fl">Calendar ID</div><input class="fi" id="gc-cid" value="${gcfg.calId}" placeholder="seu@gmail.com"></div>
+    <div class="fg"><div class="fl">Apps Script URL (criação automática de eventos)</div><input class="fi" id="gc-scr" value="${gcfg.script}" placeholder="https://script.google.com/macros/s/..."></div>
+    <div class="brow"><button class="btn bgold" onclick="saveGC()">💾 Salvar</button><button class="btn bghost" onclick="testGC()">🔍 Testar Conexão</button></div>
+    <div id="gc-res" style="margin-top:8px"></div>
+  </div>
+  <div class="card">
+    <div class="stit">Sincronizar Agendamentos</div>
+    <div class="brow"><button class="btn bnav" onclick="syncGCal()">📅 Sincronizar Todos</button><button class="btn bblue" onclick="expICS()">⬇️ Exportar .ICS</button></div>
+    <div id="sync-res" style="margin-top:9px"></div>
+    <div class="divider"></div>
+    <div class="stit">Adicionar Individualmente</div>
+    ${bk.filter(b=>b.status!=='cancelado'&&b.data>=td0).sort((a,b_)=>a.data.localeCompare(b_.data)).slice(0,8).map(b=>`<div style="display:flex;align-items:center;gap:7px;padding:7px 0;border-bottom:1px solid var(--bd)"><span style="font-size:15px">${BT[b.type].i}</span><div style="flex:1"><div style="font-size:11px;font-weight:700">${b.nome}</div><div style="font-size:10px;color:var(--mu)">${fd(b.data)} · ${b.hora}</div></div>${bdg(b.status)}<a href="${gcLink(b)}" target="_blank" class="btn bghost bsm" style="font-size:10px;padding:4px 8px">📅 Add</a></div>`).join('')}
+  </div>
+  <div class="card">
+    <div class="stit">Apps Script — Código para Instalar</div>
+    <div class="al al-gold" style="font-size:10px;margin-bottom:7px"><strong>Como instalar:</strong> script.google.com → Novo projeto → Cole o código → Implantar → App da Web → Qualquer pessoa → Copie a URL e cole acima.</div>
+    <button class="btn bghost bsm" onclick="cpScript()" style="margin-bottom:7px">📋 Copiar Código</button>
+    <div class="code">${esc(appsScript())}</div>
+  </div>`;
+  document.getElementById('admin-cnt').innerHTML=h;
+}
+function saveGC(){gcfg.key=gi('gc-key');gcfg.calId=gi('gc-cid');gcfg.script=gi('gc-scr');gcfg.on=!!(gcfg.key&&gcfg.calId);saveGc();alert('✅ Configuração salva!');renderGCal();}
+async function testGC(){
+  const key=gi('gc-key'),calId=gi('gc-cid');const res=document.getElementById('gc-res');
+  if(!key||!calId){res.innerHTML=`<div class="al al-warn">Preencha API Key e Calendar ID antes de testar.</div>`;return;}
+  res.innerHTML=`<div class="al al-info">⏳ Testando...</div>`;
+  try{const url=`https://www.googleapis.com/calendar/v3/calendars/${encodeURIComponent(calId)}/events?key=${key}&timeMin=${new Date().toISOString()}&maxResults=5&singleEvents=true&orderBy=startTime`;const r=await fetch(url);const d=await r.json();if(d.error){res.innerHTML=`<div class="al al-err">❌ Erro: ${d.error.message}</div>`;}else{gcEvt=d.items||[];gcfg.on=true;saveGc();res.innerHTML=`<div class="al al-ok">✅ Conectado! ${gcEvt.length} evento(s) encontrado(s).</div>`;}}catch(e){res.innerHTML=`<div class="al al-err">❌ Falha: ${e.message}</div>`;}
+}
+async function syncGCal(){
+  const btn=document.getElementById('sync-btn');if(btn)btn.classList.add('spin');
+  const toS=bk.filter(b=>['solicitado','confirmado'].includes(b.status)&&b.data>=td0);
+  const res=document.getElementById('sync-res');
+  if(!gcfg.script){toS.forEach(b=>window.open(gcLink(b),'_blank'));if(btn)btn.classList.remove('spin');if(res)res.innerHTML=`<div class="al al-warn">Configure o Apps Script para sincronização automática.</div>`;return;}
+  let ok=0,err=0;
+  for(const b of toS){try{const t=BT[b.type];const payload={action:'createEvent',calendarId:gcfg.calId,title:`[${t.n}] - ${b.nome}`,start:`${b.data}T${b.hora}:00`,end:`${b.data}T${am(b.hora,t.d)}:00`,description:`Nome: ${b.nome}\nWhatsApp: ${b.tel}\nCPF: ${b.cpf}\nÁrea: ${b.area}\nResumo: ${b.resumo}\nModalidade: ${b.modal}\nProtocolo: ${b.id}`};const r=await fetch(gcfg.script,{method:'POST',body:JSON.stringify(payload)});const d=await r.json();if(d.success)ok++;else err++;}catch{err++;}}
+  if(res)res.innerHTML=`<div class="al ${!err?'al-ok':'al-warn'}">${!err?'✅':'⚠️'} Sincronizado: ${ok} evento(s)${err?`, ${err} erro(s)`:''}</div>`;
+  if(btn)btn.classList.remove('spin');
+}
+function gcLink(b){const t=BT[b.type];const s=b.data.replace(/-/g,'')+'T'+b.hora.replace(':','')+'00';const e=b.data.replace(/-/g,'')+'T'+am(b.hora,t.d).replace(':','')+'00';return`https://calendar.google.com/calendar/render?action=TEMPLATE&text=${encodeURIComponent('['+t.n+'] - '+b.nome)}&dates=${s}/${e}&details=${encodeURIComponent('Nome: '+b.nome+'\nWhatsApp: '+b.tel+'\nCPF: '+b.cpf+'\nÁrea: '+b.area+'\nResumo: '+b.resumo+'\nProtocolo: '+b.id)}`;}
+function cpScript(){navigator.clipboard?.writeText(appsScript()).then(()=>alert('✅ Código copiado!'));}
+function appsScript(){return`// SOUZA ADVOCACIA — Google Apps Script\nfunction doPost(e) {\n  try {\n    const d = JSON.parse(e.postData.contents);\n    const cal = CalendarApp.getCalendarById(d.calendarId || 'primary');\n    const event = cal.createEvent(d.title, new Date(d.start), new Date(d.end), {\n      description: d.description || ''\n    });\n    event.addPopupReminder(60);\n    event.addPopupReminder(1440);\n    return ContentService.createTextOutput(\n      JSON.stringify({ success: true, eventId: event.getId() })\n    ).setMimeType(ContentService.MimeType.JSON);\n  } catch(err) {\n    return ContentService.createTextOutput(\n      JSON.stringify({ success: false, error: err.toString() })\n    ).setMimeType(ContentService.MimeType.JSON);\n  }\n}`;}
+
+// ═══════════════════════════════════════════════════════════════════
+// CONFIG
+// ═══════════════════════════════════════════════════════════════════
+function renderConfig(){
+  let h=`<div class="card gl"><div class="stit">Escritório</div>
+    <div class="drow"><div class="dl">Nome</div><div class="dv">Souza Advocacia</div></div>
+    <div class="drow"><div class="dl">OAB</div><div class="dv">Dr. Luiz Fabiano (OAB/RJ 160.689) · Dr. Marcus Souza (OAB/RJ 250.430)</div></div>
+    <div class="drow"><div class="dl">Telefone</div><div class="dv">(21) 96534-8183 · (21) 99752-9727</div></div>
+    <div class="drow"><div class="dl">E-mail</div><div class="dv">souzaadvogadosa@gmail.com</div></div>
+    <div class="drow"><div class="dl">Horário</div><div class="dv">Seg–Sex · 10h–18h · Somente agendamento</div></div>
+  </div>
+  <div class="card"><div class="stit">Dados do Sistema</div>
+    <div class="drow"><div class="dl">Clientes</div><div class="dv">${cli.length} registros</div></div>
+    <div class="drow"><div class="dl">Processos</div><div class="dv">${proc.length} registros</div></div>
+    <div class="drow"><div class="dl">Tarefas</div><div class="dv">${tar.length} registros</div></div>
+    <div class="drow"><div class="dl">Financeiro</div><div class="dv">${fin.length} lançamentos</div></div>
+    <div class="drow"><div class="dl">Agendamentos</div><div class="dv">${bk.length} registros</div></div>
+    <div class="drow"><div class="dl">Google Cal</div><div class="dv">${gcfg.on?'✅ Conectado':'❌ Não configurado'}</div></div>
+    <div class="brow" style="margin-top:10px">
+      <button class="btn bnav bsm" onclick="exportExcel()">📥 Exportar Excel</button>
+      <button class="btn bp bsm" onclick="expCSV()">📥 CSV Agendamentos</button>
+      <button class="btn bblue bsm" onclick="expICS()">📅 ICS Agendamentos</button>
+      <button class="btn bca bsm" onclick="exportAllCal()">📅 ICS Tarefas</button>
+    </div>
+  </div>
+  <div class="card"><div class="stit" style="color:var(--re)">⚠️ Zona de Perigo</div>
+    <button class="btn bred bw" onclick="if(confirm('Limpar TODOS os agendamentos? Ação irreversível!'))clearAllBk()">🗑️ Limpar Todos os Agendamentos</button>
+  </div>`;
+  document.getElementById('admin-cnt').innerHTML=h;
+}
+function clearAllBk(){bk=[];saveBk();updNotif();renderConfig();}
+
+// ═══════════════════════════════════════════════════════════════════
+// APPOINTMENT DETAIL
+// ═══════════════════════════════════════════════════════════════════
+function bdg(s){const st=SS[s]||{l:s,c:'b-gd'};return`<span class="badge ${st.c}">${st.l}</span>`;}
+function arw(b){
+  const t=BT[b.type];
+  return`<div class="ar" onclick="showDet('${b.id}')">
+    <div class="arav" style="background:${TC[b.type]}18">${t.i}</div>
+    <div class="ari"><div class="arn">${b.nome}</div><div class="ars">${t.n} · ${b.area||''}</div></div>
+    <div class="arr"><div style="font-size:12px;font-weight:700;color:var(--n)">${b.hora}</div><div style="font-size:10px;color:var(--mu)">${fd(b.data)}</div><div style="margin-top:3px">${bdg(b.status)}</div></div>
+  </div>`;
+}
+function showDet(id){
+  const b=bk.find(x=>x.id===id);if(!b)return;
+  const t=BT[b.type];const mmap={videoconferencia:'📹 Videoconferência',ligacao:'📞 Ligação',whatsapp:'💬 WhatsApp'};
+  const allSt=Object.entries(SS).map(([k,v])=>`<option value="${k}" ${b.status===k?'selected':''}>${v.l}</option>`).join('');
+  document.getElementById('mo-det-i').innerHTML=`
+    <div class="dhdr"><div style="display:flex;align-items:center;gap:10px;margin-bottom:8px"><span style="font-size:28px">${t.i}</span><div><div class="dn">${b.nome}</div><div style="font-size:11px;opacity:.6">${t.n} · ${t.d}min · ${mmap[b.modal]||b.modal}</div></div></div><div style="display:flex;gap:6px;flex-wrap:wrap">${bdg(b.status)}<span class="badge b-gd">${b.id}</span></div></div>
+    <div class="card" style="margin-bottom:10px">
+      <div class="drow"><div class="dl">Data</div><div class="dv">📅 ${fdl(b.data)}</div></div>
+      <div class="drow"><div class="dl">Horário</div><div class="dv">⏰ ${b.hora} – ${am(b.hora,t.d)}</div></div>
+      <div class="drow"><div class="dl">CPF</div><div class="dv">${b.cpf}</div></div>
+      <div class="drow"><div class="dl">WhatsApp</div><div class="dv"><a href="https://wa.me/55${b.tel}" target="_blank" style="color:var(--gr);font-weight:700">📱 ${b.tel}</a></div></div>
+      <div class="drow"><div class="dl">E-mail</div><div class="dv">${b.email||'—'}</div></div>
+      <div class="drow"><div class="dl">Cidade</div><div class="dv">${b.cidade}/${b.estado}</div></div>
+      <div class="drow"><div class="dl">Área</div><div class="dv">${b.area||'—'}</div></div>
+      <div class="drow"><div class="dl">Resumo</div><div class="dv" style="font-size:11px;line-height:1.5">${b.resumo}</div></div>
+    </div>
+    <div class="card" style="margin-bottom:10px">
+      <div class="stit">Alterar Status</div>
+      <select id="det-st" style="width:100%;padding:10px;border:1px solid var(--bd);border-radius:9px;font-size:13px;outline:none;margin-bottom:9px">${allSt}</select>
+      <div class="stit">Observações Internas</div>
+      <textarea id="det-obs" style="width:100%;padding:10px;border:1px solid var(--bd);border-radius:9px;font-size:12px;min-height:65px;resize:vertical;outline:none">${b.obs||''}</textarea>
+      <button class="btn bgold bw" style="margin-top:9px" onclick="saveDet('${b.id}')">💾 Salvar Alterações</button>
+    </div>
+    <div class="brow">
+      <a href="https://wa.me/55${b.tel}?text=${encodeURIComponent('Olá '+b.nome.split(' ')[0]+'! Confirmamos seu atendimento para '+fd(b.data)+' às '+b.hora+'. Escritório Souza Advocacia — (21) 96534-8183.')}" target="_blank" class="btn bwa" style="flex:1">📱 WhatsApp</a>
+      <a href="${gcLink(b)}" target="_blank" class="btn bnav" style="flex:1">📅 Google Cal</a>
+      <button class="btn bred" onclick="delDet('${b.id}')" style="flex:1">🗑️</button>
+    </div>`;
+  openMo('mo-detail');
+}
+function saveDet(id){const i=bk.findIndex(b=>b.id===id);if(i<0)return;bk[i].status=document.getElementById('det-st').value;bk[i].obs=document.getElementById('det-obs').value;saveBk();updNotif();closeMo('mo-detail');const at=document.querySelector('.atab.on');if(at)at.click();}
+function delDet(id){if(!confirm('Excluir este agendamento?'))return;bk=bk.filter(b=>b.id!==id);saveBk();updNotif();closeMo('mo-detail');const at=document.querySelector('.atab.on');if(at)at.click();}
+function showPending(){const p=bk.filter(b=>b.status==='solicitado');if(!p.length){alert('✅ Nenhum agendamento pendente!');return;}document.getElementById('mo-det-i').innerHTML=`<div class="mot">⏳ Aguardando Confirmação (${p.length})</div>${p.map(b=>arw(b)).join('')}`;openMo('mo-detail');}
+
+// ═══════════════════════════════════════════════════════════════════
+// PUBLIC BOOKING FLOW
+// ═══════════════════════════════════════════════════════════════════
+function qtype(t){setTimeout(()=>selType(t),100);}
+function selType(t){
+  app={type:t,step:0,nome:'',cpf:'',tel:'',email:'',cidade:'',estado:'',area:'',resumo:'',modal:'whatsapp',data:'',hora:'',extra:{},files:[],lgpd:false};
+  selDate=null;selTime=null;calM=new Date().getMonth();calY=new Date().getFullYear();
+  go('s-form');renderStep(0);
+}
+const STEPS=['Dados Pessoais','Detalhes do Caso','Data e Horário','Confirmação'];
+function renderStep(s){
+  app.step=s;const tot=STEPS.length;
+  document.getElementById('form-title').textContent=STEPS[s];
+  document.getElementById('form-prog').style.width=((s+1)/tot*100)+'%';
+  document.getElementById('form-dots').innerHTML=STEPS.map((_,i)=>`<div class="sd ${i===s?'on':i<s?'done':''}"></div>`).join('');
+  const rs=[rStep0,rStep1,rStep2,rStep3];
+  document.getElementById('form-cnt').innerHTML=rs[s]();
+}
+function formBack(){if(app.step>0)renderStep(app.step-1);else go('s-type');}
+
+function rStep0(){
+  const t=BT[app.type];
+  return`<div class="card gl" style="margin-bottom:13px;display:flex;align-items:center;gap:10px"><span style="font-size:26px">${t.i}</span><div><div style="font-weight:700;color:var(--n)">${t.n}</div><div style="font-size:11px;color:var(--mu)">${t.d} minutos</div></div></div>
+  <div class="stit">Dados Pessoais</div>
+  <div class="fg"><div class="fl">Nome Completo <span style="color:var(--g)">*</span></div><input class="fi" id="f-nome" value="${app.nome}" placeholder="Nome completo"></div>
+  <div class="frow"><div class="fg" style="flex:1"><div class="fl">CPF *</div><input class="fi" id="f-cpf" type="tel" inputmode="numeric" value="${app.cpf}" placeholder="000.000.000-00" oninput="mCPF(this)"></div><div class="fg" style="flex:1"><div class="fl">Nasc.</div><input class="fi" id="f-nasc" type="date" value="${app.extra.nasc||''}"></div></div>
+  <div class="fg"><div class="fl">WhatsApp *</div><input class="fi" id="f-tel" type="tel" inputmode="numeric" value="${app.tel}" placeholder="(21) 99999-9999" oninput="mTel(this)"></div>
+  <div class="fg"><div class="fl">E-mail</div><input class="fi" id="f-email" type="email" value="${app.email}" placeholder="email@exemplo.com"></div>
+  <div class="frow"><div class="fg" style="flex:2"><div class="fl">Cidade *</div><input class="fi" id="f-cidade" value="${app.cidade}" placeholder="Rio de Janeiro"></div><div class="fg" style="flex:1"><div class="fl">UF</div><select class="fsel" id="f-uf"><option value="">--</option>${['AC','AL','AP','AM','BA','CE','DF','ES','GO','MA','MT','MS','MG','PA','PB','PR','PE','PI','RJ','RN','RS','RO','RR','SC','SP','SE','TO'].map(u=>`<option ${app.estado===u?'selected':''}>${u}</option>`).join('')}</select></div></div>
+  <div class="brow"><button class="btn bgold" style="flex:1" onclick="s0next()">Próximo ›</button></div>`;
+}
+function rStep1(){
+  const t=app.type;let extra='';
+  if(t==='andamento')extra=`<div class="fg"><div class="fl">Nº do Processo</div><input class="fi" id="e-num" value="${app.extra.num||''}" placeholder="0000000-00.0000.8.00.0000"></div><div class="fg"><div class="fl">Parte Contrária</div><input class="fi" id="e-contra" value="${app.extra.contra||''}" placeholder="Se souber"></div>`;
+  else if(t==='previdenciario')extra=`<div class="fg"><div class="fl">Benefício Desejado *</div><select class="fsel" id="e-benef"><option value="">Selecione</option>${['Aposentadoria','Auxílio-doença','Aposentadoria por incapacidade','BPC/LOAS','Pensão por morte','Auxílio-acidente','Revisão de benefício','Outro'].map(x=>`<option>${x}</option>`).join('')}</select></div><div class="fg"><div class="fl">Já recebe benefício INSS?</div><select class="fsel" id="e-recebe"><option>Não</option><option>Sim</option></select></div>`;
+  else if(t==='trabalhista')extra=`<div class="fg"><div class="fl">Empresa *</div><input class="fi" id="e-emp" value="${app.extra.emp||''}" placeholder="Nome da empresa"></div><div class="frow"><div class="fg"><div class="fl">Admissão</div><input class="fi" type="date" id="e-adm"></div><div class="fg"><div class="fl">Demissão</div><input class="fi" type="date" id="e-dem"></div></div><div class="fg"><div class="fl">Assunto *</div><select class="fsel" id="e-tasst"><option value="">Selecione</option>${['Verbas rescisórias','Horas extras','Assédio moral','Acidente de trabalho','Reconhecimento de vínculo','FGTS','Insalubridade/periculosidade','Outro'].map(x=>`<option>${x}</option>`).join('')}</select></div>`;
+  else if(t==='consumidor')extra=`<div class="fg"><div class="fl">Empresa Envolvida *</div><input class="fi" id="e-cemp" value="${app.extra.emp||''}" placeholder="Nome da empresa"></div><div class="frow"><div class="fg"><div class="fl">Data do Problema</div><input class="fi" type="date" id="e-cdat"></div><div class="fg"><div class="fl">Valor Envolvido</div><input class="fi" id="e-cval" placeholder="R$ 0,00"></div></div><div class="fg"><div class="fl">Tipo</div><select class="fsel" id="e-ctip"><option value="">Selecione</option>${['Banco','Energia elétrica','Telefonia/internet','Produto com defeito','Cobrança indevida','Plano de saúde','Outro'].map(x=>`<option>${x}</option>`).join('')}</select></div>`;
+  else if(t==='autista')extra=`<div class="fg"><div class="fl">Nome do Beneficiário</div><input class="fi" id="e-bnm" placeholder="Nome da pessoa beneficiária"></div><div class="frow"><div class="fg"><div class="fl">Idade</div><input class="fi" type="number" id="e-id" placeholder="0"></div><div class="fg"><div class="fl">Diagnóstico</div><input class="fi" id="e-diag" placeholder="Ex: TEA Nível 2"></div></div><div class="fg"><div class="fl">Possui laudo?</div><select class="fsel" id="e-ldo"><option>Sim</option><option>Não</option><option>Em andamento</option></select></div><div class="fg"><div class="fl">Pedido no INSS?</div><select class="fsel" id="e-inss"><option>Não</option><option>Sim — em análise</option><option>Sim — negado</option></select></div>`;
+  else if(t==='documentos')extra=`<div class="fg"><div class="fl">Tipo de Documento *</div><input class="fi" id="e-tdoc" placeholder="Ex: CNIS, laudo médico..."></div>`;
+  else if(t==='retorno')extra=`<div class="fg"><div class="fl">Data do Último Atendimento</div><input class="fi" type="date" id="e-ult"></div><div class="fg"><div class="fl">Assunto do Retorno *</div><input class="fi" id="e-assr" placeholder="O que deseja tratar?"></div>`;
+  return`<div class="stit">Detalhes do Caso</div>
+  <div class="fg"><div class="fl">Área Jurídica *</div><select class="fsel" id="f-area"><option value="">Selecione a área</option>${AREAS.map(a=>`<option ${app.area===a?'selected':''}>${a}</option>`).join('')}</select></div>
+  ${extra}
+  <div class="fg"><div class="fl">Resumo do Caso *</div><textarea class="fi" id="f-res" placeholder="Descreva brevemente sua situação jurídica...">${app.resumo}</textarea></div>
+  <div class="fg"><div class="fl">Documentos (opcional)</div><div class="up" onclick="document.getElementById('fi-file').click()"><div style="font-size:28px">📎</div><div style="font-size:12px;font-weight:600;color:var(--n);margin:4px 0">Toque para anexar</div><div style="font-size:10px;color:var(--mu)">PDF · Imagem · Word</div></div><input type="file" id="fi-file" multiple accept=".pdf,.jpg,.jpeg,.png,.doc,.docx" style="display:none" onchange="hFile(this)"><div id="file-lst">${app.files.map((f,i)=>`<div style="display:flex;align-items:center;gap:7px;padding:7px;background:var(--gb);border:1px solid var(--bd);border-radius:7px;margin-top:6px;font-size:11px">📎 ${f}<span onclick="rmFile(${i})" style="margin-left:auto;color:var(--re);cursor:pointer;font-size:15px">✕</span></div>`).join('')}</div></div>
+  <div class="stit" style="margin-top:4px">Modalidade de Atendimento</div>
+  <div id="modal-group">
+    <div class="ri ${app.modal==='videoconferencia'?'on':''}" onclick="selModal('videoconferencia')"><div class="rc"></div><span class="rt">📹 Videoconferência</span></div>
+    <div class="ri ${app.modal==='ligacao'?'on':''}" onclick="selModal('ligacao')"><div class="rc"></div><span class="rt">📞 Ligação Telefônica</span></div>
+    <div class="ri ${app.modal==='whatsapp'?'on':''}" onclick="selModal('whatsapp')"><div class="rc"></div><span class="rt">💬 WhatsApp</span></div>
+  </div>
+  <div class="brow"><button class="btn bghost" style="flex:1" onclick="renderStep(0)">‹ Voltar</button><button class="btn bgold" style="flex:1" onclick="s1next()">Próximo ›</button></div>`;
+}
+function rStep2(){
+  const y=calY,m=calM,fd_=new Date(y,m,1).getDay(),dim=new Date(y,m+1,0).getDate();
+  const mn=new Date(y,m).toLocaleDateString('pt-BR',{month:'long',year:'numeric'});
+  const cells=[...Array(fd_).fill(null),...Array.from({length:dim},(_,i)=>i+1)];
+  let cHtml=`<div class="cnav"><button class="cnb" onclick="cPrev()">‹</button><h3>${mn}</h3><button class="cnb" onclick="cNext()">›</button></div><div class="cgrid" style="margin-bottom:3px">${['D','S','T','Q','Q','S','S'].map(d=>`<div class="chdr">${d}</div>`).join('')}</div><div class="cgrid">`;
+  cells.forEach(day=>{
+    if(!day){cHtml+=`<div></div>`;return;}
+    const ds=`${y}-${String(m+1).padStart(2,'0')}-${String(day).padStart(2,'0')}`;
+    const dow=new Date(y,m,day).getDay(),isPst=ds<td0,isWE=dow===0||dow===6,isSel=ds===selDate,isT=ds===td0;
+    if(isPst||isWE)cHtml+=`<div class="cday dis">${day}</div>`;
+    else cHtml+=`<div class="cday avail ${isSel?'sel':''} ${isT&&!isSel?'tod':''}" onclick="pickDate('${ds}')">${day}</div>`;
+  });
+  cHtml+=`</div>`;
+  let tHtml='';
+  if(selDate){
+    const taken=bk.filter(b=>b.data===selDate&&b.status!=='cancelado').map(b=>b.hora);
+    tHtml=`<div class="stit" style="margin-top:2px">Horários — ${fd(selDate)}</div><div class="tslots">${HRS.map(h=>{const tk=taken.includes(h);return`<div class="ts ${tk?'taken':''} ${h===selTime?'sel':''}" onclick="${tk?'':'pickTime(\''+h+'\')'}">${h}</div>`;}).join('')}</div>`;
+  }else{tHtml=`<div class="al al-info">📅 Selecione uma data disponível para ver os horários.</div>`;}
+  return`<div class="stit">Data e Horário</div><div class="card" style="padding:11px">${cHtml}</div><div class="card" style="padding:11px">${tHtml}</div>
+  <div class="brow"><button class="btn bghost" style="flex:1" onclick="renderStep(1)">‹ Voltar</button><button class="btn bgold" style="flex:1" onclick="s2next()">Próximo ›</button></div>`;
+}
+function rStep3(){
+  const t=BT[app.type];const mmap={videoconferencia:'📹 Videoconferência',ligacao:'📞 Ligação',whatsapp:'💬 WhatsApp'};
+  return`<div class="stit">Revisão Final</div>
+  <div class="card" style="margin-bottom:11px">
+    <div style="display:flex;align-items:center;gap:10px;margin-bottom:11px;padding-bottom:9px;border-bottom:1px solid var(--bd)"><span style="font-size:26px">${t.i}</span><div><div style="font-weight:700;color:var(--n)">${t.n}</div><div style="font-size:11px;color:var(--mu)">${t.d}min · ${mmap[app.modal]}</div></div></div>
+    <div class="ri2"><div class="rl">Nome</div><div class="rv">${app.nome}</div></div>
+    <div class="ri2"><div class="rl">WhatsApp</div><div class="rv">${app.tel}</div></div>
+    <div class="ri2"><div class="rl">Cidade</div><div class="rv">${app.cidade}/${app.estado}</div></div>
+    <div class="ri2"><div class="rl">Área</div><div class="rv">${app.area||'Não informado'}</div></div>
+    <div class="ri2"><div class="rl">Data</div><div class="rv">📅 ${fd(selDate)}</div></div>
+    <div class="ri2"><div class="rl">Horário</div><div class="rv">⏰ ${selTime||'—'}</div></div>
+  </div>
+  <div class="al al-warn" style="font-size:11px;margin-bottom:11px">⚠️ O agendamento não gera contratação automática.</div>
+  <div class="crow" id="lgpd-row" onclick="togLgpd()">
+    <div class="cbox ${app.lgpd?'on':''}" id="lgpd-box">${app.lgpd?'✓':''}</div>
+    <div class="ctxt">Autorizo o tratamento dos meus dados para fins de agendamento e análise jurídica, conforme a <span style="color:var(--gd);text-decoration:underline" onclick="event.stopPropagation();showLGPD()">Política de Privacidade</span>. (LGPD)</div>
+  </div>
+  <div class="brow"><button class="btn bghost" style="flex:1" onclick="renderStep(2)">‹ Voltar</button><button class="btn bgold" style="flex:1" onclick="submitBooking()">✅ Confirmar</button></div>`;
+}
+function mCPF(el){let v=el.value.replace(/\D/g,'').substring(0,11);v=v.replace(/(\d{3})(\d)/,'$1.$2').replace(/(\d{3})(\d)/,'$1.$2').replace(/(\d{3})(\d{1,2})$/,'$1-$2');el.value=v;}
+function mTel(el){let v=el.value.replace(/\D/g,'').substring(0,11);v=v.replace(/^(\d{2})(\d)/,'($1) $2').replace(/(\d{5})(\d)/,'$1-$2');el.value=v;}
+function hFile(i){Array.from(i.files).forEach(f=>app.files.push(f.name));const fl=document.getElementById('file-lst');fl.innerHTML=app.files.map((f,j)=>`<div style="display:flex;align-items:center;gap:7px;padding:7px;background:var(--gb);border:1px solid var(--bd);border-radius:7px;margin-top:6px;font-size:11px">📎 ${f}<span onclick="rmFile(${j})" style="margin-left:auto;color:var(--re);cursor:pointer;font-size:15px">✕</span></div>`).join('');}
+function rmFile(i){app.files.splice(i,1);renderStep(1);}
+function selModal(m){app.modal=m;document.querySelectorAll('#modal-group .ri').forEach(el=>el.classList.remove('on'));event.currentTarget.classList.add('on');}
+function togLgpd(){app.lgpd=!app.lgpd;const b=document.getElementById('lgpd-box');b.className='cbox'+(app.lgpd?' on':'');b.textContent=app.lgpd?'✓':'';}
+function cPrev(){if(calM===0){calM=11;calY--;}else calM--;renderStep(2);}
+function cNext(){if(calM===11){calM=0;calY++;}else calM++;renderStep(2);}
+function pickDate(d){selDate=d;selTime=null;renderStep(2);}
+function pickTime(t){selTime=t;renderStep(2);}
+function gi(id){const e=document.getElementById(id);return e?e.value:'';}
+function s0next(){
+  const nome=gi('f-nome').trim(),cpf=gi('f-cpf').trim(),tel=gi('f-tel').trim(),cidade=gi('f-cidade').trim();
+  if(!nome||!cpf||!tel||!cidade){alert('Preencha: Nome, CPF, WhatsApp e Cidade.');return;}
+  Object.assign(app,{nome,cpf,tel:tel.replace(/\D/g,''),email:gi('f-email').trim(),cidade,estado:gi('f-uf'),extra:{...app.extra,nasc:gi('f-nasc')}});
+  renderStep(1);
+}
+function s1next(){
+  const area=gi('f-area'),res=gi('f-res').trim();if(!area||!res){alert('Preencha a área jurídica e o resumo.');return;}
+  app.area=area;app.resumo=res;
+  const t=app.type;
+  if(t==='andamento')app.extra={...app.extra,num:gi('e-num'),contra:gi('e-contra')};
+  else if(t==='previdenciario'){const b=gi('e-benef');if(!b){alert('Selecione o benefício.');return;}app.extra={...app.extra,benef:b,recebe:gi('e-recebe')};}
+  else if(t==='trabalhista'){const e=gi('e-emp');if(!e){alert('Informe a empresa.');return;}app.extra={...app.extra,emp:e,adm:gi('e-adm'),dem:gi('e-dem'),tasst:gi('e-tasst')};}
+  else if(t==='consumidor'){const e=gi('e-cemp');if(!e){alert('Informe a empresa envolvida.');return;}app.extra={...app.extra,emp:e,cdat:gi('e-cdat'),cval:gi('e-cval'),ctip:gi('e-ctip')};}
+  else if(t==='autista')app.extra={...app.extra,bnm:gi('e-bnm'),id_:gi('e-id'),diag:gi('e-diag'),ldo:gi('e-ldo'),inss:gi('e-inss')};
+  else if(t==='documentos'){const d=gi('e-tdoc');if(!d){alert('Informe o tipo de documento.');return;}app.extra={...app.extra,tdoc:d};}
+  else if(t==='retorno'){const a=gi('e-assr');if(!a){alert('Informe o assunto do retorno.');return;}app.extra={...app.extra,ult:gi('e-ult'),assr:a};}
+  renderStep(2);
+}
+function s2next(){if(!selDate||!selTime){alert('Selecione data e horário.');return;}app.data=selDate;app.hora=selTime;renderStep(3);}
+function submitBooking(){
+  if(!app.lgpd){alert('É necessário aceitar a Política de Privacidade.');return;}
+  const b={id:gidb(),type:app.type,status:'solicitado',nome:app.nome,cpf:app.cpf,tel:app.tel,email:app.email,cidade:app.cidade,estado:app.estado,area:app.area,resumo:app.resumo,modal:app.modal,data:app.data,hora:app.hora,extra:app.extra,files:[...app.files],createdAt:new Date().toISOString(),obs:''};
+  bk.push(b);saveBk();updNotif();
+  const t=BT[b.type];const mmap={videoconferencia:'📹 Videoconferência',ligacao:'📞 Ligação',whatsapp:'💬 WhatsApp'};
+  document.getElementById('suc-msg').textContent=`Olá, ${b.nome.split(' ')[0]}! Seu agendamento foi realizado. Em breve a equipe confirmará pelo WhatsApp.`;
+  document.getElementById('suc-det').innerHTML=`<div class="ri2"><div class="rl">Tipo</div><div class="rv">${t.i} ${t.n}</div></div><div class="ri2"><div class="rl">Data</div><div class="rv">📅 ${fd(b.data)}</div></div><div class="ri2"><div class="rl">Horário</div><div class="rv">⏰ ${b.hora}</div></div><div class="ri2"><div class="rl">Modalidade</div><div class="rv">${mmap[b.modal]||b.modal}</div></div><div class="ri2"><div class="rl">Protocolo</div><div class="rv" style="font-family:monospace;font-size:11px">${b.id}</div></div>`;
+  const msg=`Olá! Confirmando agendamento:%0ATipo: ${t.n}%0AData: ${fd(b.data)}%0AHorário: ${b.hora}%0AProtocolo: ${b.id}`;
+  document.getElementById('suc-wa').href=`https://wa.me/5521965348183?text=${msg}`;
+  const ds=b.data.replace(/-/g,'')+'T'+b.hora.replace(':','')+'00';
+  const de=b.data.replace(/-/g,'')+'T'+am(b.hora,t.d).replace(':','')+'00';
+  document.getElementById('suc-cal').href=`https://calendar.google.com/calendar/render?action=TEMPLATE&text=${encodeURIComponent('['+t.n+'] - '+b.nome)}&dates=${ds}/${de}&details=${encodeURIComponent('Nome: '+b.nome+'\nWhatsApp: '+b.tel+'\nÁrea: '+b.area+'\nProtocolo: '+b.id)}`;
+  go('s-success');
+}
+
+// ═══════════════════════════════════════════════════════════════════
+// HELPERS
+// ═══════════════════════════════════════════════════════════════════
+const badge=(t,c)=>`<span class="badge ${c}">${t}</span>`;
+const sbadge=s=>s==='Em andamento'?badge(s,'bb'):s==='Finalizado'?badge(s,'bg'):s==='Suspenso'?badge(s,'by'):s==='Concluído'?badge(s,'bg'):badge(s,'br');
+const pbadge=p=>p==='Alta'?badge(p,'br'):p==='Média'?badge(p,'by'):badge(p,'bg');
+const tbadge=t=>t==='Ativo'?badge(t,'bg'):t==='Novo'?badge(t,'bb'):badge(t,'bga');
+const fsbadge=s=>s==='Pago'?badge(s,'bg'):s==='Parcial'?badge(s,'by'):badge(s,'br');
+const kc=(bg,n,co,l)=>`<div class="kc" style="background:${bg}"><div class="kn" style="color:${co}">${n}</div><div class="kl">${l}</div></div>`;
+function dcolor(d,active){if(!d)return'—';const i=isPast(d)&&active?'🔴 ':isNear(d)?'🟡 ':'🟢 ';const c=isPast(d)&&active?'dr':isNear(d)?'dy':'dg';return`<span class="${c}">${i}${fmtD(d)}</span>`;}
+function gcalUrl(title,date,endDate,desc,location){const s=date.replace(/-/g,'')+'T090000';const e=(endDate||date).replace(/-/g,'')+'T100000';return`https://calendar.google.com/calendar/render?action=TEMPLATE&text=${encodeURIComponent(title)}&dates=${s}/${e}&details=${encodeURIComponent(desc||'')}&location=${encodeURIComponent(location||'')}`;}
+function buildAdvSelect(id,selected){const sel=document.getElementById(id);if(!sel)return;sel.innerHTML=users.filter(u=>u.ativo&&(u.role==='admin'||u.role==='advogado')).map(u=>`<option value="${u.nome}" ${u.nome===selected?'selected':''}>${u.nome}</option>`).join('');}
+function buildCliSelect(id,selected){const sel=document.getElementById(id);if(!sel)return;sel.innerHTML='<option value="">— Selecionar —</option>'+cli.map(c=>`<option value="${c.id}" ${c.id===+selected?'selected':''}>${c.nome}</option>`).join('');}
+
+// ═══════════════════════════════════════════════════════════════════
+// EXPORT
+// ═══════════════════════════════════════════════════════════════════
+function exportExcel(){
+  const wb=XLSX.utils.book_new();
+  XLSX.utils.book_append_sheet(wb,XLSX.utils.json_to_sheet(cli.map(c=>({Nome:c.nome,'CPF/CNPJ':c.cpf,Telefone:c.tel,'E-mail':c.email,'Endereço':c.end,Tipo:c.tipo,'Observações':c.obs}))),'Clientes');
+  XLSX.utils.book_append_sheet(wb,XLSX.utils.json_to_sheet(proc.map(p=>({'Nº Processo':p.num,Cliente:cn(p.cliId),Área:p.tipo,'Tribunal/Vara':p.vara,Status:p.status,Início:fmtD(p.ini),'Próx.Mov':fmtD(p.prox),Advogado:p.adv,'Observações':p.obs}))),'Processos');
+  XLSX.utils.book_append_sheet(wb,XLSX.utils.json_to_sheet(tar.map(t=>({Data:fmtD(t.data),Descrição:t.desc,Cliente:cn(t.cliId),Prioridade:t.prio,Status:t.status,Responsável:t.resp,Concluída:t.ok?'Sim':'Não'}))),'Tarefas');
+  XLSX.utils.book_append_sheet(wb,XLSX.utils.json_to_sheet(fin.map(f=>({Cliente:cn(f.cliId),Descrição:f.desc,Data:fmtD(f.data),Contratado:f.ct,Recebido:f.rc,Pendente:(f.ct||0)-(f.rc||0),Pagamento:f.pg,Status:f.st}))),'Financeiro');
+  XLSX.utils.book_append_sheet(wb,XLSX.utils.json_to_sheet(bk.map(b=>({Protocolo:b.id,Tipo:BT[b.type]?.n,Status:SS[b.status]?.l,Nome:b.nome,CPF:b.cpf,Telefone:b.tel,'E-mail':b.email,Cidade:b.cidade,Estado:b.estado,Área:b.area,Data:b.data,Hora:b.hora,Modalidade:b.modal,Resumo:b.resumo}))),'Agendamentos');
+  XLSX.utils.book_append_sheet(wb,XLSX.utils.json_to_sheet(users.map(u=>({Nome:u.nome,Cargo:u.cargo,'E-mail':u.email,OAB:u.oab,Telefone:u.tel,Função:ROLES[u.role]?.l,Status:u.ativo?'Ativo':'Inativo'}))),'Usuários');
+  XLSX.writeFile(wb,'SouzaAdvocacia_'+new Date().toLocaleDateString('pt-BR').replace(/\//g,'-')+'.xlsx');
+}
+function expCSV(){
+  const h=['ID','Tipo','Status','Nome','CPF','Telefone','Email','Cidade','UF','Área','Data','Hora','Modalidade','Resumo','Obs'];
+  const rows=bk.map(b=>[b.id,BT[b.type]?.n,SS[b.status]?.l,b.nome,b.cpf,b.tel,b.email,b.cidade,b.estado,b.area,b.data,b.hora,b.modal,b.resumo?.replace(/,/g,';'),b.obs?.replace(/,/g,';')]);
+  const csv=[h,...rows].map(r=>r.map(v=>`"${(v||'').toString().replace(/"/g,'""')}"`).join(',')).join('\n');
+  const a=document.createElement('a');a.href='data:text/csv;charset=utf-8,\uFEFF'+encodeURIComponent(csv);a.download=`agendamentos_${td0}.csv`;a.click();
+}
+function expICS(){
+  let ics='BEGIN:VCALENDAR\nVERSION:2.0\nPRODID:-//Souza Advocacia//PT\n';
+  bk.filter(b=>b.data&&b.hora&&b.status!=='cancelado').forEach(b=>{
+    const t=BT[b.type],s=b.data.replace(/-/g,'')+'T'+b.hora.replace(':','')+'00',e=b.data.replace(/-/g,'')+'T'+am(b.hora,t.d).replace(':','')+'00';
+    ics+=`BEGIN:VEVENT\nUID:${b.id}@souzaadv.com\nDTSTART:${s}\nDTEND:${e}\nSUMMARY:[${t.n}] - ${b.nome}\nDESCRIPTION:Nome: ${b.nome}\\nWhatsApp: ${b.tel}\\nCPF: ${b.cpf}\\nÁrea: ${b.area}\\nStatus: ${SS[b.status]?.l}\\nProtocolo: ${b.id}\nEND:VEVENT\n`;
+  });
+  ics+='END:VCALENDAR';
+  const a=document.createElement('a');a.href='data:text/calendar;charset=utf-8,'+encodeURIComponent(ics);a.download=`agenda_${td0}.ics`;a.click();
+}
+
+// ═══════════════════════════════════════════════════════════════════
+// INIT
+// ═══════════════════════════════════════════════════════════════════
+document.addEventListener('DOMContentLoaded',()=>{
+  load();
+  const sid=+localStorage.getItem('sa_sess');
+  if(sid){const u=users.find(x=>x.id===sid&&x.ativo);if(u){currentUser=u;showApp();return;}}
+  go('s-home');
+});
+</script>
+</body>
+</html>
