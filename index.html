@@ -396,7 +396,15 @@ tr:hover td{background:#f8fafc!important}
 .sync-err{color:#dc2626;font-size:11px}
 .sync-warn{color:#d97706;font-size:11px}
 .sync-load{color:#6b7280;font-size:11px}
-.lb{background:#fff;border-radius:16px;padding:32px 28px;width:100%;max-width:360px;text-align:center;box-shadow:0 25px 60px rgba(0,0,0,.35)}
+.lb{background:#fff;border-radius:16px;padding:28px 24px;width:100%;max-width:420px;text-align:center;box-shadow:0 25px 60px rgba(0,0,0,.35)}
+.user-chips{display:flex;flex-wrap:wrap;gap:8px;justify-content:center;margin:12px 0}
+.uchip-login{display:flex;flex-direction:column;align-items:center;gap:4px;padding:10px 12px;background:#f8fafc;border:1.5px solid var(--bd);border-radius:10px;cursor:pointer;transition:all .14s;min-width:80px;text-decoration:none}
+.uchip-login:hover,.uchip-login.sel{border-color:var(--g);background:var(--gb)}
+.uchip-login .av{width:36px;height:36px;font-size:13px}
+.uchip-login .ucn{font-size:10px;font-weight:700;color:var(--n);margin-top:2px;max-width:80px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.uchip-login .ucp{font-size:9px;color:var(--mu)}
+.login-divider{display:flex;align-items:center;gap:8px;margin:10px 0;color:var(--mu);font-size:11px}
+.login-divider::before,.login-divider::after{content:'';flex:1;height:1px;background:var(--bd)}
 .lb .ico{font-size:42px;margin-bottom:8px}.lb h2{font-size:18px;font-weight:700;color:var(--n);margin-bottom:3px}
 .lb .sub{font-size:12px;color:var(--mu);margin-bottom:22px}
 .lerr{color:#dc2626;font-size:12px;margin-bottom:8px;display:none;text-align:left;padding:6px 8px;background:#fef2f2;border-radius:6px}
@@ -480,20 +488,40 @@ tr:hover td{background:#f8fafc!important}
      ╚══════════════════════════════════════════════╝ -->
 
 <!-- LOGIN -->
-<div id="ls" style="display:none">
+<div id="ls">
   <div class="lb">
-    <div class="ico">⚖️</div>
-    <h2>Marcus Souza I Advogado</h2>
-    <p class="sub">Sistema de Gestão Jurídica + Agendamentos</p>
-    <input type="email" id="lemail" placeholder="E-mail" onkeydown="if(event.key==='Enter')doLogin()">
-    <input type="password" id="lpwd" placeholder="Senha" style="margin-top:8px" onkeydown="if(event.key==='Enter')doLogin()">
-    <div class="lerr" id="lerr">E-mail ou senha incorretos.</div>
-    <button class="btn bgold" style="width:100%;padding:11px;margin-top:8px" onclick="doLogin()">Entrar no Sistema</button>
-    <button onclick="go('s-home')" style="margin-top:10px;background:none;border:none;color:var(--mu);cursor:pointer;font-size:12px;width:100%">‹ Voltar ao Site</button>
-    <div class="lhint">
-      <strong>Acesso padrão:</strong><br>
-      marcus@souzaadv.com / Admin@2025 (Admin)<br>
+    <svg viewBox="0 0 70 70" width="44" height="44" fill="none" style="margin:0 auto 8px;display:block">
+      <polygon points="35,4 62,19 62,51 35,66 8,51 8,19" fill="#060e22" stroke="rgba(200,169,106,0.3)" stroke-width="1.5"/>
+      <polygon points="35,27 40,30 40,40 35,43 30,40 30,30" fill="#C8A96A"/>
+    </svg>
+    <h2 style="font-size:16px;font-weight:700;color:#0B1A3B;margin-bottom:2px">Marcus Souza I Advogado</h2>
+    <p class="sub" style="margin-bottom:16px">Sistema de Gestão Jurídica</p>
+
+    <!-- Seletor rápido — preenchido dinamicamente via renderUserChips() -->
+    <div id="user-chips-wrap" style="display:none;margin-bottom:12px">
+      <div style="font-size:10px;color:#7A7D8E;margin-bottom:7px;font-weight:700;text-transform:uppercase;letter-spacing:.5px">Acessar como</div>
+      <div class="user-chips" id="user-chips"></div>
+      <div class="login-divider">ou entre com e-mail e senha</div>
     </div>
+
+    <input type="email" id="lemail" class="fi" placeholder="E-mail de acesso"
+      style="text-align:left;margin-bottom:8px"
+      onkeydown="if(event.key==='Enter')document.getElementById('lpwd').focus()"
+      oninput="selectChipByEmail(this.value)">
+    <input type="password" id="lpwd" class="fi" placeholder="Senha"
+      onkeydown="if(event.key==='Enter')doLogin()">
+
+    <div class="lerr" id="lerr" style="display:none;margin-top:8px"></div>
+
+    <button class="btn bgold" style="width:100%;padding:12px;margin-top:10px;font-size:14px;letter-spacing:.3px" onclick="doLogin()">
+      Entrar no Sistema
+    </button>
+    <button onclick="go('s-home')" style="margin-top:10px;background:none;border:none;color:var(--mu);cursor:pointer;font-size:12px;width:100%">
+      ‹ Voltar ao Site
+    </button>
+    <button onclick="resetAndLogin()" style="margin-top:6px;background:none;border:1px solid rgba(200,169,106,.25);color:rgba(200,169,106,.7);cursor:pointer;font-size:10px;width:100%;padding:6px;border-radius:7px">
+      🔄 Problemas para entrar?
+    </button>
   </div>
 </div>
 
@@ -638,14 +666,81 @@ tr:hover td{background:#f8fafc!important}
 </div></div>
 
 <!-- Modal: Usuário -->
-<div class="mo-desk" id="m-user"><div class="mbox">
+<div class="mo-desk" id="m-user"><div class="mbox" style="max-width:540px">
   <h3>👤 <span id="m-user-t">Novo Usuário</span></h3>
   <input type="hidden" id="user-id">
-  <div class="frow"><div class="ff" style="flex:2"><div class="fl">Nome Completo *</div><input id="user-nome" placeholder="Dr. Nome Sobrenome"></div><div class="ff"><div class="fl">Cargo</div><input id="user-cargo" placeholder="Ex: Advogado, Estagiário..."></div></div>
-  <div class="frow"><div class="ff" style="flex:2"><div class="fl">E-mail *</div><input type="email" id="user-email" placeholder="email@souzaadv.com"></div><div class="ff"><div class="fl">Telefone</div><input id="user-tel" placeholder="(21) 99999-9999"></div></div>
-  <div class="frow"><div class="ff"><div class="fl">OAB</div><input id="user-oab" placeholder="OAB/RJ 000.000"></div><div class="ff"><div class="fl">Senha *</div><input type="password" id="user-pwd" placeholder="Mínimo 6 caracteres"></div><div class="ff"><div class="fl">Função</div><select id="user-role"><option value="advogado">Advogado</option><option value="colaborador">Colaborador</option><option value="estagiario">Estagiário</option><option value="admin">Administrador</option></select></div></div>
-  <div class="frow"><div class="ff"><div class="fl">Status</div><select id="user-ativo"><option value="1">Ativo</option><option value="0">Inativo</option></select></div></div>
-  <div class="mfoot"><button class="btn bp" onclick="saveUser()">💾 Salvar</button><button class="btn bgh" onclick="closeMo('m-user')">Cancelar</button></div>
+
+  <!-- Identificação -->
+  <div class="stit" style="margin-bottom:8px">Identificação</div>
+  <div class="frow">
+    <div class="ff" style="flex:2">
+      <div class="fl">Nome Completo *</div>
+      <input id="user-nome" placeholder="Dr. Nome Sobrenome" class="fi">
+    </div>
+    <div class="ff">
+      <div class="fl">Cargo / Função</div>
+      <input id="user-cargo" placeholder="Ex: Advogado Sócio" class="fi">
+    </div>
+  </div>
+  <div class="frow">
+    <div class="ff">
+      <div class="fl">OAB (opcional)</div>
+      <input id="user-oab" placeholder="OAB/RJ 000.000" class="fi">
+    </div>
+    <div class="ff">
+      <div class="fl">Telefone</div>
+      <input id="user-tel" placeholder="(21) 99999-9999" class="fi">
+    </div>
+  </div>
+
+  <!-- Acesso -->
+  <div class="stit" style="margin:12px 0 8px">Credenciais de Acesso</div>
+  <div class="frow">
+    <div class="ff" style="flex:2">
+      <div class="fl">E-mail * (usado no login)</div>
+      <input type="email" id="user-email" placeholder="email@souzaadv.com" class="fi">
+    </div>
+    <div class="ff">
+      <div class="fl">Perfil de Acesso *</div>
+      <select id="user-role" class="fsel" onchange="updateRoleDesc()">
+        <option value="admin">👑 Administrador</option>
+        <option value="advogado">⚖️ Advogado</option>
+        <option value="estagiario">🎓 Estagiário</option>
+        <option value="colaborador">🗂️ Colaborador Administrativo</option>
+        <option value="financeiro">💰 Financeiro</option>
+        <option value="atendente">📞 Atendente</option>
+        <option value="personalizado">🔧 Usuário Personalizado</option>
+      </select>
+    </div>
+  </div>
+  <div class="frow">
+    <div class="ff">
+      <div class="fl">Senha * <span id="user-pwd-hint" style="font-size:10px;color:var(--mu)">(deixe em branco para manter)</span></div>
+      <input type="password" id="user-pwd" placeholder="Mínimo 6 caracteres" class="fi" oninput="checkPwdMatch()">
+    </div>
+    <div class="ff">
+      <div class="fl">Confirmar Senha</div>
+      <input type="password" id="user-pwd2" placeholder="Repetir senha" class="fi" oninput="checkPwdMatch()">
+      <div id="pwd-match" style="font-size:10px;margin-top:3px"></div>
+    </div>
+  </div>
+  <div class="frow">
+    <div class="ff">
+      <div class="fl">Status</div>
+      <select id="user-ativo" class="fsel">
+        <option value="1">✅ Ativo</option>
+        <option value="0">🔒 Inativo / Bloqueado</option>
+      </select>
+    </div>
+    <div class="ff" id="user-role-desc" style="background:#f8fafc;border:1px solid var(--bd);border-radius:8px;padding:8px;font-size:11px;color:var(--mu)">
+      Selecione um perfil para ver as permissões.
+    </div>
+  </div>
+
+  <div class="mfoot">
+    <button class="btn bp" onclick="saveUser()">💾 Salvar Usuário</button>
+    <button class="btn bgh" onclick="closeMo('m-user')">Cancelar</button>
+  </div>
 </div></div>
 
 <!-- Modal: Menu Usuário -->
@@ -864,8 +959,43 @@ function goAdmin(){
   ls.classList.add('on');ls.style.display='flex';
   ls.style.alignItems='center';ls.style.justifyContent='center';
   const le=document.getElementById('lemail'),lp=document.getElementById('lpwd'),er=document.getElementById('lerr');
-  if(le){le.value='';setTimeout(()=>le.focus(),80);}
+  if(le){le.value='';setTimeout(()=>{renderUserChips();le.focus();},80);}
   if(lp)lp.value='';if(er)er.style.display='none';
+}
+
+// Renderiza chips de usuários ativos na tela de login
+function renderUserChips(){
+  const wrap=document.getElementById('user-chips-wrap');
+  const cont=document.getElementById('user-chips');
+  if(!wrap||!cont)return;
+  const ativos=users.filter(u=>u.ativo);
+  if(ativos.length<2){wrap.style.display='none';return;}
+  wrap.style.display='block';
+  cont.innerHTML=ativos.map(u=>`
+    <div class="uchip-login" id="chip-${u.id}" onclick="selectChip(${u.id})">
+      <div class="av" style="background:${ac(u.id)};color:#fff;width:36px;height:36px;font-size:13px">${initials(u.nome)}</div>
+      <div class="ucn">${u.nome.split(' ').slice(0,2).join(' ')}</div>
+      <div class="ucp">${ROLES[u.role]?.l||u.role}</div>
+    </div>`).join('');
+}
+
+// Seleciona usuário pelo chip e preenche o e-mail
+function selectChip(uid){
+  const u=users.find(x=>x.id===uid);if(!u)return;
+  document.querySelectorAll('.uchip-login').forEach(c=>c.classList.remove('sel'));
+  const chip=document.getElementById('chip-'+uid);
+  if(chip)chip.classList.add('sel');
+  const le=document.getElementById('lemail');
+  const lp=document.getElementById('lpwd');
+  if(le)le.value=u.email;
+  if(lp){lp.value='';lp.focus();}
+}
+
+// Destaca o chip quando e-mail é digitado manualmente
+function selectChipByEmail(email){
+  document.querySelectorAll('.uchip-login').forEach(c=>c.classList.remove('sel'));
+  const u=users.find(x=>x.email.toLowerCase()===email.toLowerCase());
+  if(u){const chip=document.getElementById('chip-'+u.id);if(chip)chip.classList.add('sel');}
 }
 function showApp(){
   document.querySelectorAll('.sc').forEach(s=>s.classList.remove('on'));
@@ -895,12 +1025,33 @@ function doLogin(){
   const email=(document.getElementById('lemail').value||'').trim().toLowerCase();
   const pwd=(document.getElementById('lpwd').value||'');
   const lerr=document.getElementById('lerr');
-  if(!email||!pwd){lerr.textContent='Preencha e-mail e senha.';lerr.style.display='block';return;}
+  if(!email||!pwd){
+    lerr.innerHTML='Preencha e-mail e senha.';
+    lerr.style.display='block';return;
+  }
   if(!users||!users.length)users=D_USERS;
-  if(!users.some(u=>u.email==='marcus@souzaadv.com'&&u.ativo)){users=D_USERS;localStorage.removeItem('sa_users');}
-  const u=users.find(x=>x.email.toLowerCase()===email&&x.pwd===pwd&&x.ativo);
-  if(!u){lerr.textContent='E-mail ou senha incorretos.';lerr.style.display='block';document.getElementById('lpwd').value='';document.getElementById('lpwd').focus();return;}
-  lerr.style.display='none';currentUser=u;localStorage.setItem('sa_sess',String(u.id));showApp();
+  if(!users.some(u=>u.email==='marcus@souzaadv.com'&&u.ativo)){
+    users=D_USERS;localStorage.removeItem('sa_users');
+  }
+  const byEmail=users.find(x=>x.email.toLowerCase()===email);
+  const u=byEmail&&byEmail.pwd===pwd&&byEmail.ativo?byEmail:null;
+  if(!u){
+    if(!byEmail){
+      lerr.innerHTML='❌ E-mail não cadastrado.<br><span style="font-size:10px">Verifique ou contate o administrador.</span>';
+    }else if(byEmail&&!byEmail.ativo){
+      lerr.innerHTML='🔒 Usuário bloqueado.<br><span style="font-size:10px">Contate o administrador para reativar.</span>';
+    }else{
+      lerr.innerHTML='❌ Senha incorreta.<br><span style="font-size:10px">Tente novamente.</span>';
+    }
+    lerr.style.display='block';
+    document.getElementById('lpwd').value='';
+    document.getElementById('lpwd').focus();
+    return;
+  }
+  lerr.style.display='none';
+  currentUser=u;
+  localStorage.setItem('sa_sess',String(u.id));
+  showApp();
 }
 function doLogout(){closeMo('m-umenu');localStorage.removeItem('sa_sess');location.reload();}
 function showUserMenu(){
@@ -2486,35 +2637,128 @@ function toggleAcesso(uid){
 // ═══════════════════════════════════════════════════════════════════
 function renderUsers(){
   const p=perm();
-  let html=`<div class="fbar">${p.usr?`<button class="btn bp" onclick="openUserModal()">+ Novo Usuário</button>`:''}</div>`;
-  html+=`<div class="card"><div class="tw"><table><thead><tr><th></th><th>Nome</th><th>E-mail</th><th>OAB</th><th>Cargo</th><th>Função</th><th>Status</th><th>Telefone</th>${p.usr?'<th>Ações</th>':''}</tr></thead><tbody>${users.map(u=>`<tr style="opacity:${u.ativo?1:.55}">
-    <td><div class="av" style="width:32px;height:32px;font-size:12px;background:${ac(u.id)};color:#fff">${initials(u.nome)}</div></td>
-    <td style="font-weight:700">${u.nome}</td><td style="font-size:11px;color:#2563eb">${u.email}</td>
-    <td style="font-size:11px">${u.oab||'—'}</td><td style="font-size:11px">${u.cargo||'—'}</td>
-    <td><span class="urole ${ROLES[u.role]?.cls||'r-colaborador'}">${ROLES[u.role]?.l||u.role}</span></td>
-    <td>${u.ativo?badge('Ativo','bg'):badge('Inativo','bga')}</td>
-    <td style="font-size:11px">${u.tel||'—'}</td>
-    ${p.usr?`<td><div style="display:flex;gap:3px"><button class="btn bgh xs" onclick="editUser(${u.id})">✏️</button>${u.id!==currentUser.id?`<button class="btn ${u.ativo?'bd_':'bg_'} xs" onclick="toggleUser(${u.id})">${u.ativo?'🔒':'🔓'}</button>`:''}</div></td>`:''}</tr>`).join('')}</tbody></table></div></div>`;
+  const lastAcc=u=>{const l=accessLog.filter(x=>x.usuario===u.nome&&!x.negado&&x.mod==='login');return l.length?l[0].data+' '+l[0].hora:'Nunca';};
+  let html=`
+  <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:12px;flex-wrap:wrap;gap:8px">
+    <div>
+      <div style="font-size:14px;font-weight:700;color:var(--n)">${users.length} usuário(s) cadastrado(s)</div>
+      <div style="font-size:11px;color:var(--mu)">${users.filter(u=>u.ativo).length} ativo(s) · ${users.filter(u=>!u.ativo).length} bloqueado(s)</div>
+    </div>
+    ${p.usr_?`<button class="btn bp" onclick="openUserModal()">+ Novo Usuário</button>`:''}
+  </div>
+  <div class="card"><div class="tw"><table>
+    <thead><tr>
+      <th></th><th>Nome e Cargo</th><th>E-mail / Login</th>
+      <th>Perfil</th><th>Status</th><th>Último Acesso</th>
+      ${p.usr_?'<th>Ações</th>':''}
+    </tr></thead>
+    <tbody>${users.map(u=>`
+      <tr style="opacity:${u.ativo?1:.5}">
+        <td><div class="av" style="width:34px;height:34px;font-size:12px;background:${ac(u.id)};color:#fff">${initials(u.nome)}</div></td>
+        <td>
+          <div style="font-weight:700;font-size:12px">${esc(u.nome)}</div>
+          <div style="font-size:10px;color:var(--mu)">${esc(u.cargo||'—')}${u.oab?' · '+u.oab:''}</div>
+        </td>
+        <td>
+          <div style="font-size:11px;color:#2563eb">${esc(u.email)}</div>
+          <div style="font-size:10px;color:var(--mu)">${u.tel||'—'}</div>
+        </td>
+        <td><span class="urole ${ROLES[u.role]?.cls||'r-colaborador'}">${ROLES[u.role]?.l||u.role}</span></td>
+        <td>${u.ativo?badge('Ativo','bg'):badge('Bloqueado','br')}</td>
+        <td style="font-size:10px;color:var(--mu)">${lastAcc(u)}</td>
+        ${p.usr_?`<td><div style="display:flex;gap:3px">
+          <button class="btn bsa xs" onclick="openPermModal(${u.id})" title="Permissões">🔑</button>
+          <button class="btn bgh xs" onclick="editUser(${u.id})" title="Editar">✏️</button>
+          ${u.id!==currentUser.id?`<button class="btn ${u.ativo?'bd_':'bg_'} xs" onclick="toggleUser(${u.id})" title="${u.ativo?'Bloquear':'Desbloquear'}">${u.ativo?'🔒':'🔓'}</button>`:''}
+        </div></td>`:''}
+      </tr>`).join('')}
+    </tbody>
+  </table></div></div>`;
   document.getElementById('admin-cnt').innerHTML=html;
 }
 function openUserModal(id){
   document.getElementById('user-id').value=id||'';
   document.getElementById('m-user-t').textContent=id?'Editar Usuário':'Novo Usuário';
-  if(id){const u=users.find(x=>x.id===id);['nome','cargo','email','tel','oab'].forEach(f=>document.getElementById('user-'+f).value=u[f]||'');document.getElementById('user-pwd').value=u.pwd||'';document.getElementById('user-role').value=u.role;document.getElementById('user-ativo').value=u.ativo?'1':'0';}
-  else{['nome','cargo','email','tel','oab','pwd'].forEach(f=>document.getElementById('user-'+f).value='');document.getElementById('user-role').value='advogado';document.getElementById('user-ativo').value='1';}
+  const pwdHint=document.getElementById('user-pwd-hint');
+  if(id){
+    const u=users.find(x=>x.id===id);
+    ['nome','cargo','email','tel','oab'].forEach(f=>document.getElementById('user-'+f).value=u[f]||'');
+    document.getElementById('user-pwd').value='';
+    if(document.getElementById('user-pwd2'))document.getElementById('user-pwd2').value='';
+    document.getElementById('user-role').value=u.role;
+    document.getElementById('user-ativo').value=u.ativo?'1':'0';
+    if(pwdHint)pwdHint.textContent='(deixe em branco para manter a senha atual)';
+  }else{
+    ['nome','cargo','email','tel','oab','pwd'].forEach(f=>{const el=document.getElementById('user-'+f);if(el)el.value='';});
+    if(document.getElementById('user-pwd2'))document.getElementById('user-pwd2').value='';
+    document.getElementById('user-role').value='advogado';
+    document.getElementById('user-ativo').value='1';
+    if(pwdHint)pwdHint.textContent='(obrigatório para novo usuário)';
+  }
+  const pmatch=document.getElementById('pwd-match');if(pmatch)pmatch.textContent='';
   openMo('m-user');
+  setTimeout(updateRoleDesc,50);
 }
 function populateUserForm(u){['nome','cargo','email','tel','oab'].forEach(f=>document.getElementById('user-'+f).value=u[f]||'');document.getElementById('user-id').value=u.id;document.getElementById('user-pwd').value=u.pwd||'';document.getElementById('user-role').value=u.role;document.getElementById('user-ativo').value=u.ativo?'1':'0';}
 const editUser=id=>openUserModal(id);
 function saveUser(){
-  const nome=document.getElementById('user-nome').value.trim();const email=document.getElementById('user-email').value.trim();const pwd=document.getElementById('user-pwd').value;
-  if(!nome||!email)return alert('Preencha nome e e-mail.');
+  const nome=document.getElementById('user-nome').value.trim();
+  const email=document.getElementById('user-email').value.trim().toLowerCase();
+  const pwd=document.getElementById('user-pwd').value;
+  const pwd2=(document.getElementById('user-pwd2')||{value:''}).value;
   const id=+document.getElementById('user-id').value;
-  if(!id&&!pwd)return alert('Defina uma senha para o novo usuário.');
-  const o={nome,cargo:document.getElementById('user-cargo').value.trim(),email,pwd:pwd||(id?(users.find(u=>u.id===id)||{}).pwd:''),oab:document.getElementById('user-oab').value.trim(),tel:document.getElementById('user-tel').value.trim(),role:document.getElementById('user-role').value,ativo:document.getElementById('user-ativo').value==='1'};
-  if(id){users.splice(users.findIndex(u=>u.id===id),1,{...o,id});}else{users.push({...o,id:gid2()});}
-  save();closeMo('m-user');renderUsers();
-  if(currentUser.id===id){currentUser=users.find(u=>u.id===id);document.getElementById('uname').textContent='Dr. '+currentUser.nome.split(' ').slice(-1)[0];document.getElementById('uav').textContent=initials(currentUser.nome);}
+  if(!nome){alert('Preencha o nome completo.');document.getElementById('user-nome').focus();return;}
+  if(!email||!email.includes('@')){alert('Preencha um e-mail válido.');document.getElementById('user-email').focus();return;}
+  const emailDup=users.find(u=>u.email.toLowerCase()===email&&u.id!==id);
+  if(emailDup){alert('E-mail já cadastrado para: '+emailDup.nome);return;}
+  if(!id&&!pwd){alert('Defina uma senha para o novo usuário.');document.getElementById('user-pwd').focus();return;}
+  if(pwd&&pwd.length<6){alert('A senha deve ter no mínimo 6 caracteres.');return;}
+  if(pwd&&pwd2&&pwd!==pwd2){alert('As senhas não coincidem. Verifique.');document.getElementById('user-pwd2')?.focus();return;}
+  const existingPwd=id?(users.find(u=>u.id===id)||{}).pwd:'';
+  const o={nome,cargo:document.getElementById('user-cargo').value.trim(),email,pwd:pwd||existingPwd,
+    oab:document.getElementById('user-oab').value.trim(),tel:document.getElementById('user-tel').value.trim(),
+    role:document.getElementById('user-role').value,ativo:document.getElementById('user-ativo').value==='1'};
+  if(id){
+    const idx=users.findIndex(u=>u.id===id);
+    if(idx>=0)users[idx]={...users[idx],...o};
+  }else{
+    users.push({...o,id:gid2()});
+  }
+  save();closeMo('m-user');
+  if(currentUser&&currentUser.id===id){
+    currentUser={...currentUser,...o};
+    document.getElementById('uname').textContent='Dr. '+currentUser.nome.split(' ').slice(-1)[0];
+    document.getElementById('uav').textContent=initials(currentUser.nome);
+  }
+  logAccess('usuarios',id?'editou: '+nome:'criou: '+nome);
+  alert(id?'✅ Usuário atualizado!':'✅ Usuário criado!\nLogin: '+email+'\nSenha: '+pwd);
+  const cnt=document.getElementById('admin-cnt');
+  if(cnt&&cnt.innerHTML.includes('Usuários Cadastrados'))renderAcessos();
+  else renderUsers();
+}
+
+function checkPwdMatch(){
+  const p1=document.getElementById('user-pwd')?.value||'';
+  const p2=document.getElementById('user-pwd2')?.value||'';
+  const el=document.getElementById('pwd-match');if(!el)return;
+  if(!p1||!p2){el.textContent='';return;}
+  if(p1===p2){el.textContent='✅ Senhas coincidem';el.style.color='#16a34a';}
+  else{el.textContent='❌ Senhas não coincidem';el.style.color='#dc2626';}
+}
+
+function updateRoleDesc(){
+  const role=document.getElementById('user-role')?.value;
+  const el=document.getElementById('user-role-desc');if(!el||!role)return;
+  const desc={
+    admin:'👑 Acesso total. Gerencia usuários, permissões, financeiro e configurações.',
+    advogado:'⚖️ Clientes, processos, financeiro e agenda. Sem gestão de usuários.',
+    estagiario:'🎓 Visualiza clientes e processos. Sem financeiro ou configurações.',
+    colaborador:'🗂️ Agenda e cadastro de clientes. Sem acesso jurídico ou financeiro.',
+    financeiro:'💰 Módulo financeiro e relatórios. Sem acesso a processos.',
+    atendente:'📞 Visualiza clientes e agenda. Acesso mais restrito.',
+    personalizado:'🔧 Permissões definidas individualmente pelo administrador.',
+  };
+  el.innerHTML=`<strong style="font-size:11px;color:var(--n)">${ROLES[role]?.l||role}</strong><br><span style="font-size:10px">${desc[role]||''}</span>`;
 }
 function toggleUser(id){if(id===currentUser.id)return alert('Não é possível desativar sua própria conta.');const idx=users.findIndex(u=>u.id===id);users[idx].ativo=!users[idx].ativo;save();renderUsers();}
 
