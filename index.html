@@ -5,7 +5,7 @@
 <meta name="viewport" content="width=device-width,initial-scale=1,user-scalable=no,viewport-fit=cover">
 <meta name="theme-color" content="#0B1A3B">
 <meta name="apple-mobile-web-app-capable" content="yes">
-<title>Souza Advocacia — Sistema Completo</title>
+<title>Marcus Souza I Advogado — Sistema Completo</title>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
 <style>
@@ -360,6 +360,30 @@ tr:hover td{background:#f8fafc!important}
 ═══════════════════════════════════════════════ */
 #ls{position:fixed;inset:0;background:linear-gradient(135deg,#0f2444,var(--n) 50%,#2563eb);display:none;align-items:center;justify-content:center;z-index:9999;padding:16px}
 #ls.on{display:flex;align-items:center;justify-content:center}
+.r-admin{background:#fef2f2;color:#991b1b;border:1px solid #fecaca}
+.r-advogado{background:#eff6ff;color:#1d4ed8;border:1px solid #bfdbfe}
+.r-estagiario{background:#f0fdf4;color:#166534;border:1px solid #bbf7d0}
+.r-colaborador{background:#fffbeb;color:#92400e;border:1px solid #fde68a}
+.r-financeiro{background:#f5f3ff;color:#5b21b6;border:1px solid #ddd6fe}
+.r-atendente{background:#ecfeff;color:#155e75;border:1px solid #a5f3fc}
+.r-personalizado{background:#f8fafc;color:#475569;border:1px solid #cbd5e1}
+.urole{display:inline-block;padding:2px 8px;border-radius:10px;font-size:10px;font-weight:700}
+.perm-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(190px,1fr));gap:8px;margin:10px 0}
+.perm-mod{background:#f8fafc;border:1px solid var(--bd);border-radius:8px;padding:10px}
+.perm-mod-title{font-size:10px;font-weight:800;text-transform:uppercase;letter-spacing:.6px;color:var(--n);margin-bottom:8px}
+.perm-row{display:flex;align-items:center;justify-content:space-between;padding:3px 0;font-size:11px}
+.ptog{position:relative;width:34px;height:18px;cursor:pointer}
+.ptog input{opacity:0;width:0;height:0}
+.pslider{position:absolute;inset:0;background:#cbd5e1;border-radius:9px;transition:.2s}
+.ptog input:checked+.pslider{background:var(--gr)}
+.pslider::before{content:'';position:absolute;height:14px;width:14px;left:2px;bottom:2px;background:#fff;border-radius:50%;transition:.2s}
+.ptog input:checked+.pslider::before{transform:translateX(16px)}
+.log-row{display:grid;grid-template-columns:100px 1fr 1fr 70px;gap:4px;padding:5px 8px;border-bottom:1px solid var(--bd);font-size:11px;align-items:center}
+.log-row:hover{background:#f8fafc}
+.sync-ok{color:#16a34a;font-size:11px}
+.sync-err{color:#dc2626;font-size:11px}
+.sync-warn{color:#d97706;font-size:11px}
+.sync-load{color:#6b7280;font-size:11px}
 .lb{background:#fff;border-radius:16px;padding:32px 28px;width:100%;max-width:360px;text-align:center;box-shadow:0 25px 60px rgba(0,0,0,.35)}
 .lb .ico{font-size:42px;margin-bottom:8px}.lb h2{font-size:18px;font-weight:700;color:var(--n);margin-bottom:3px}
 .lb .sub{font-size:12px;color:var(--mu);margin-bottom:22px}
@@ -385,10 +409,10 @@ tr:hover td{background:#f8fafc!important}
       <polygon points="35,21 46,27 46,43 35,49 24,43 24,27" fill="#8A9BB5" opacity="0.85"/>
       <polygon points="35,27 40,30 40,40 35,43 30,40 30,30" fill="#C8A96A"/>
     </svg>
-    <h1>Souza Advocacia</h1>
+    <h1>Marcus Souza I Advogado</h1>
     <p class="sub">Advocacia e Consultoria Jurídica</p>
     <p class="msg">Seja bem-vindo! Agende seu atendimento com segurança, praticidade e total sigilo profissional.</p>
-    <p class="oab">OAB/RJ 160.689 · 250.430 · (21) 96534-8183</p>
+    <p class="oab">OAB/RJ 250.430 · (21) 96534-8183</p>
   </div>
   <div class="cnt" style="padding-top:14px;display:flex;flex-direction:column;gap:9px">
     <button class="hbtn" onclick="go('s-type')"><div class="hbtn-ic" style="background:#eff6ff">📅</div><div><h3>Agendar Atendimento</h3><p>Escolha o tipo e horário disponível</p></div><span class="hbtn-arr">›</span></button>
@@ -397,7 +421,7 @@ tr:hover td{background:#f8fafc!important}
     <a href="https://wa.me/5521965348183?text=Olá!%20Gostaria%20de%20falar%20com%20o%20escritório." target="_blank" class="hbtn"><div class="hbtn-ic" style="background:#f0fdf4">💬</div><div><h3>Falar com o Escritório</h3><p>WhatsApp (21) 96534-8183</p></div><span class="hbtn-arr">›</span></a>
     <div class="al al-warn" style="font-size:11px">⚠️ <strong>Importante:</strong> O agendamento não representa contratação automática. A análise depende dos documentos e fatos apresentados.</div>
   </div>
-  <div class="foot">Souza Advocacia · Dr. Luiz Fabiano (OAB/RJ 160.689) · Dr. Marcus Souza (OAB/RJ 250.430)<br>Seg–Sex 10h–18h · Somente com agendamento<br><span onclick="showLGPD()" style="color:var(--g);cursor:pointer">Política de Privacidade</span> · <span onclick="goAdmin()" style="color:var(--g);cursor:pointer">Acesso ao Sistema</span></div>
+  <div class="foot">Marcus Souza I Advogado · Dr. Marcus Souza (OAB/RJ 250.430)<br>Seg–Sex 10h–18h · Somente com agendamento<br><span onclick="showLGPD()" style="color:var(--g);cursor:pointer">Política de Privacidade</span> · <span onclick="goAdmin()" style="color:var(--g);cursor:pointer">Acesso ao Sistema</span></div>
 </div>
 
 <!-- TYPE SELECTION -->
@@ -406,15 +430,9 @@ tr:hover td{background:#f8fafc!important}
   <div style="padding:8px 14px;font-size:10px;color:var(--mu);letter-spacing:.5px">Selecione como podemos ajudar você</div>
   <div class="tgrid">
     <div class="tc" onclick="selType('primeiro')"><div class="tc-ic">👤</div><div class="tc-nm">Primeiro Atendimento</div><div class="tc-d">30 min</div></div>
-    <div class="tc" onclick="selType('andamento')"><div class="tc-ic">⚖️</div><div class="tc-nm">Andamento de Processo</div><div class="tc-d">20 min</div></div>
-    <div class="tc" onclick="selType('documentos')"><div class="tc-ic">📄</div><div class="tc-nm">Entrega de Documentos</div><div class="tc-d">15 min</div></div>
     <div class="tc" onclick="selType('duvidas')"><div class="tc-ic">❓</div><div class="tc-nm">Dúvidas Jurídicas</div><div class="tc-d">20 min</div></div>
     <div class="tc" onclick="selType('retorno')"><div class="tc-ic">🔄</div><div class="tc-nm">Retorno de Atendimento</div><div class="tc-d">20 min</div></div>
-    <div class="tc" onclick="selType('previdenciario')"><div class="tc-ic">🏦</div><div class="tc-nm">Consulta Previdenciária</div><div class="tc-d">40 min</div></div>
-    <div class="tc" onclick="selType('trabalhista')"><div class="tc-ic">💼</div><div class="tc-nm">Consulta Trabalhista</div><div class="tc-d">40 min</div></div>
-    <div class="tc" onclick="selType('consumidor')"><div class="tc-ic">🛡️</div><div class="tc-nm">Direito do Consumidor</div><div class="tc-d">30 min</div></div>
-    <div class="tc" onclick="selType('autista')"><div class="tc-ic">💙</div><div class="tc-nm">BPC/LOAS · Autismo</div><div class="tc-d">40 min</div></div>
-    <div class="tc" onclick="selType('outros')"><div class="tc-ic">📋</div><div class="tc-nm">Outros Assuntos</div><div class="tc-d">30 min</div></div>
+    <div class="tc" onclick="selType('andamento')"><div class="tc-ic">⚖️</div><div class="tc-nm">Andamento de Processo</div><div class="tc-d">20 min</div></div>
   </div>
   <div class="al al-warn" style="margin:0 14px 14px;font-size:11px">O sistema <strong>não oferece atendimento criminal</strong>.</div>
 </div>
@@ -453,7 +471,7 @@ tr:hover td{background:#f8fafc!important}
 <div id="ls" style="display:none">
   <div class="lb">
     <div class="ico">⚖️</div>
-    <h2>Souza Advocacia</h2>
+    <h2>Marcus Souza I Advogado</h2>
     <p class="sub">Sistema de Gestão Jurídica + Agendamentos</p>
     <input type="email" id="lemail" placeholder="E-mail" onkeydown="if(event.key==='Enter')doLogin()">
     <input type="password" id="lpwd" placeholder="Senha" style="margin-top:8px" onkeydown="if(event.key==='Enter')doLogin()">
@@ -463,7 +481,6 @@ tr:hover td{background:#f8fafc!important}
     <div class="lhint">
       <strong>Acesso padrão:</strong><br>
       marcus@souzaadv.com / Admin@2025 (Admin)<br>
-      luiz@souzaadv.com / Luiz@2025 (Advogado)
     </div>
   </div>
 </div>
@@ -475,7 +492,7 @@ tr:hover td{background:#f8fafc!important}
       <polygon points="35,4 62,19 62,51 35,66 8,51 8,19" fill="#060e22" stroke="rgba(200,169,106,.25)" stroke-width="1"/>
       <polygon points="35,27 40,30 40,40 35,43 30,40 30,30" fill="#C8A96A"/>
     </svg>
-    <div class="ahdr-nm">Souza Advocacia<small id="hdr-oab">OAB/RJ 250.430 · 160.689</small></div>
+    <div class="ahdr-nm">Marcus Souza I Advogado<small id="hdr-oab">OAB/RJ 250.430</small></div>
     <div class="ahdr-r">
       <span id="a-clock" style="font-size:10px;color:rgba(255,255,255,.35)"></span>
       <span id="sbadge" style="font-size:11px;color:rgba(255,255,255,.5)">✅ Salvo</span>
@@ -507,6 +524,7 @@ tr:hover td{background:#f8fafc!important}
     <div class="tab-sep"></div>
     <button class="atab" onclick="aTab('busca',this)">🔎 Busca Proc.</button>
     <button class="atab" id="tab-users-btn" onclick="aTab('usuarios',this)">👤 Usuários</button>
+    <button class="atab" id="tab-acessos-btn" onclick="aTab('acessos',this)">🔐 Controle Acesso</button>
     <button class="atab" onclick="aTab('gcal',this)">🔗 Google Cal</button>
     <button class="atab" onclick="aTab('config',this)">⚙️ Config</button>
   </div>
@@ -525,7 +543,7 @@ tr:hover td{background:#f8fafc!important}
 <div class="mo" id="mo-lgpd">
   <div class="mob"><div class="moh"></div><div class="moi">
     <div class="mot">🔒 Política de Privacidade</div>
-    <p style="font-size:12px;line-height:1.7;margin-bottom:14px">O Souza Advocacia trata seus dados com base na LGPD (Lei nº 13.709/2018).<br><br><strong>Dados coletados:</strong> nome, CPF, telefone, e-mail e documentos.<br><strong>Finalidade:</strong> Agendamento, análise jurídica e prestação de serviços.<br><strong>Compartilhamento:</strong> Não compartilhamos dados com terceiros, salvo obrigação legal.<br><strong>Seus direitos:</strong> Acesso, correção e exclusão. Contato: souzaadvogadosa@gmail.com</p>
+    <p style="font-size:12px;line-height:1.7;margin-bottom:14px">O Marcus Souza I Advogado trata seus dados com base na LGPD (Lei nº 13.709/2018).<br><br><strong>Dados coletados:</strong> nome, CPF, telefone, e-mail e documentos.<br><strong>Finalidade:</strong> Agendamento, análise jurídica e prestação de serviços.<br><strong>Compartilhamento:</strong> Não compartilhamos dados com terceiros, salvo obrigação legal.<br><strong>Seus direitos:</strong> Acesso, correção e exclusão. Contato: souzaadvogadosa@gmail.com</p>
     <button class="btn bgold bw" onclick="closeMo('mo-lgpd')">Entendido</button>
   </div></div>
 </div>
@@ -677,16 +695,50 @@ const cn=id=>(cli.find(c=>c.id===+id)||{}).nome||'—';
 // ═══════════════════════════════════════════════════════════════════
 // GESTÃO JURÍDICA CONSTANTS — após td0, dt() e currentUser
 // ═══════════════════════════════════════════════════════════════════
-const ROLES={admin:{l:'Administrador',cls:'r-admin',e:1,del:1,fin:1,usr:1,cfg:1},advogado:{l:'Advogado',cls:'r-advogado',e:1,del:1,fin:1,usr:0,cfg:1},colaborador:{l:'Colaborador',cls:'r-colaborador',e:1,del:0,fin:0,usr:0,cfg:0},estagiario:{l:'Estagiário',cls:'r-estagiario',e:0,del:0,fin:0,usr:0,cfg:0}};
-const perm=()=>ROLES[currentUser?.role]||ROLES.estagiario;
+const ROLES={
+  admin:{l:'Administrador',cls:'r-admin',
+    cli:{v:1,c:1,e:1,d:1},proc:{v:1,c:1,e:1,d:1},age:{v:1,c:1,e:1,d:1},
+    fin:{v:1,c:1,e:1,d:1},tar:{v:1,c:1,e:1,d:1},rel:{v:1},cfg:{v:1,e:1},usr:{v:1,c:1,e:1,d:1},
+    e:1,del:1,fin_:1,usr_:1,cfg_:1},
+  advogado:{l:'Advogado',cls:'r-advogado',
+    cli:{v:1,c:1,e:1,d:0},proc:{v:1,c:1,e:1,d:0},age:{v:1,c:1,e:1,d:0},
+    fin:{v:1,c:1,e:1,d:0},tar:{v:1,c:1,e:1,d:0},rel:{v:1},cfg:{v:0,e:0},usr:{v:0,c:0,e:0,d:0},
+    e:1,del:0,fin_:1,usr_:0,cfg_:0},
+  estagiario:{l:'Estagiário',cls:'r-estagiario',
+    cli:{v:1,c:0,e:0,d:0},proc:{v:1,c:0,e:0,d:0},age:{v:1,c:0,e:0,d:0},
+    fin:{v:0,c:0,e:0,d:0},tar:{v:1,c:1,e:0,d:0},rel:{v:0},cfg:{v:0,e:0},usr:{v:0,c:0,e:0,d:0},
+    e:0,del:0,fin_:0,usr_:0,cfg_:0},
+  colaborador:{l:'Colaborador Administrativo',cls:'r-colaborador',
+    cli:{v:1,c:1,e:1,d:0},proc:{v:0,c:0,e:0,d:0},age:{v:1,c:1,e:1,d:1},
+    fin:{v:0,c:0,e:0,d:0},tar:{v:1,c:1,e:1,d:0},rel:{v:0},cfg:{v:0,e:0},usr:{v:0,c:0,e:0,d:0},
+    e:1,del:0,fin_:0,usr_:0,cfg_:0},
+  financeiro:{l:'Financeiro',cls:'r-financeiro',
+    cli:{v:1,c:0,e:0,d:0},proc:{v:0,c:0,e:0,d:0},age:{v:0,c:0,e:0,d:0},
+    fin:{v:1,c:1,e:1,d:0},tar:{v:1,c:0,e:0,d:0},rel:{v:1},cfg:{v:0,e:0},usr:{v:0,c:0,e:0,d:0},
+    e:0,del:0,fin_:1,usr_:0,cfg_:0},
+  atendente:{l:'Atendente',cls:'r-atendente',
+    cli:{v:1,c:1,e:0,d:0},proc:{v:0,c:0,e:0,d:0},age:{v:1,c:1,e:0,d:0},
+    fin:{v:0,c:0,e:0,d:0},tar:{v:1,c:0,e:0,d:0},rel:{v:0},cfg:{v:0,e:0},usr:{v:0,c:0,e:0,d:0},
+    e:0,del:0,fin_:0,usr_:0,cfg_:0},
+  personalizado:{l:'Usuário Personalizado',cls:'r-personalizado',
+    cli:{v:0,c:0,e:0,d:0},proc:{v:0,c:0,e:0,d:0},age:{v:0,c:0,e:0,d:0},
+    fin:{v:0,c:0,e:0,d:0},tar:{v:0,c:0,e:0,d:0},rel:{v:0},cfg:{v:0,e:0},usr:{v:0,c:0,e:0,d:0},
+    e:0,del:0,fin_:0,usr_:0,cfg_:0},
+};
+const perm=()=>{const b=ROLES[currentUser?.role]||ROLES.estagiario;if(currentUser?.customPerms){const r={...b};Object.keys(currentUser.customPerms).forEach(k=>{if(typeof r[k]==='object')r[k]={...r[k],...currentUser.customPerms[k]};else r[k]=currentUser.customPerms[k];});return r;}return b;};
+const can=(mod,act)=>{const p=perm();return !!(p[mod]&&p[mod][act]);};
+function denyAccess(area){document.getElementById('admin-cnt').innerHTML=`<div style="display:flex;flex-direction:column;align-items:center;justify-content:center;min-height:300px;gap:16px;text-align:center;padding:32px"><div style="font-size:56px">🔒</div><div style="font-size:18px;font-weight:700;color:var(--n)">Acesso Restrito</div><div style="max-width:400px;font-size:13px;color:var(--mu);line-height:1.6">Você não possui autorização para acessar <b>${area}</b>.<br>Solicite liberação ao administrador.</div></div>`;}
+let accessLog=[];
+function logAccess(mod,acao,negado=false){const e={id:Date.now(),usuario:currentUser?.nome||'—',perfil:ROLES[currentUser?.role]?.l||'—',data:new Date().toLocaleDateString('pt-BR'),hora:new Date().toLocaleTimeString('pt-BR',{hour:'2-digit',minute:'2-digit'}),mod,acao,negado};accessLog.unshift(e);if(accessLog.length>300)accessLog=accessLog.slice(0,300);try{localStorage.setItem('sa_log',JSON.stringify(accessLog.slice(0,100)));}catch(e){}}
+function loadLog(){try{const d=localStorage.getItem('sa_log');if(d)accessLog=JSON.parse(d);}catch(e){}}
+function deepMerge(b,o){const r={...b};Object.keys(o||{}).forEach(k=>{if(typeof o[k]==='object'&&!Array.isArray(o[k]))r[k]={...(b[k]||{}),...o[k]};else r[k]=o[k];});return r;}
 const avatarColor=['#3b82f6','#16a34a','#d97706','#9333ea','#ef4444','#0ea5e9','#f59e0b'];
 const ac=id=>avatarColor[id%avatarColor.length];
 const initials=n=>n.split(' ').filter(Boolean).slice(0,2).map(w=>w[0].toUpperCase()).join('');
 
 // DEFAULT DATA — após td0 e dt() para poder usá-los
 const D_USERS=[
-  {id:1,nome:'Dr. Marcus Vinicius Souza',cargo:'Advogado Sócio',email:'marcus@souzaadv.com',pwd:'Admin@2025',oab:'OAB/RJ 250.430',tel:'(21) 99752-9727',role:'admin',ativo:true},
-  {id:2,nome:'Dr. Luiz Fabiano Ribeiro de Souza',cargo:'Advogado Sócio',email:'luiz@souzaadv.com',pwd:'Luiz@2025',oab:'OAB/RJ 160.689',tel:'(21) 99999-0000',role:'advogado',ativo:true},
+  {id:1,nome:'Dr. Marcus Souza',cargo:'Advogado Sócio',email:'marcus@souzaadv.com',pwd:'Admin@2025',oab:'OAB/RJ 250.430',tel:'(21) 96534-8183',role:'admin',ativo:true},
 ];
 const D_CLI=[
   {id:1,nome:'João Silva Santos',cpf:'123.456.789-00',tel:'21999991111',email:'joao@gmail.com',end:'Rua das Flores, 100 – Rio de Janeiro/RJ',tipo:'Ativo',obs:'Preferência por WhatsApp'},
@@ -696,20 +748,20 @@ const D_CLI=[
   {id:5,nome:'Ana Paula Rodrigues',cpf:'321.654.987-00',tel:'21955555555',email:'ana@gmail.com',end:'Rua da Paz, 400 – São João de Meriti/RJ',tipo:'Inativo',obs:''},
 ];
 const D_PROC=[
-  {id:1,num:'0001234-56.2024.8.19.0001',cliId:1,tipo:'Trabalhista',vara:'1ª VT Rio de Janeiro',status:'Em andamento',ini:'2024-03-15',prox:dt(22),adv:'Dr. Marcus Vinicius Souza',obs:'Rescisão indireta – salários em atraso'},
-  {id:2,num:'0009876-54.2024.8.19.0002',cliId:2,tipo:'Consumidor',vara:'3º JEC Rio de Janeiro',status:'Em andamento',ini:'2024-06-20',prox:dt(5),adv:'Dr. Luiz Fabiano Ribeiro de Souza',obs:'Negativa plano de saúde'},
-  {id:3,num:'0005678-90.2023.8.19.0003',cliId:3,tipo:'Previdenciário',vara:'JEF Rio de Janeiro',status:'Suspenso',ini:'2023-11-10',prox:dt(60),adv:'Dr. Marcus Vinicius Souza',obs:'Aguardando perícia INSS'},
-  {id:4,num:'0002345-67.2024.8.19.0004',cliId:4,tipo:'Cível',vara:'15ª Vara Cível RJ',status:'Finalizado',ini:'2024-01-08',prox:'',adv:'Dr. Luiz Fabiano Ribeiro de Souza',obs:'Acordo celebrado'},
-  {id:5,num:'0007654-32.2025.8.19.0005',cliId:1,tipo:'Criminal',vara:'1ª Vara Criminal RJ',status:'Em andamento',ini:'2025-01-15',prox:td0,adv:'Dr. Marcus Vinicius Souza',obs:'TC em andamento'},
-  {id:6,num:'0003456-78.2025.8.19.0006',cliId:5,tipo:'Família',vara:'1ª Vara de Família RJ',status:'Em andamento',ini:'2025-02-01',prox:dt(42),adv:'Dr. Luiz Fabiano Ribeiro de Souza',obs:'Divórcio consensual'},
+  {id:1,num:'0001234-56.2024.8.19.0001',cliId:1,tipo:'Trabalhista',vara:'1ª VT Rio de Janeiro',status:'Em andamento',ini:'2024-03-15',prox:dt(22),adv:'Dr. Marcus Souza',obs:'Rescisão indireta – salários em atraso'},
+  {id:2,num:'0009876-54.2024.8.19.0002',cliId:2,tipo:'Consumidor',vara:'3º JEC Rio de Janeiro',status:'Em andamento',ini:'2024-06-20',prox:dt(5),adv:'Dr. Marcus Souza',obs:'Negativa plano de saúde'},
+  {id:3,num:'0005678-90.2023.8.19.0003',cliId:3,tipo:'Previdenciário',vara:'JEF Rio de Janeiro',status:'Suspenso',ini:'2023-11-10',prox:dt(60),adv:'Dr. Marcus Souza',obs:'Aguardando perícia INSS'},
+  {id:4,num:'0002345-67.2024.8.19.0004',cliId:4,tipo:'Cível',vara:'15ª Vara Cível RJ',status:'Finalizado',ini:'2024-01-08',prox:'',adv:'Dr. Marcus Souza',obs:'Acordo celebrado'},
+  {id:5,num:'0007654-32.2025.8.19.0005',cliId:1,tipo:'Criminal',vara:'1ª Vara Criminal RJ',status:'Em andamento',ini:'2025-01-15',prox:td0,adv:'Dr. Marcus Souza',obs:'TC em andamento'},
+  {id:6,num:'0003456-78.2025.8.19.0006',cliId:5,tipo:'Família',vara:'1ª Vara de Família RJ',status:'Em andamento',ini:'2025-02-01',prox:dt(42),adv:'Dr. Marcus Souza',obs:'Divórcio consensual'},
 ];
 const D_TAR=[
-  {id:1,data:td0,desc:'Protocolar petição inicial – Light SERJ',cliId:2,procId:2,prio:'Alta',status:'Pendente',resp:'Dr. Marcus Vinicius Souza',local:'Fórum Central RJ',ok:false},
-  {id:2,data:td0,desc:'Audiência trabalhista João Silva',cliId:1,procId:1,prio:'Alta',status:'Em andamento',resp:'Dr. Marcus Vinicius Souza',local:'1ª VT Rio de Janeiro',ok:false},
-  {id:3,data:dt(-1),desc:'Enviar documentos ao perito INSS',cliId:3,procId:3,prio:'Média',status:'Pendente',resp:'Dr. Luiz Fabiano Ribeiro de Souza',local:'',ok:false},
-  {id:4,data:dt(1),desc:'Reunião com Frutbras sobre contrato',cliId:4,procId:4,prio:'Média',status:'Pendente',resp:'Dr. Marcus Vinicius Souza',local:'CEASA-RJ',ok:false},
-  {id:5,data:dt(4),desc:'Prazo para recurso trabalhista',cliId:1,procId:5,prio:'Alta',status:'Pendente',resp:'Dr. Luiz Fabiano Ribeiro de Souza',local:'',ok:false},
-  {id:6,data:td0,desc:'Consulta inicial Ana Paula',cliId:5,procId:6,prio:'Baixa',status:'Concluído',resp:'Dr. Marcus Vinicius Souza',local:'',ok:true},
+  {id:1,data:td0,desc:'Protocolar petição inicial – Light SERJ',cliId:2,procId:2,prio:'Alta',status:'Pendente',resp:'Dr. Marcus Souza',local:'Fórum Central RJ',ok:false},
+  {id:2,data:td0,desc:'Audiência trabalhista João Silva',cliId:1,procId:1,prio:'Alta',status:'Em andamento',resp:'Dr. Marcus Souza',local:'1ª VT Rio de Janeiro',ok:false},
+  {id:3,data:dt(-1),desc:'Enviar documentos ao perito INSS',cliId:3,procId:3,prio:'Média',status:'Pendente',resp:'Dr. Marcus Souza',local:'',ok:false},
+  {id:4,data:dt(1),desc:'Reunião com Frutbras sobre contrato',cliId:4,procId:4,prio:'Média',status:'Pendente',resp:'Dr. Marcus Souza',local:'CEASA-RJ',ok:false},
+  {id:5,data:dt(4),desc:'Prazo para recurso trabalhista',cliId:1,procId:5,prio:'Alta',status:'Pendente',resp:'Dr. Marcus Souza',local:'',ok:false},
+  {id:6,data:td0,desc:'Consulta inicial Ana Paula',cliId:5,procId:6,prio:'Baixa',status:'Concluído',resp:'Dr. Marcus Souza',local:'',ok:true},
 ];
 const D_FIN=[
   {id:1,cliId:1,desc:'Honorários – Reclamação Trabalhista',ct:3500,rc:2000,pg:'PIX',st:'Parcial',data:'2024-03-15'},
@@ -719,7 +771,7 @@ const D_FIN=[
   {id:5,cliId:5,desc:'Honorários – Direito de Família',ct:1200,rc:0,pg:'Parcelado',st:'Pendente',data:'2025-02-01'},
 ];
 // Agendamentos data
-let bk=[], gcfg={key:'',calId:'',script:'',on:false}, gcEvt=[];
+let bk=[], gcfg={key:'',calId:'adv.souzamarcus@gmail.com',script:'',on:false}, gcEvt=[];
 // UI state
 let aTabCur='dash', calV=new Date(), selD=null;
 let tarFil='Todas', waCliId=null, emailCliId=null;
@@ -751,11 +803,10 @@ function load(){
     const d=localStorage.getItem('sa_'+k);
     try{_ld[k]=d?JSON.parse(d):_ld[k];}catch(e){console.warn('load err',k,e);}
   });
-  // Validar integridade: admin marcus@ deve existir
   const savedU=(_ld.users&&_ld.users.length)?_ld.users:D_USERS;
-  const adminPresent=savedU.some(u=>u.email==='marcus@souzaadv.com'&&u.ativo);
-  users=adminPresent?savedU:D_USERS;
-  if(!adminPresent){console.warn('load: admin não encontrado, resetando users');localStorage.removeItem('sa_users');localStorage.removeItem('sa_sess');}
+  const adminOk=savedU.some(u=>u.email==='marcus@souzaadv.com'&&u.ativo);
+  users=adminOk?savedU:D_USERS;
+  if(!adminOk){localStorage.removeItem('sa_users');localStorage.removeItem('sa_sess');}
   cli=_ld.cli||D_CLI; proc=_ld.proc||D_PROC; tar=_ld.tar||D_TAR; fin=_ld.fin||D_FIN;
   bk=JSON.parse(localStorage.getItem('ms_bookings')||'[]');
   const gc=localStorage.getItem('ms_gcal');if(gc)gcfg=JSON.parse(gc);
@@ -787,16 +838,11 @@ function goAdmin(){
   document.querySelectorAll('.sc').forEach(s=>s.classList.remove('on'));
   document.getElementById('admin-app').style.display='none';
   const ls=document.getElementById('ls');
-  ls.classList.add('on');
-  ls.style.display='flex';
-  ls.style.alignItems='center';
-  ls.style.justifyContent='center';
-  const le=document.getElementById('lemail');
-  const lp=document.getElementById('lpwd');
-  const er=document.getElementById('lerr');
+  ls.classList.add('on');ls.style.display='flex';
+  ls.style.alignItems='center';ls.style.justifyContent='center';
+  const le=document.getElementById('lemail'),lp=document.getElementById('lpwd'),er=document.getElementById('lerr');
   if(le){le.value='';setTimeout(()=>le.focus(),80);}
-  if(lp) lp.value='';
-  if(er) er.style.display='none';
+  if(lp)lp.value='';if(er)er.style.display='none';
 }
 function showApp(){
   document.querySelectorAll('.sc').forEach(s=>s.classList.remove('on'));
@@ -807,8 +853,10 @@ function showApp(){
   document.getElementById('uname').textContent=nm.split(' ')[1]?'Dr. '+nm.split(' ').slice(-1)[0]:nm;
   document.getElementById('uav').textContent=initials(nm);
   document.getElementById('uav').style.background=ac(currentUser.id);
-  document.getElementById('hdr-oab').textContent=users.filter(u=>u.oab&&u.ativo).map(u=>u.oab).join(' · ')||'Souza Advocacia';
-  if(!perm().usr) document.getElementById('tab-users-btn').style.display='none';
+  document.getElementById('hdr-oab').textContent=users.filter(u=>u.oab&&u.ativo).map(u=>u.oab).join(' · ')||'Marcus Souza I Advogado';
+  if(!perm().usr_) document.getElementById('tab-users-btn').style.display='none';
+  const aceBtn=document.getElementById('tab-acessos-btn');
+  if(aceBtn)aceBtn.style.display=currentUser?.role==='admin'?'':'none';
   startClock();updNotif();
   aTab('dash',document.querySelector('.atab'));
 }
@@ -824,26 +872,12 @@ function doLogin(){
   const email=(document.getElementById('lemail').value||'').trim().toLowerCase();
   const pwd=(document.getElementById('lpwd').value||'');
   const lerr=document.getElementById('lerr');
-  if(!email||!pwd){
-    lerr.textContent='Preencha e-mail e senha.';
-    lerr.style.display='block';return;
-  }
-  // Garantir users carregado — fallback para D_USERS se localStorage corrompido
-  if(!users||!users.length) users=D_USERS;
-  const adminOk=users.some(u=>u.email==='marcus@souzaadv.com'&&u.ativo);
-  if(!adminOk){users=D_USERS;localStorage.removeItem('sa_users');}
+  if(!email||!pwd){lerr.textContent='Preencha e-mail e senha.';lerr.style.display='block';return;}
+  if(!users||!users.length)users=D_USERS;
+  if(!users.some(u=>u.email==='marcus@souzaadv.com'&&u.ativo)){users=D_USERS;localStorage.removeItem('sa_users');}
   const u=users.find(x=>x.email.toLowerCase()===email&&x.pwd===pwd&&x.ativo);
-  if(!u){
-    lerr.textContent='E-mail ou senha incorretos.';
-    lerr.style.display='block';
-    document.getElementById('lpwd').value='';
-    document.getElementById('lpwd').focus();
-    return;
-  }
-  lerr.style.display='none';
-  currentUser=u;
-  localStorage.setItem('sa_sess',String(u.id));
-  showApp();
+  if(!u){lerr.textContent='E-mail ou senha incorretos.';lerr.style.display='block';document.getElementById('lpwd').value='';document.getElementById('lpwd').focus();return;}
+  lerr.style.display='none';currentUser=u;localStorage.setItem('sa_sess',String(u.id));showApp();
 }
 function doLogout(){closeMo('m-umenu');localStorage.removeItem('sa_sess');location.reload();}
 function showUserMenu(){
@@ -869,13 +903,18 @@ function aTab(tab,btn){
   aTabCur=tab;
   document.querySelectorAll('.atab').forEach(b=>b.classList.remove('on'));
   if(btn)btn.classList.add('on');
+  const guards={clientes:()=>can('cli','v'),processos:()=>can('proc','v'),financeiro:()=>can('fin','v'),tarefas:()=>can('tar','v'),comunicacoes:()=>can('cli','v'),usuarios:()=>can('usr','v'),config:()=>can('cfg','v')};
+  const gl={clientes:'Clientes',processos:'Processos',financeiro:'Financeiro',tarefas:'Tarefas',comunicacoes:'Comunicações',usuarios:'Usuários',config:'Configurações'};
+  if(guards[tab]&&!guards[tab]()){logAccess(tab,'acesso negado',true);denyAccess(gl[tab]||tab);return;}
   const r={
     dash:renderDash,clientes:renderCli,processos:renderProc,tarefas:renderTar,
     semana:renderSem,calmes:renderCal,financeiro:renderFin,comunicacoes:renderCom,
     agenda:renderAgenda,agcal:renderAgCal,kanban:renderKanban,agendamentos:renderAgendamentos,
-    metricas:renderMetricas,busca:renderBusca,usuarios:renderUsers,gcal:renderGCal,config:renderConfig
+    metricas:renderMetricas,busca:renderBusca,usuarios:renderUsers,gcal:renderGCal,config:renderConfig,
+    acessos:renderAcessos
   };
   document.getElementById('admin-cnt').innerHTML='';
+  logAccess(tab,'visualizar');
   (r[tab]||renderDash)();
 }
 
@@ -985,14 +1024,24 @@ function renderProc(){
   </div>
   <div class="card"><div style="font-size:11px;color:var(--mu);margin-bottom:7px">🔴 Atrasado | 🟡 Vence ≤7 dias | 🟢 OK</div>
   <div class="tw"><table>
-    <thead><tr><th>Nº Processo</th><th>Cliente</th><th>Área</th><th>Vara</th><th>Status</th><th>Início</th><th>Próx. Mov.</th><th>Advogado</th><th>Obs.</th><th>Ações</th></tr></thead>
+    <div style="display:flex;gap:8px;margin-bottom:8px;flex-wrap:wrap;align-items:center">
+      <button class="btn bsa bsm" onclick="djSyncAll()" id="proc-sync-btn">⚡ Sync Datajud</button>
+      <span id="proc-sync-st" style="font-size:11px;color:var(--mu)"></span>
+    </div>
+    <thead><tr><th>Nº Processo</th><th>Cliente</th><th>Área</th><th>Vara</th><th>Status</th><th>Próx. Mov.</th><th>Adv.</th><th>⚡ Datajud</th><th>Ações</th></tr></thead>
     <tbody>${filt.map(r=>`<tr class="${isPast(r.prox)&&r.status==='Em andamento'?'late':''}">
-      <td class="mono">${r.num}</td><td style="font-weight:600;white-space:nowrap">${cn(r.cliId)}</td>
-      <td>${badge(r.tipo,'bb')}</td><td style="font-size:11px">${r.vara}</td>
-      <td>${sbadge(r.status)}</td><td style="font-size:11px;white-space:nowrap">${fmtD(r.ini)}</td>
+      <td class="mono" style="font-size:10px">${r.num}</td>
+      <td style="font-weight:600;white-space:nowrap;font-size:12px">${cn(r.cliId)}</td>
+      <td>${badge(r.tipo,'bb')}</td><td style="font-size:11px">${r.vara||'—'}</td>
+      <td>${sbadge(r.status)}</td>
       <td style="white-space:nowrap">${dcolor(r.prox,r.status==='Em andamento')}</td>
-      <td style="font-size:11px;white-space:nowrap">${r.adv}</td>
-      <td class="eli" style="font-size:11px;color:var(--mu)">${r.obs||'—'}</td>
+      <td style="font-size:11px;white-space:nowrap">${r.adv||'—'}</td>
+      <td style="min-width:160px">
+        <div style="display:flex;align-items:flex-start;gap:4px">
+          <button class="btn bsa xs" style="flex-shrink:0" onclick="event.stopPropagation();djSyncProc(${r.id},'${r.num}','dj-${r.id}')" title="Consultar Datajud">⚡</button>
+          <span id="dj-${r.id}" style="font-size:10px;line-height:1.4">${r.djMov?`<span class="sync-ok">✅ ${esc((r.djMov).substring(0,22))}</span><br><span style="font-size:9px;color:var(--mu)">${r.djSyncAt||''}</span>`:'<span class="sync-load">—</span>'}</span>
+        </div>
+      </td>
       <td><div style="display:flex;gap:3px">
         ${r.prox?`<button class="btn bca xs" onclick="addProcToCalendar(${r.id})">📅</button>`:''}
         <button class="btn bsa xs" onclick="searchProcNum('${r.num}','${r.vara}')">🔍</button>
@@ -1160,18 +1209,18 @@ function delFin(id){if(confirm('Excluir este lançamento?')){fin=fin.filter(f=>f
 // COMUNICAÇÕES
 // ═══════════════════════════════════════════════════════════════════
 const WA_TPLS={
-  audiencia:n=>`Prezado(a) ${n},\n\nLembramos que sua audiência está agendada em nosso escritório. Por favor, confirme sua presença ou entre em contato.\n\n*Souza Advocacia*\n📞 (21) 99752-9727`,
-  prazo:n=>`Prezado(a) ${n},\n\nInformamos que há um prazo processual importante se aproximando em seu processo. Entre em contato com urgência.\n\n*Souza Advocacia*\n📞 (21) 99752-9727`,
-  docs:n=>`Prezado(a) ${n},\n\nPrecisamos de alguns documentos para dar continuidade ao seu processo. Entre em contato para obter a lista completa.\n\n*Souza Advocacia*\n📞 (21) 99752-9727`,
-  cobranca:n=>`Prezado(a) ${n},\n\nHá honorários advocatícios pendentes em aberto. Por favor, entre em contato para regularização.\n\n*Souza Advocacia*\n📞 (21) 99752-9727`,
-  update:n=>`Prezado(a) ${n},\n\nTemos novidades sobre o andamento do seu processo. Entre em contato para uma atualização completa.\n\n*Souza Advocacia*\n📞 (21) 99752-9727`,
+  audiencia:n=>`Prezado(a) ${n},\n\nLembramos que sua audiência está agendada em nosso escritório. Por favor, confirme sua presença ou entre em contato.\n\n*Marcus Souza I Advogado*\n📞 (21) 96534-8183`,
+  prazo:n=>`Prezado(a) ${n},\n\nInformamos que há um prazo processual importante se aproximando em seu processo. Entre em contato com urgência.\n\n*Marcus Souza I Advogado*\n📞 (21) 96534-8183`,
+  docs:n=>`Prezado(a) ${n},\n\nPrecisamos de alguns documentos para dar continuidade ao seu processo. Entre em contato para obter a lista completa.\n\n*Marcus Souza I Advogado*\n📞 (21) 96534-8183`,
+  cobranca:n=>`Prezado(a) ${n},\n\nHá honorários advocatícios pendentes em aberto. Por favor, entre em contato para regularização.\n\n*Marcus Souza I Advogado*\n📞 (21) 96534-8183`,
+  update:n=>`Prezado(a) ${n},\n\nTemos novidades sobre o andamento do seu processo. Entre em contato para uma atualização completa.\n\n*Marcus Souza I Advogado*\n📞 (21) 96534-8183`,
 };
 const EMAIL_TPLS={
-  audiencia:{sub:'Lembrete de Audiência — Souza Advocacia',body:n=>`Prezado(a) ${n},\n\nEste é um lembrete referente à audiência agendada no seu processo.\n\nAtenciosamente,\nSouza Advocacia\nOAB/RJ 250.430 · 160.689\n(21) 99752-9727 | souzaadvogadosa@gmail.com`},
-  prazo:{sub:'Alerta de Prazo Processual — Souza Advocacia',body:n=>`Prezado(a) ${n},\n\nInformamos que há um prazo processual importante se aproximando em seu processo. Entre em contato com urgência.\n\nAtenciosamente,\nSouza Advocacia`},
-  docs:{sub:'Solicitação de Documentos — Souza Advocacia',body:n=>`Prezado(a) ${n},\n\nPara dar continuidade ao seu processo, necessitamos que nos envie alguns documentos.\n\nAtenciosamente,\nSouza Advocacia`},
-  cobranca:{sub:'Honorários Advocatícios Pendentes — Souza Advocacia',body:n=>`Prezado(a) ${n},\n\nHá honorários advocatícios em aberto. Solicitamos a regularização.\n\nAtenciosamente,\nSouza Advocacia`},
-  update:{sub:'Atualização do Seu Processo — Souza Advocacia',body:n=>`Prezado(a) ${n},\n\nTemos novidades sobre o andamento do seu processo. Por favor, entre em contato.\n\nAtenciosamente,\nSouza Advocacia`},
+  audiencia:{sub:'Lembrete de Audiência — Marcus Souza I Advogado',body:n=>`Prezado(a) ${n},\n\nEste é um lembrete referente à audiência agendada no seu processo.\n\nAtenciosamente,\nMarcus Souza I Advogado\nOAB/RJ 250.430\n(21) 96534-8183 | souzaadvogadosa@gmail.com`},
+  prazo:{sub:'Alerta de Prazo Processual — Marcus Souza I Advogado',body:n=>`Prezado(a) ${n},\n\nInformamos que há um prazo processual importante se aproximando em seu processo. Entre em contato com urgência.\n\nAtenciosamente,\nMarcus Souza I Advogado`},
+  docs:{sub:'Solicitação de Documentos — Marcus Souza I Advogado',body:n=>`Prezado(a) ${n},\n\nPara dar continuidade ao seu processo, necessitamos que nos envie alguns documentos.\n\nAtenciosamente,\nMarcus Souza I Advogado`},
+  cobranca:{sub:'Honorários Advocatícios Pendentes — Marcus Souza I Advogado',body:n=>`Prezado(a) ${n},\n\nHá honorários advocatícios em aberto. Solicitamos a regularização.\n\nAtenciosamente,\nMarcus Souza I Advogado`},
+  update:{sub:'Atualização do Seu Processo — Marcus Souza I Advogado',body:n=>`Prezado(a) ${n},\n\nTemos novidades sobre o andamento do seu processo. Por favor, entre em contato.\n\nAtenciosamente,\nMarcus Souza I Advogado`},
 };
 function renderCom(){
   let html=`<div class="ccrow">
@@ -1207,8 +1256,8 @@ function setEmailTpl(tpl){const c=cli.find(x=>x.id===emailCliId);if(!c)return;co
 function sendEmail(){const c=cli.find(x=>x.id===emailCliId);if(!c||!c.email)return alert('Cliente sem e-mail.');const sub=encodeURIComponent(document.getElementById('email-sub').value);const body=encodeURIComponent(document.getElementById('email-body').value);window.location.href=`mailto:${c.email}?subject=${sub}&body=${body}`;closeMo('m-email');}
 function openWAMass(){const grp=document.getElementById('wa-group').value;const tpl=document.getElementById('wa-tpl-mass').value;const filt=cli.filter(c=>grp==='ativos'?c.tipo==='Ativo':grp==='novos'?c.tipo==='Novo':c.tipo==='Inativo');let html='';filt.forEach(c=>{if(!c.tel)return;const num='55'+c.tel.replace(/\D/g,'');const msg=encodeURIComponent(WA_TPLS[tpl](c.nome.split(' ')[0]));html+=`<div style="display:flex;align-items:center;justify-content:space-between;padding:5px 0;border-bottom:1px solid var(--bd);font-size:12px"><span>${c.nome}</span><a href="https://wa.me/${num}?text=${msg}" target="_blank" class="btn bwa xs">📱</a></div>`;});document.getElementById('wa-mass-list').innerHTML=html||'<p style="color:var(--mu);font-size:11px">Nenhum cliente com telefone neste grupo.</p>';}
 function openEmailMass(){const grp=document.getElementById('email-group').value;const tpl=document.getElementById('email-tpl-mass').value;const filt=cli.filter(c=>(grp==='ativos'?c.tipo==='Ativo':grp==='novos'?c.tipo==='Novo':c.tipo==='Inativo')&&c.email);if(!filt.length)return alert('Nenhum cliente com e-mail neste grupo.');const emails=filt.map(c=>c.email).join(',');const t=EMAIL_TPLS[tpl];window.location.href=`mailto:${emails}?subject=${encodeURIComponent(t.sub)}&body=${encodeURIComponent(t.body('Prezado(a)'))}` ;}
-function exportAllCal(){let events='BEGIN:VCALENDAR\nVERSION:2.0\nPRODID:-//Souza Advocacia//PT\n';tar.filter(t=>!t.ok&&t.data>=td0).forEach(t=>{const s=t.data.replace(/-/g,'')+'T090000Z';events+=`BEGIN:VEVENT\nDTSTART:${s}\nDTEND:${s.replace('090000','100000')}\nSUMMARY:${t.desc}\nDESCRIPTION:Cliente: ${cn(t.cliId)} | Resp: ${t.resp}\nLOCATION:${t.local||''}\nEND:VEVENT\n`;});events+='END:VCALENDAR';const b=new Blob([events],{type:'text/calendar'});const a=document.createElement('a');a.href=URL.createObjectURL(b);a.download='tarefas_souza.ics';a.click();}
-function exportPrazos(){let events='BEGIN:VCALENDAR\nVERSION:2.0\nPRODID:-//Souza Advocacia//PT\n';proc.filter(p=>p.prox&&p.prox>=td0&&p.status==='Em andamento').forEach(p=>{const s=p.prox.replace(/-/g,'')+'T090000Z';events+=`BEGIN:VEVENT\nDTSTART:${s}\nDTEND:${s.replace('090000','100000')}\nSUMMARY:⚖️ Movimentação: ${p.num.substring(0,20)}\nDESCRIPTION:Processo: ${p.num} | Cliente: ${cn(p.cliId)} | Adv: ${p.adv}\nLOCATION:${p.vara||''}\nEND:VEVENT\n`;});events+='END:VCALENDAR';const b=new Blob([events],{type:'text/calendar'});const a=document.createElement('a');a.href=URL.createObjectURL(b);a.download='prazos_souza.ics';a.click();}
+function exportAllCal(){let events='BEGIN:VCALENDAR\nVERSION:2.0\nPRODID:-//Marcus Souza I Advogado//PT\n';tar.filter(t=>!t.ok&&t.data>=td0).forEach(t=>{const s=t.data.replace(/-/g,'')+'T090000Z';events+=`BEGIN:VEVENT\nDTSTART:${s}\nDTEND:${s.replace('090000','100000')}\nSUMMARY:${t.desc}\nDESCRIPTION:Cliente: ${cn(t.cliId)} | Resp: ${t.resp}\nLOCATION:${t.local||''}\nEND:VEVENT\n`;});events+='END:VCALENDAR';const b=new Blob([events],{type:'text/calendar'});const a=document.createElement('a');a.href=URL.createObjectURL(b);a.download='tarefas_souza.ics';a.click();}
+function exportPrazos(){let events='BEGIN:VCALENDAR\nVERSION:2.0\nPRODID:-//Marcus Souza I Advogado//PT\n';proc.filter(p=>p.prox&&p.prox>=td0&&p.status==='Em andamento').forEach(p=>{const s=p.prox.replace(/-/g,'')+'T090000Z';events+=`BEGIN:VEVENT\nDTSTART:${s}\nDTEND:${s.replace('090000','100000')}\nSUMMARY:⚖️ Movimentação: ${p.num.substring(0,20)}\nDESCRIPTION:Processo: ${p.num} | Cliente: ${cn(p.cliId)} | Adv: ${p.adv}\nLOCATION:${p.vara||''}\nEND:VEVENT\n`;});events+='END:VCALENDAR';const b=new Blob([events],{type:'text/calendar'});const a=document.createElement('a');a.href=URL.createObjectURL(b);a.download='prazos_souza.ics';a.click();}
 
 // ═══════════════════════════════════════════════════════════════════
 // AGENDA HOJE (agendamentos)
@@ -1318,6 +1367,127 @@ function renderMetricas(){
   h+=`<div class="card"><div class="stit">Modalidade</div>${Object.entries(bM).map(([k,v])=>`<div class="br2"><div class="bl2">${mmap[k]||k}</div><div class="bt"><div class="bf" style="width:${Math.round(v/Math.max(1,tot)*100)}%">${v}</div></div></div>`).join('')}</div>`;
   document.getElementById('admin-cnt').innerHTML=h;
 }
+
+// ═══════════════════════════════════════════════════════════════════
+// DATAJUD — API PÚBLICA CNJ (Pull only — Resolução 331/2020)
+// URL: POST https://api-publica.datajud.cnj.jus.br/{alias}/_search
+// Header: Authorization: APIKey {chave}
+// Body: {"query":{"match":{"numeroProcesso":"00000000000000000000"}}}
+// ═══════════════════════════════════════════════════════════════════
+const DJ_KEY  = 'cDZHYzlZa0JadVREZDJCendQbXY6SkJlTzNjLV9TRENyQk1RdnFKZGRQdw==';
+const DJ_BASE = 'https://api-publica.datajud.cnj.jus.br/';
+const DJ_EP = {
+  tjac:'api_publica_tjac',tjal:'api_publica_tjal',tjam:'api_publica_tjam',
+  tjap:'api_publica_tjap',tjba:'api_publica_tjba',tjce:'api_publica_tjce',
+  tjdft:'api_publica_tjdft',tjes:'api_publica_tjes',tjgo:'api_publica_tjgo',
+  tjma:'api_publica_tjma',tjmg:'api_publica_tjmg',tjms:'api_publica_tjms',
+  tjmt:'api_publica_tjmt',tjpa:'api_publica_tjpa',tjpb:'api_publica_tjpb',
+  tjpr:'api_publica_tjpr',tjpe:'api_publica_tjpe',tjpi:'api_publica_tjpi',
+  tjrj:'api_publica_tjrj',tjrn:'api_publica_tjrn',tjrs:'api_publica_tjrs',
+  tjro:'api_publica_tjro',tjrr:'api_publica_tjrr',tjsc:'api_publica_tjsc',
+  tjse:'api_publica_tjse',tjsp:'api_publica_tjsp',tjto:'api_publica_tjto',
+  trf1:'api_publica_trf1',trf2:'api_publica_trf2',trf3:'api_publica_trf3',
+  trf4:'api_publica_trf4',trf5:'api_publica_trf5',trf6:'api_publica_trf6',
+  trt1:'api_publica_trt1',trt2:'api_publica_trt2',trt3:'api_publica_trt3',
+  trt4:'api_publica_trt4',trt5:'api_publica_trt5',trt6:'api_publica_trt6',
+  trt7:'api_publica_trt7',trt8:'api_publica_trt8',trt9:'api_publica_trt9',
+  trt10:'api_publica_trt10',trt11:'api_publica_trt11',trt12:'api_publica_trt12',
+  trt13:'api_publica_trt13',trt14:'api_publica_trt14',trt15:'api_publica_trt15',
+  trt16:'api_publica_trt16',trt17:'api_publica_trt17',trt18:'api_publica_trt18',
+  trt19:'api_publica_trt19',trt20:'api_publica_trt20',trt21:'api_publica_trt21',
+  trt22:'api_publica_trt22',trt23:'api_publica_trt23',trt24:'api_publica_trt24',
+  tst:'api_publica_tst',stj:'api_publica_stj',tse:'api_publica_tse',stm:'api_publica_stm',
+};
+function numRaw(n){return String(n||'').replace(/\D/g,'');}
+function fmtDJ(s){if(!s)return'—';if(/^\d{14}$/.test(String(s))){const v=String(s);return`${v.slice(6,8)}/${v.slice(4,6)}/${v.slice(0,4)}`;}try{return new Date(s).toLocaleDateString('pt-BR',{day:'2-digit',month:'2-digit',year:'numeric'});}catch(e){return String(s);}}
+function djAssuntos(raw){if(!raw||!raw.length)return[];const f=[];raw.forEach(a=>{if(Array.isArray(a))a.forEach(x=>{if(x&&x.nome)f.push(x);});else if(a&&a.nome)f.push(a);});return f;}
+function detectTribCNJ(num){
+  const d=num.replace(/\D/g,'');if(d.length!==20)return null;
+  const seg=d[13],tt=d.substring(14,16);
+  const m={'8':{'01':'tjac','02':'tjal','03':'tjam','04':'tjap','05':'tjba','06':'tjce','07':'tjdft','08':'tjes','09':'tjgo','10':'tjma','11':'tjmt','12':'tjms','13':'tjmg','14':'tjpa','15':'tjpb','16':'tjpr','17':'tjpe','18':'tjpi','19':'tjrj','20':'tjrn','21':'tjrs','22':'tjro','23':'tjrr','24':'tjsc','25':'tjse','26':'tjsp','27':'tjto'},
+   '9':{'01':'trt1','02':'trt2','03':'trt3','04':'trt4','05':'trt5','06':'trt6','07':'trt7','08':'trt8','09':'trt9','10':'trt10','11':'trt11','12':'trt12','13':'trt13','14':'trt14','15':'trt15','16':'trt16','17':'trt17','18':'trt18','19':'trt19','20':'trt20','21':'trt21','22':'trt22','23':'trt23','24':'trt24','00':'tst'},
+   '4':{'01':'trf1','02':'trf2','03':'trf3','04':'trf4','05':'trf5','06':'trf6'},
+   '3':{'00':'stj'},'2':{'00':'tse'},'6':{'00':'stm'}};
+  return(m[seg]&&m[seg][tt])||null;
+}
+function djErrMsg(status,msg){
+  if(status===401||status===403)return'APIKey inválida ou expirada. Atualize em datajud-wiki.cnj.jus.br/api-publica/acesso/';
+  if(status===429)return'Limite de requisições atingido. Aguarde e tente novamente.';
+  if(status===502||status===503||status===504)return'API Datajud temporariamente indisponível. Tente em alguns minutos.';
+  if(msg&&(msg.includes('fetch')||msg.includes('network')))return'Sem conexão com a internet ou CORS bloqueado.';
+  if(msg&&msg.includes('timeout'))return'Timeout — API sobrecarregada.';
+  return msg||`HTTP ${status}`;
+}
+// Consulta principal — POST com match simples (padrão doc. CNJ)
+async function djFetch(alias,body,retries=1){
+  const url=`${DJ_BASE}${alias}/_search`;
+  for(let i=0;i<=retries;i++){
+    try{
+      const ctrl=new AbortController();
+      const tid=setTimeout(()=>ctrl.abort(),15000);
+      const r=await fetch(url,{method:'POST',headers:{'Authorization':`APIKey ${DJ_KEY}`,'Content-Type':'application/json'},body:JSON.stringify(body),signal:ctrl.signal});
+      clearTimeout(tid);
+      if(!r.ok){let m='';try{const j=await r.json();m=j.error?.reason||'';}catch(e){}throw{status:r.status,message:djErrMsg(r.status,m)};}
+      return await r.json();
+    }catch(e){if(i<retries&&(e.name==='AbortError'||e.name==='TypeError')){await new Promise(r=>setTimeout(r,1000*(i+1)));continue;}throw new Error(e.message||djErrMsg(0,String(e)));}
+  }
+}
+// Consulta por número CNJ — query match exata (doc. oficial CNJ)
+async function djConsultar(numProc){
+  const nd=numRaw(numProc);
+  if(nd.length!==20)throw new Error(`Número inválido: "${numProc}". Deve ter 20 dígitos. Formato: NNNNNNN-DD.AAAA.J.TT.OOOO`);
+  const trib=detectTribCNJ(numProc);
+  const alias=trib?DJ_EP[trib]:null;
+  if(!alias)throw new Error(`Tribunal não identificado. Verifique dígitos 14-15 (tribunal) e 13 (segmento) do número CNJ.`);
+  // Query exata conforme documentação CNJ — match simples com número sem máscara
+  const data=await djFetch(alias,{size:1,query:{match:{numeroProcesso:nd}}});
+  return{hits:data?.hits?.hits||[],trib,alias,nd};
+}
+// Sync de processo individual — atualiza célula na tabela e persiste
+async function djSyncProc(procId,numProc,cellId){
+  const cell=document.getElementById(cellId||`dj-${procId}`);
+  if(cell)cell.innerHTML='<span class="sync-load">⏳ consultando CNJ...</span>';
+  try{
+    const{hits,trib,nd}=await djConsultar(numProc);
+    if(!hits.length){
+      if(cell)cell.innerHTML=`<span class="sync-warn" title="Não encontrado no Datajud.\nCausas: sigilo (nivelSigilo>0), número incorreto, tribunal não indexado ou dado não enviado pelo tribunal.">⚠️ Não encontrado</span>`;
+      return;
+    }
+    const s=hits[0]._source;
+    const movs=(s.movimentos||[]).sort((a,b)=>new Date(b.dataHora)-new Date(a.dataHora));
+    const ult=movs[0];
+    const grauN={G1:'1º Grau',G2:'2º Grau',JE:'Juizado',TR:'Turma',SU:'Superior'}[s.grau]||s.grau||'';
+    if(cell)cell.innerHTML=ult
+      ?`<span class="sync-ok" title="Tribunal: ${trib?.toUpperCase()}\nÓrgão: ${esc(s.orgaoJulgador?.nome||'')}\nÚltimo mov.: ${esc(ult.nome)} (${fmtDJ(ult.dataHora)})\nAtualização Datajud: ${fmtDJ(s.dataHoraUltimaAtualizacao)}\nTotal movimentos: ${movs.length}">✅ ${esc((ult.nome||'').substring(0,26))}<br><span style="font-size:9px;color:var(--mu)">${fmtDJ(ult.dataHora)} · ${trib?.toUpperCase()||''}</span></span>`
+      :`<span class="sync-warn">Sem movimentos</span>`;
+    // Persistir dados no processo local
+    const pi=proc.findIndex(p=>numRaw(p.num)===nd);
+    if(pi>=0){proc[pi].djMov=ult?.nome||'';proc[pi].djMovDt=fmtDJ(ult?.dataHora);proc[pi].djSyncAt=new Date().toLocaleDateString('pt-BR');proc[pi].djGrau=grauN;proc[pi].djOrgao=s.orgaoJulgador?.nome||'';save();}
+    logAccess('processos',`sync OK: ${trib?.toUpperCase()||''} ${nd.substring(0,15)}`);
+  }catch(e){
+    const d=e.message||'Erro';
+    if(cell)cell.innerHTML=`<span class="sync-err" title="${esc(d)}\n\nVerifique:\n• Conexão com internet\n• Número CNJ (20 dígitos)\n• APIKey em datajud-wiki.cnj.jus.br">⚠️ ${esc(d.substring(0,28))}</span>`;
+  }
+}
+// Sync em lote — Pull manual de todos os processos ativos
+async function djSyncAll(){
+  const st=document.getElementById('proc-sync-st');
+  const btn=document.querySelector('[onclick*="djSyncAll"]');
+  const ativos=proc.filter(p=>p.status!=='Finalizado'&&p.status!=='Arquivado');
+  if(!ativos.length){if(st)st.textContent='Nenhum processo ativo.';return;}
+  if(btn){btn.disabled=true;btn.textContent='⏳ Consultando...';}
+  let ok=0,err=0;
+  for(let i=0;i<ativos.length;i++){
+    if(st)st.textContent=`⏳ ${i+1}/${ativos.length}`;
+    try{await djSyncProc(ativos[i].id,ativos[i].num);ok++;}catch(e){err++;}
+    await new Promise(r=>setTimeout(r,400));
+  }
+  if(btn){btn.disabled=false;btn.textContent='⚡ Sync Datajud';}
+  if(st)st.textContent=`✅ ${ok} OK${err?` · ⚠️ ${err} erro(s)`:''} — ${new Date().toLocaleTimeString('pt-BR',{hour:'2-digit',minute:'2-digit'})}`;
+  renderProc();
+}
+// Estado da aba Busca Processual
+let djLast=null,djAfter=null,djAlias=null,djQuery=null,djPage=0,djTotal=0;
 
 // ═══════════════════════════════════════════════════════════════════
 // BUSCA PROCESSUAL — DATAJUD API PÚBLICA CNJ (Resolução CNJ 331/2020)
@@ -2126,6 +2296,115 @@ async function djSyncAll(){
 }
 
 // ═══════════════════════════════════════════════════════════════════
+// CONTROLE DE ACESSOS E PERMISSÕES
+// ═══════════════════════════════════════════════════════════════════
+const MOD_LBL={cli:{l:'Clientes',i:'👥'},proc:{l:'Processos',i:'⚖️'},age:{l:'Agenda',i:'📅'},fin:{l:'Financeiro',i:'💰'},tar:{l:'Tarefas',i:'✅'},rel:{l:'Relatórios',i:'📊'},cfg:{l:'Config',i:'⚙️'},usr:{l:'Usuários',i:'👤'}};
+const ACT_LBL={v:'Visualizar',c:'Criar',e:'Editar',d:'Excluir'};
+
+function renderAcessos(){
+  if(currentUser?.role!=='admin'){denyAccess('Controle de Acessos');return;}
+  loadLog();
+  const sbadge_=u=>u.ativo?'<span class="badge bg">Ativo</span>':'<span class="badge br">Bloqueado</span>';
+  const lastAcc=u=>{const l=accessLog.filter(x=>x.usuario===u.nome&&!x.negado);return l.length?`${l[0].data} ${l[0].hora}`:'Nunca';};
+  const denied=u=>accessLog.filter(x=>x.usuario===u.nome&&x.negado).length;
+  let h=`<div class="card hi" style="margin-bottom:12px"><div class="stitle">🔐 Controle de Acessos e Permissões</div><div style="font-size:12px;color:var(--mu)">Somente o administrador tem acesso a esta área. Gerencie perfis, permissões e bloqueios.</div></div>
+  <div class="card" style="margin-bottom:12px">
+    <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:10px"><div class="stitle">👥 Usuários</div><button class="btn bp bsm" onclick="openUserModal()">+ Novo</button></div>
+    <div class="tw"><table><thead><tr><th></th><th>Usuário</th><th>Perfil</th><th>Status</th><th>Último Acesso</th><th>Negados</th><th>Ações</th></tr></thead><tbody>
+    ${users.map(u=>`<tr style="opacity:${u.ativo?1:.6}">
+      <td><div class="av" style="width:30px;height:30px;font-size:11px;background:${ac(u.id)};color:#fff">${initials(u.nome)}</div></td>
+      <td><div style="font-weight:700;font-size:12px">${esc(u.nome)}</div><div style="font-size:10px;color:#2563eb">${esc(u.email)}</div><div style="font-size:10px;color:var(--mu)">${esc(u.cargo||'')} ${u.oab?'· '+u.oab:''}</div></td>
+      <td><span class="urole ${ROLES[u.role]?.cls||'r-colaborador'}">${ROLES[u.role]?.l||u.role}</span></td>
+      <td>${sbadge_(u)}</td>
+      <td style="font-size:11px;color:var(--mu)">${lastAcc(u)}</td>
+      <td style="text-align:center">${denied(u)>0?`<span style="color:#dc2626;font-weight:700">${denied(u)}</span>`:'<span style="color:var(--mu)">0</span>'}</td>
+      <td><div style="display:flex;gap:3px;flex-wrap:wrap">
+        <button class="btn bsa xs" onclick="openPermModal(${u.id})" title="Permissões">🔑</button>
+        <button class="btn bgh xs" onclick="editUser(${u.id})">✏️</button>
+        ${u.id!==currentUser.id?`<button class="btn ${u.ativo?'bd_':'bg_'} xs" onclick="toggleAcesso(${u.id})">${u.ativo?'🔒':'🔓'}</button>`:''}
+      </div></td>
+    </tr>`).join('')}
+    </tbody></table></div>
+  </div>
+  <div class="card">
+    <div class="stitle">📋 Log de Acessos</div>
+    <div style="display:flex;gap:8px;margin-bottom:8px">
+      <select id="log-fu" onchange="renderLogT()" style="font-size:11px"><option value="">Todos</option>${users.map(u=>`<option value="${u.nome}">${u.nome}</option>`).join('')}</select>
+      <select id="log-ft" onchange="renderLogT()" style="font-size:11px"><option value="">Todos</option><option value="negado">Negados</option><option value="ok">Permitidos</option></select>
+      <button class="btn bgh bsm" onclick="accessLog=[];localStorage.removeItem('sa_log');renderAcessos()">🗑️ Limpar</button>
+    </div>
+    <div id="log-cont"></div>
+  </div>`;
+  document.getElementById('admin-cnt').innerHTML=h;
+  renderLogT();
+}
+function renderLogT(){
+  const fu=(document.getElementById('log-fu')||{}).value||'';
+  const ft=(document.getElementById('log-ft')||{}).value||'';
+  let logs=accessLog;
+  if(fu)logs=logs.filter(l=>l.usuario===fu);
+  if(ft==='negado')logs=logs.filter(l=>l.negado);
+  if(ft==='ok')logs=logs.filter(l=>!l.negado);
+  const c=document.getElementById('log-cont');if(!c)return;
+  if(!logs.length){c.innerHTML='<div style="text-align:center;padding:16px;font-size:12px;color:var(--mu)">Nenhum registro.</div>';return;}
+  c.innerHTML=`<div style="max-height:280px;overflow-y:auto">
+    <div class="log-row" style="font-weight:700;font-size:10px;text-transform:uppercase;color:var(--mu);background:#f8fafc"><div>Data/Hora</div><div>Usuário</div><div>Módulo · Ação</div><div>Status</div></div>
+    ${logs.slice(0,80).map(l=>`<div class="log-row"><div style="font-size:10px">${l.data}<br>${l.hora}</div><div style="font-size:11px;font-weight:600">${esc(l.usuario)}<br><span style="font-size:10px;color:var(--mu)">${esc(l.perfil)}</span></div><div style="font-size:11px">${esc(l.mod)}<br><span style="font-size:10px;color:var(--mu)">${esc(l.acao)}</span></div><div>${l.negado?'<span style="color:#dc2626;font-size:10px;font-weight:700">⛔ NEGADO</span>':'<span style="color:#16a34a;font-size:10px">✅</span>'}</div></div>`).join('')}
+  </div>`;
+}
+function openPermModal(userId){
+  const u=users.find(x=>x.id===userId);if(!u)return;
+  const base=ROLES[u.role]||ROLES.estagiario;
+  const merged=u.customPerms?deepMerge(base,u.customPerms):base;
+  let rows='';
+  Object.entries(MOD_LBL).forEach(([mod,{l,i}])=>{
+    rows+=`<div class="perm-mod"><div class="perm-mod-title">${i} ${l}</div>`;
+    Object.entries(ACT_LBL).forEach(([act,albl])=>{
+      const val=merged[mod]&&merged[mod][act]?1:0;
+      rows+=`<div class="perm-row"><span>${albl}</span><label class="ptog"><input type="checkbox" id="pc-${mod}-${act}" ${val?'checked':''}><span class="pslider"></span></label></div>`;
+    });
+    rows+='</div>';
+  });
+  const m=document.createElement('div');m.className='mo-desk on';m.id='m-perm-modal';
+  m.innerHTML=`<div class="mbox" style="max-width:820px;max-height:85vh;overflow-y:auto">
+    <h3>🔑 Permissões — ${esc(u.nome)}</h3>
+    <div style="display:flex;align-items:center;gap:10px;margin-bottom:14px;flex-wrap:wrap">
+      <span class="urole ${ROLES[u.role]?.cls||'r-colaborador'}">${ROLES[u.role]?.l||u.role}</span>
+      <span style="font-size:11px;color:var(--mu)">Permissões personalizadas sobrepõem o perfil padrão</span>
+      <button class="btn bgh bsm" onclick="resetPerm(${userId})">↺ Resetar</button>
+    </div>
+    <div class="perm-grid">${rows}</div>
+    <div class="mfoot" style="margin-top:14px">
+      <button class="btn bp" onclick="savePerm(${userId})">💾 Salvar</button>
+      <button class="btn bgh" onclick="document.getElementById('m-perm-modal').remove()">Cancelar</button>
+    </div>
+  </div>`;
+  document.body.appendChild(m);
+  m.addEventListener('click',e=>{if(e.target===m)m.remove();});
+}
+function savePerm(uid){
+  const u=users.find(x=>x.id===uid);if(!u)return;
+  const cp={};
+  Object.keys(MOD_LBL).forEach(mod=>{cp[mod]={};Object.keys(ACT_LBL).forEach(act=>{const el=document.getElementById(`pc-${mod}-${act}`);if(el)cp[mod][act]=el.checked?1:0;});});
+  u.customPerms=cp;save();
+  document.getElementById('m-perm-modal')?.remove();
+  logAccess('usuarios',`permissões salvas: ${u.nome}`);
+  alert(`✅ Permissões de ${u.nome} salvas!`);renderAcessos();
+}
+function resetPerm(uid){
+  const u=users.find(x=>x.id===uid);if(!u)return;
+  if(!confirm(`Resetar permissões de ${u.nome} ao perfil padrão?`))return;
+  delete u.customPerms;save();
+  document.getElementById('m-perm-modal')?.remove();
+  renderAcessos();
+}
+function toggleAcesso(uid){
+  const u=users.find(x=>x.id===uid);if(!u)return;
+  if(!confirm(`${u.ativo?'Bloquear':'Desbloquear'} ${u.nome}?`))return;
+  u.ativo=!u.ativo;save();logAccess('usuarios',`${u.ativo?'desbloqueado':'bloqueado'}: ${u.nome}`);renderAcessos();
+}
+
+// ═══════════════════════════════════════════════════════════════════
 // USUÁRIOS
 // ═══════════════════════════════════════════════════════════════════
 function renderUsers(){
@@ -2171,7 +2450,10 @@ function renderGCal(){
   <div class="card gl">
     <div class="stit">Configuração da API</div>
     <div class="fg"><div class="fl">Google Calendar API Key</div><input class="fi" id="gc-key" value="${gcfg.key}" placeholder="AIzaSy..." style="font-family:monospace;font-size:12px"></div>
-    <div class="fg"><div class="fl">Calendar ID</div><input class="fi" id="gc-cid" value="${gcfg.calId}" placeholder="seu@gmail.com"></div>
+    <div class="fg"><div class="fl">Calendar ID</div><input class="fi" id="gc-cid" value="${gcfg.calId||'adv.souzamarcus@gmail.com'}" placeholder="seu@gmail.com"></div>
+  <div class="fg"><div class="fl">Visualização da Agenda</div>
+    <iframe src="https://calendar.google.com/calendar/embed?src=adv.souzamarcus%40gmail.com&ctz=America%2FSao_Paulo" style="border:1px solid var(--bd);border-radius:8px;width:100%;min-height:400px" frameborder="0" scrolling="no"></iframe>
+  </div>
     <div class="fg"><div class="fl">Apps Script URL (criação automática de eventos)</div><input class="fi" id="gc-scr" value="${gcfg.script}" placeholder="https://script.google.com/macros/s/..."></div>
     <div class="brow"><button class="btn bgold" onclick="saveGC()">💾 Salvar</button><button class="btn bghost" onclick="testGC()">🔍 Testar Conexão</button></div>
     <div id="gc-res" style="margin-top:8px"></div>
@@ -2218,9 +2500,9 @@ function appsScript(){return`// SOUZA ADVOCACIA — Google Apps Script\nfunction
 // ═══════════════════════════════════════════════════════════════════
 function renderConfig(){
   let h=`<div class="card gl"><div class="stit">Escritório</div>
-    <div class="drow"><div class="dl">Nome</div><div class="dv">Souza Advocacia</div></div>
-    <div class="drow"><div class="dl">OAB</div><div class="dv">Dr. Luiz Fabiano (OAB/RJ 160.689) · Dr. Marcus Souza (OAB/RJ 250.430)</div></div>
-    <div class="drow"><div class="dl">Telefone</div><div class="dv">(21) 96534-8183 · (21) 99752-9727</div></div>
+    <div class="drow"><div class="dl">Nome</div><div class="dv">Marcus Souza I Advogado</div></div>
+    <div class="drow"><div class="dl">OAB</div><div class="dv">Dr. Marcus Souza (OAB/RJ 250.430)</div></div>
+    <div class="drow"><div class="dl">Telefone</div><div class="dv">(21) 96534-8183 · (21) 96534-8183</div></div>
     <div class="drow"><div class="dl">E-mail</div><div class="dv">souzaadvogadosa@gmail.com</div></div>
     <div class="drow"><div class="dl">Horário</div><div class="dv">Seg–Sex · 10h–18h · Somente agendamento</div></div>
   </div>
@@ -2266,7 +2548,7 @@ function showDet(id){
     <div class="card" style="margin-bottom:10px">
       <div class="drow"><div class="dl">Data</div><div class="dv">📅 ${fdl(b.data)}</div></div>
       <div class="drow"><div class="dl">Horário</div><div class="dv">⏰ ${b.hora} – ${am(b.hora,t.d)}</div></div>
-      <div class="drow"><div class="dl">CPF</div><div class="dv">${b.cpf}</div></div>
+      
       <div class="drow"><div class="dl">WhatsApp</div><div class="dv"><a href="https://wa.me/55${b.tel}" target="_blank" style="color:var(--gr);font-weight:700">📱 ${b.tel}</a></div></div>
       <div class="drow"><div class="dl">E-mail</div><div class="dv">${b.email||'—'}</div></div>
       <div class="drow"><div class="dl">Cidade</div><div class="dv">${b.cidade}/${b.estado}</div></div>
@@ -2281,7 +2563,7 @@ function showDet(id){
       <button class="btn bgold bw" style="margin-top:9px" onclick="saveDet('${b.id}')">💾 Salvar Alterações</button>
     </div>
     <div class="brow">
-      <a href="https://wa.me/55${b.tel}?text=${encodeURIComponent('Olá '+b.nome.split(' ')[0]+'! Confirmamos seu atendimento para '+fd(b.data)+' às '+b.hora+'. Escritório Souza Advocacia — (21) 96534-8183.')}" target="_blank" class="btn bwa" style="flex:1">📱 WhatsApp</a>
+      <a href="https://wa.me/55${b.tel}?text=${encodeURIComponent('Olá '+b.nome.split(' ')[0]+'! Confirmamos seu atendimento para '+fd(b.data)+' às '+b.hora+'. Escritório Marcus Souza I Advogado — (21) 96534-8183.')}" target="_blank" class="btn bwa" style="flex:1">📱 WhatsApp</a>
       <a href="${gcLink(b)}" target="_blank" class="btn bnav" style="flex:1">📅 Google Cal</a>
       <button class="btn bred" onclick="delDet('${b.id}')" style="flex:1">🗑️</button>
     </div>`;
@@ -2294,11 +2576,7 @@ function showPending(){const p=bk.filter(b=>b.status==='solicitado');if(!p.lengt
 // ═══════════════════════════════════════════════════════════════════
 // PUBLIC BOOKING FLOW
 // ═══════════════════════════════════════════════════════════════════
-function qtype(t){
-  const st=document.getElementById('s-type');
-  if(st&&st.classList.contains('on')){selType(t);}
-  else{go('s-type');setTimeout(()=>selType(t),80);}
-}
+function qtype(t){const st=document.getElementById('s-type');if(st&&st.classList.contains('on')){selType(t);}else{go('s-type');setTimeout(()=>selType(t),80);}}
 function selType(t){
   app={type:t,step:0,nome:'',cpf:'',tel:'',email:'',cidade:'',estado:'',area:'',resumo:'',modal:'whatsapp',data:'',hora:'',extra:{},files:[],lgpd:false};
   selDate=null;selTime=null;calM=new Date().getMonth();calY=new Date().getFullYear();
@@ -2320,7 +2598,7 @@ function rStep0(){
   return`<div class="card gl" style="margin-bottom:13px;display:flex;align-items:center;gap:10px"><span style="font-size:26px">${t.i}</span><div><div style="font-weight:700;color:var(--n)">${t.n}</div><div style="font-size:11px;color:var(--mu)">${t.d} minutos</div></div></div>
   <div class="stit">Dados Pessoais</div>
   <div class="fg"><div class="fl">Nome Completo <span style="color:var(--g)">*</span></div><input class="fi" id="f-nome" value="${app.nome}" placeholder="Nome completo"></div>
-  <div class="frow"><div class="fg" style="flex:1"><div class="fl">CPF *</div><input class="fi" id="f-cpf" type="tel" inputmode="numeric" value="${app.cpf}" placeholder="000.000.000-00" oninput="mCPF(this)"></div><div class="fg" style="flex:1"><div class="fl">Nasc.</div><input class="fi" id="f-nasc" type="date" value="${app.extra.nasc||''}"></div></div>
+
   <div class="fg"><div class="fl">WhatsApp *</div><input class="fi" id="f-tel" type="tel" inputmode="numeric" value="${app.tel}" placeholder="(21) 99999-9999" oninput="mTel(this)"></div>
   <div class="fg"><div class="fl">E-mail</div><input class="fi" id="f-email" type="email" value="${app.email}" placeholder="email@exemplo.com"></div>
   <div class="frow"><div class="fg" style="flex:2"><div class="fl">Cidade *</div><input class="fi" id="f-cidade" value="${app.cidade}" placeholder="Rio de Janeiro"></div><div class="fg" style="flex:1"><div class="fl">UF</div><select class="fsel" id="f-uf"><option value="">--</option>${['AC','AL','AP','AM','BA','CE','DF','ES','GO','MA','MT','MS','MG','PA','PB','PR','PE','PI','RJ','RN','RS','RO','RR','SC','SP','SE','TO'].map(u=>`<option ${app.estado===u?'selected':''}>${u}</option>`).join('')}</select></div></div>
@@ -2400,9 +2678,9 @@ function pickDate(d){selDate=d;selTime=null;renderStep(2);}
 function pickTime(t){selTime=t;renderStep(2);}
 function gi(id){const e=document.getElementById(id);return e?e.value:'';}
 function s0next(){
-  const nome=gi('f-nome').trim(),cpf=gi('f-cpf').trim(),tel=gi('f-tel').trim(),cidade=gi('f-cidade').trim();
-  if(!nome||!cpf||!tel||!cidade){alert('Preencha: Nome, CPF, WhatsApp e Cidade.');return;}
-  Object.assign(app,{nome,cpf,tel:tel.replace(/\D/g,''),email:gi('f-email').trim(),cidade,estado:gi('f-uf'),extra:{...app.extra,nasc:gi('f-nasc')}});
+  const nome=gi('f-nome').trim(),tel=gi('f-tel').trim(),cidade=gi('f-cidade').trim();
+  if(!nome||!tel||!cidade){alert('Preencha: Nome, WhatsApp e Cidade.');return;}
+  Object.assign(app,{nome,cpf:'',tel:tel.replace(/\D/g,''),email:gi('f-email').trim(),cidade,estado:gi('f-uf'),extra:{...app.extra}});
   renderStep(1);
 }
 function s1next(){
@@ -2421,7 +2699,7 @@ function s1next(){
 function s2next(){if(!selDate||!selTime){alert('Selecione data e horário.');return;}app.data=selDate;app.hora=selTime;renderStep(3);}
 function submitBooking(){
   if(!app.lgpd){alert('É necessário aceitar a Política de Privacidade.');return;}
-  const b={id:gidb(),type:app.type,status:'solicitado',nome:app.nome,cpf:app.cpf,tel:app.tel,email:app.email,cidade:app.cidade,estado:app.estado,area:app.area,resumo:app.resumo,modal:app.modal,data:app.data,hora:app.hora,extra:app.extra,files:[...app.files],createdAt:new Date().toISOString(),obs:''};
+  const b={id:gidb(),type:app.type,status:'solicitado',nome:app.nome,cpf:'',tel:app.tel,email:app.email,cidade:app.cidade,estado:app.estado,area:app.area,resumo:app.resumo,modal:app.modal,data:app.data,hora:app.hora,extra:app.extra,files:[...app.files],createdAt:new Date().toISOString(),obs:''};
   bk.push(b);saveBk();updNotif();
   const t=BT[b.type];const mmap={videoconferencia:'📹 Videoconferência',ligacao:'📞 Ligação',whatsapp:'💬 WhatsApp'};
   document.getElementById('suc-msg').textContent=`Olá, ${b.nome.split(' ')[0]}! Seu agendamento foi realizado. Em breve a equipe confirmará pelo WhatsApp.`;
@@ -2457,21 +2735,21 @@ function exportExcel(){
   XLSX.utils.book_append_sheet(wb,XLSX.utils.json_to_sheet(proc.map(p=>({'Nº Processo':p.num,Cliente:cn(p.cliId),Área:p.tipo,'Tribunal/Vara':p.vara,Status:p.status,Início:fmtD(p.ini),'Próx.Mov':fmtD(p.prox),Advogado:p.adv,'Observações':p.obs}))),'Processos');
   XLSX.utils.book_append_sheet(wb,XLSX.utils.json_to_sheet(tar.map(t=>({Data:fmtD(t.data),Descrição:t.desc,Cliente:cn(t.cliId),Prioridade:t.prio,Status:t.status,Responsável:t.resp,Concluída:t.ok?'Sim':'Não'}))),'Tarefas');
   XLSX.utils.book_append_sheet(wb,XLSX.utils.json_to_sheet(fin.map(f=>({Cliente:cn(f.cliId),Descrição:f.desc,Data:fmtD(f.data),Contratado:f.ct,Recebido:f.rc,Pendente:(f.ct||0)-(f.rc||0),Pagamento:f.pg,Status:f.st}))),'Financeiro');
-  XLSX.utils.book_append_sheet(wb,XLSX.utils.json_to_sheet(bk.map(b=>({Protocolo:b.id,Tipo:BT[b.type]?.n,Status:SS[b.status]?.l,Nome:b.nome,CPF:b.cpf,Telefone:b.tel,'E-mail':b.email,Cidade:b.cidade,Estado:b.estado,Área:b.area,Data:b.data,Hora:b.hora,Modalidade:b.modal,Resumo:b.resumo}))),'Agendamentos');
+  XLSX.utils.book_append_sheet(wb,XLSX.utils.json_to_sheet(bk.map(b=>({Protocolo:b.id,Tipo:BT[b.type]?.n,Status:SS[b.status]?.l,Nome:b.nome,Telefone:b.tel,'E-mail':b.email,Cidade:b.cidade,Estado:b.estado,Área:b.area,Data:b.data,Hora:b.hora,Modalidade:b.modal,Resumo:b.resumo}))),'Agendamentos');
   XLSX.utils.book_append_sheet(wb,XLSX.utils.json_to_sheet(users.map(u=>({Nome:u.nome,Cargo:u.cargo,'E-mail':u.email,OAB:u.oab,Telefone:u.tel,Função:ROLES[u.role]?.l,Status:u.ativo?'Ativo':'Inativo'}))),'Usuários');
   XLSX.writeFile(wb,'SouzaAdvocacia_'+new Date().toLocaleDateString('pt-BR').replace(/\//g,'-')+'.xlsx');
 }
 function expCSV(){
-  const h=['ID','Tipo','Status','Nome','CPF','Telefone','Email','Cidade','UF','Área','Data','Hora','Modalidade','Resumo','Obs'];
-  const rows=bk.map(b=>[b.id,BT[b.type]?.n,SS[b.status]?.l,b.nome,b.cpf,b.tel,b.email,b.cidade,b.estado,b.area,b.data,b.hora,b.modal,b.resumo?.replace(/,/g,';'),b.obs?.replace(/,/g,';')]);
+  const h=['ID','Tipo','Status','Nome','','Telefone','Email','Cidade','UF','Área','Data','Hora','Modalidade','Resumo','Obs'];
+  const rows=bk.map(b=>[b.id,BT[b.type]?.n,SS[b.status]?.l,b.nome,b.tel,b.email,b.cidade,b.estado,b.area,b.data,b.hora,b.modal,b.resumo?.replace(/,/g,';'),b.obs?.replace(/,/g,';')]);
   const csv=[h,...rows].map(r=>r.map(v=>`"${(v||'').toString().replace(/"/g,'""')}"`).join(',')).join('\n');
   const a=document.createElement('a');a.href='data:text/csv;charset=utf-8,\uFEFF'+encodeURIComponent(csv);a.download=`agendamentos_${td0}.csv`;a.click();
 }
 function expICS(){
-  let ics='BEGIN:VCALENDAR\nVERSION:2.0\nPRODID:-//Souza Advocacia//PT\n';
+  let ics='BEGIN:VCALENDAR\nVERSION:2.0\nPRODID:-//Marcus Souza I Advogado//PT\n';
   bk.filter(b=>b.data&&b.hora&&b.status!=='cancelado').forEach(b=>{
     const t=BT[b.type],s=b.data.replace(/-/g,'')+'T'+b.hora.replace(':','')+'00',e=b.data.replace(/-/g,'')+'T'+am(b.hora,t.d).replace(':','')+'00';
-    ics+=`BEGIN:VEVENT\nUID:${b.id}@souzaadv.com\nDTSTART:${s}\nDTEND:${e}\nSUMMARY:[${t.n}] - ${b.nome}\nDESCRIPTION:Nome: ${b.nome}\\nWhatsApp: ${b.tel}\\nCPF: ${b.cpf}\\nÁrea: ${b.area}\\nStatus: ${SS[b.status]?.l}\\nProtocolo: ${b.id}\nEND:VEVENT\n`;
+    ics+=`BEGIN:VEVENT\nUID:${b.id}@souzaadv.com\nDTSTART:${s}\nDTEND:${e}\nSUMMARY:[${t.n}] - ${b.nome}\nDESCRIPTION:Nome: ${b.nome}\\nWhatsApp: ${b.tel}\\nÁrea: ${b.area}\\nStatus: ${SS[b.status]?.l}\\nProtocolo: ${b.id}\nEND:VEVENT\n`;
   });
   ics+='END:VCALENDAR';
   const a=document.createElement('a');a.href='data:text/calendar;charset=utf-8,'+encodeURIComponent(ics);a.download=`agenda_${td0}.ics`;a.click();
@@ -2481,19 +2759,12 @@ function expICS(){
 // INIT
 // ═══════════════════════════════════════════════════════════════════
 document.addEventListener('DOMContentLoaded',()=>{
-  // Garantir que #ls começa fechado
   const ls=document.getElementById('ls');
   if(ls){ls.classList.remove('on');ls.style.display='none';}
-  // Carregar dados com proteção contra localStorage corrompido
-  try{load();}catch(e){console.warn('load erro:',e);users=D_USERS;}
-  if(!users||!users.length) users=D_USERS;
-  // Restaurar sessão anterior
+  try{load();loadLog();}catch(e){console.warn('load:',e);users=D_USERS;}
+  if(!users||!users.length)users=D_USERS;
   const sid=parseInt(localStorage.getItem('sa_sess')||'0',10);
-  if(sid>0){
-    const u=users.find(x=>x.id===sid&&x.ativo);
-    if(u){currentUser=u;showApp();return;}
-    localStorage.removeItem('sa_sess'); // sessão inválida — limpar
-  }
+  if(sid>0){const u=users.find(x=>x.id===sid&&x.ativo);if(u){currentUser=u;showApp();return;}localStorage.removeItem('sa_sess');}
   go('s-home');
 });
 </script>
