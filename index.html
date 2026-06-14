@@ -508,8 +508,14 @@ tr:hover td{background:#f8fafc!important}
       style="text-align:left;margin-bottom:8px"
       onkeydown="if(event.key==='Enter')document.getElementById('lpwd').focus()"
       oninput="selectChipByEmail(this.value)">
-    <input type="password" id="lpwd" class="fi" placeholder="Senha"
-      onkeydown="if(event.key==='Enter')doLogin()">
+    <div style="position:relative">
+      <input type="password" id="lpwd" class="fi" placeholder="Senha"
+        onkeydown="if(event.key==='Enter')doLogin()"
+        style="padding-right:42px">
+      <button type="button" onclick="togglePwd('lpwd',this)"
+        style="position:absolute;right:10px;top:50%;transform:translateY(-50%);background:none;border:none;cursor:pointer;font-size:16px;color:var(--mu);padding:4px;line-height:1"
+        title="Mostrar/ocultar senha">👁️</button>
+    </div>
 
     <div class="lerr" id="lerr" style="display:none;margin-top:8px"></div>
 
@@ -521,6 +527,9 @@ tr:hover td{background:#f8fafc!important}
     </button>
     <button onclick="resetAndLogin()" style="margin-top:6px;background:none;border:1px solid rgba(200,169,106,.25);color:rgba(200,169,106,.7);cursor:pointer;font-size:10px;width:100%;padding:6px;border-radius:7px">
       🔄 Problemas para entrar?
+    </button>
+    <button onclick="importarAcessos()" style="margin-top:4px;background:none;border:1px solid rgba(200,169,106,.2);color:rgba(200,169,106,.6);cursor:pointer;font-size:10px;width:100%;padding:6px;border-radius:7px">
+      📲 Primeiro acesso neste aparelho? Importar acessos
     </button>
   </div>
 </div>
@@ -716,11 +725,21 @@ tr:hover td{background:#f8fafc!important}
   <div class="frow">
     <div class="ff">
       <div class="fl">Senha * <span id="user-pwd-hint" style="font-size:10px;color:var(--mu)">(deixe em branco para manter)</span></div>
-      <input type="password" id="user-pwd" placeholder="Mínimo 6 caracteres" class="fi" oninput="checkPwdMatch()">
+      <div style="position:relative">
+        <input type="password" id="user-pwd" placeholder="Mínimo 6 caracteres" class="fi" oninput="checkPwdMatch()" style="padding-right:42px">
+        <button type="button" onclick="togglePwd('user-pwd',this)"
+          style="position:absolute;right:10px;top:50%;transform:translateY(-50%);background:none;border:none;cursor:pointer;font-size:16px;color:var(--mu);padding:4px;line-height:1"
+          title="Mostrar/ocultar">👁️</button>
+      </div>
     </div>
     <div class="ff">
       <div class="fl">Confirmar Senha</div>
-      <input type="password" id="user-pwd2" placeholder="Repetir senha" class="fi" oninput="checkPwdMatch()">
+      <div style="position:relative">
+        <input type="password" id="user-pwd2" placeholder="Repetir senha" class="fi" oninput="checkPwdMatch()" style="padding-right:42px">
+        <button type="button" onclick="togglePwd('user-pwd2',this)"
+          style="position:absolute;right:10px;top:50%;transform:translateY(-50%);background:none;border:none;cursor:pointer;font-size:16px;color:var(--mu);padding:4px;line-height:1"
+          title="Mostrar/ocultar">👁️</button>
+      </div>
       <div id="pwd-match" style="font-size:10px;margin-top:3px"></div>
     </div>
   </div>
@@ -1053,7 +1072,16 @@ function doLogin(){
   localStorage.setItem('sa_sess',String(u.id));
   showApp();
 }
-function doLogout(){closeMo('m-umenu');localStorage.removeItem('sa_sess');location.reload();}
+function doLogout(){closeMo('m-umenu');djStopMonitor();localStorage.removeItem('sa_sess');location.reload();}
+
+// Alternar visibilidade da senha
+function togglePwd(fieldId, btn){
+  const f=document.getElementById(fieldId);if(!f)return;
+  const show=f.type==='password';
+  f.type=show?'text':'password';
+  btn.textContent=show?'🙈':'👁️';
+  btn.title=show?'Ocultar senha':'Mostrar senha';
+}
 function showUserMenu(){
   document.getElementById('umenu-info').innerHTML=`
     <div style="display:flex;align-items:center;gap:10px;margin-bottom:10px">
@@ -3152,7 +3180,36 @@ function renderConfig(){
   <div class="card"><div class="stit" style="color:var(--re)">⚠️ Zona de Perigo</div>
     <button class="btn bred bw" onclick="if(confirm('Limpar TODOS os agendamentos? Ação irreversível!'))clearAllBk()">🗑️ Limpar Todos os Agendamentos</button>
   </div>`;
-  document.getElementById('admin-cnt').innerHTML=h;
+  
+  // Sincronização
+  h+=`<div class="card" style="margin-bottom:12px">
+    <div class="stit">📲 Sincronização entre Aparelhos</div>
+    <div class="al al-warn" style="font-size:11px;margin-bottom:10px">
+      ⚠️ <strong>Os dados ficam salvos localmente em cada aparelho.</strong>
+      Para usar em outro celular/computador, exporte aqui e importe lá.
+    </div>
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:10px">
+      <div style="background:#f0fdf4;border:1px solid #bbf7d0;border-radius:8px;padding:12px">
+        <div style="font-size:12px;font-weight:700;color:#166534;margin-bottom:4px">📤 Exportar</div>
+        <div style="font-size:11px;color:var(--mu);margin-bottom:8px">Todos os dados em arquivo .json para enviar ao outro aparelho.</div>
+        <button class="btn bgreen bsm bw" onclick="exportarDados()">📤 Exportar dados (.json)</button>
+      </div>
+      <div style="background:#eff6ff;border:1px solid #bfdbfe;border-radius:8px;padding:12px">
+        <div style="font-size:12px;font-weight:700;color:#1d4ed8;margin-bottom:4px">📥 Importar</div>
+        <div style="font-size:11px;color:var(--mu);margin-bottom:8px">Carrega os dados exportados neste dispositivo.</div>
+        <button class="btn bblue bsm bw" onclick="importarDados()">📥 Importar dados (.json)</button>
+      </div>
+    </div>
+    <div style="border-top:1px solid var(--bd);padding-top:10px">
+      <div style="font-size:12px;font-weight:700;color:var(--n);margin-bottom:4px">🔑 Código de acesso rápido</div>
+      <div style="font-size:11px;color:var(--mu);margin-bottom:8px">Compartilha só os logins/senhas (sem dados de clientes). Mais rápido e seguro para novo colaborador.</div>
+      <div style="display:flex;gap:8px;flex-wrap:wrap">
+        <button class="btn bgold bsm" onclick="exportarAcessos()">📋 Gerar código</button>
+        <button class="btn bghost bsm" onclick="importarAcessos()">📲 Usar código</button>
+      </div>
+    </div>
+  </div>\`;
+document.getElementById('admin-cnt').innerHTML=h;
 }
 function clearAllBk(){bk=[];saveBk();updNotif();renderConfig();}
 
@@ -3383,6 +3440,61 @@ const PAYMENT={picpay:'https://link.picpay.com/p/17814621996a2ef4b7697a2',pix:'a
 function copyPayLink(){navigator.clipboard?.writeText(PAYMENT.picpay).then(()=>alert('✅ Link copiado!'));}
 function copyPixKey(){navigator.clipboard?.writeText(PAYMENT.pix).then(()=>alert('✅ Chave PIX copiada!'));}
 function copyBankData(){navigator.clipboard?.writeText('Banco '+PAYMENT.banco+' | Ag: '+PAYMENT.ag+' | CC: '+PAYMENT.cc+' | '+PAYMENT.fav).then(()=>alert('✅ Dados bancários copiados!'));}
+
+// ═══════════════════════════════════════════════════════════════════
+// SINCRONIZAÇÃO ENTRE APARELHOS
+// Os dados ficam no localStorage de cada aparelho.
+// Para usar em outro dispositivo: exportar aqui → importar lá.
+// ═══════════════════════════════════════════════════════════════════
+function exportarDados(){
+  const dados={v:2,exportedAt:new Date().toISOString(),exportedBy:currentUser?.nome,
+    users:users.map(u=>({...u})),cli,proc,tar,fin};
+  const a=document.createElement('a');
+  a.href='data:application/json;charset=utf-8,'+encodeURIComponent(JSON.stringify(dados,null,2));
+  a.download='sistema-'+td0+'.json';a.click();
+  alert('✅ Dados exportados!\n\nEnvie o arquivo .json para o outro aparelho e use a opção Importar Dados.');
+}
+function importarDados(){
+  const input=document.createElement('input');
+  input.type='file';input.accept='.json';
+  input.onchange=async e=>{
+    const file=e.target.files[0];if(!file)return;
+    try{
+      const dados=JSON.parse(await file.text());
+      if(!dados.v||!dados.users?.length){alert('❌ Arquivo inválido.');return;}
+      const quando=dados.exportedAt?new Date(dados.exportedAt).toLocaleString('pt-BR'):'desconhecido';
+      if(!confirm(`Importar dados de ${dados.exportedBy||'outro aparelho'} (${quando})?\n\nIsso irá substituir os dados locais.`))return;
+      users=dados.users;
+      if(dados.cli)cli=dados.cli;
+      if(dados.proc)proc=dados.proc;
+      if(dados.tar)tar=dados.tar;
+      if(dados.fin)fin=dados.fin;
+      ['users','cli','proc','tar','fin'].forEach(k=>localStorage.setItem('sa_'+k,JSON.stringify(
+        k==='users'?users:k==='cli'?cli:k==='proc'?proc:k==='tar'?tar:fin)));
+      alert('✅ Dados importados! Faça o login com seu e-mail e senha.');
+      location.reload();
+    }catch(err){alert('❌ Erro ao importar: '+err.message);}
+  };input.click();
+}
+function exportarAcessos(){
+  const dados={v:2,t:'acessos',exportedAt:new Date().toISOString(),users:users.map(u=>({...u}))};
+  const b64=btoa(unescape(encodeURIComponent(JSON.stringify(dados))));
+  navigator.clipboard?.writeText(b64)
+    .then(()=>alert('✅ Código copiado!\n\nNo outro aparelho, toque em "Primeiro acesso neste aparelho?" e cole o código.'))
+    .catch(()=>prompt('Copie este código e cole no outro aparelho:',b64));
+}
+function importarAcessos(){
+  const codigo=prompt('Cole o código de acessos aqui:','');
+  if(!codigo)return;
+  try{
+    const dados=JSON.parse(decodeURIComponent(escape(atob(codigo.trim()))));
+    if(!dados.users||dados.t!=='acessos'){alert('❌ Código inválido.');return;}
+    users=dados.users;
+    localStorage.setItem('sa_users',JSON.stringify(users));
+    alert('✅ Acessos importados! Faça o login com seu e-mail e senha.');
+    location.reload();
+  }catch(e){alert('❌ Código inválido ou corrompido.');}
+}
 
 // ═══════════════════════════════════════════════════════════════════
 // EXPORT
