@@ -953,7 +953,7 @@ function showApp(){
   const tabAce=document.getElementById('tab-acessos-btn');
   if(tabAce)tabAce.style.display=currentUser?.role==='admin'?'':'none';
   startClock();updNotif();
-  djStartMonitor(); // Poll automático Datajud (Pull a cada 4h)
+  setTimeout(djStartMonitor,2000); // Poll Datajud — delay garante que função já está definida
   aTab('dash',document.querySelector('.atab'));
 }
 function openMo(id){document.getElementById(id).classList.add('on');}
@@ -1727,7 +1727,11 @@ async function djSearch(alias, body, retries=2) {
           'Content-Type': 'application/json',
         },
         body: JSON.stringify(body),
-        signal: AbortSignal.timeout(15000), // 15s timeout
+        signal: (() => {
+          const ctrl = new AbortController();
+          setTimeout(() => ctrl.abort(), 15000);
+          return ctrl.signal;
+        })()
       });
       if(!r.ok){
         let errMsg='';
