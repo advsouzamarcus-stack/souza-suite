@@ -355,6 +355,36 @@ tr:hover td{background:#f8fafc!important}
 .ccrow{display:flex;gap:12px;flex-wrap:wrap;margin-bottom:13px}
 .cc{flex:1;min-width:220px}
 
+.r-admin{background:#fef2f2;color:#991b1b;border:1px solid #fecaca}
+.r-advogado{background:#eff6ff;color:#1d4ed8;border:1px solid #bfdbfe}
+.r-estagiario{background:#f0fdf4;color:#166534;border:1px solid #bbf7d0}
+.r-colaborador{background:#fffbeb;color:#92400e;border:1px solid #fde68a}
+.r-financeiro{background:#f5f3ff;color:#5b21b6;border:1px solid #ddd6fe}
+.r-atendente{background:#ecfeff;color:#155e75;border:1px solid #a5f3fc}
+.r-personalizado{background:#f8fafc;color:#475569;border:1px solid #cbd5e1}
+.urole{display:inline-block;padding:2px 8px;border-radius:10px;font-size:10px;font-weight:700}
+/* Permissão toggle */
+.perm-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(200px,1fr));gap:8px;margin:10px 0}
+.perm-mod{background:#f8fafc;border:1px solid var(--bd);border-radius:8px;padding:10px}
+.perm-mod-title{font-size:10px;font-weight:800;text-transform:uppercase;letter-spacing:.6px;color:var(--n);margin-bottom:8px}
+.perm-row{display:flex;align-items:center;justify-content:space-between;padding:3px 0;font-size:11px;color:var(--tx)}
+.ptog{position:relative;width:34px;height:18px;cursor:pointer}
+.ptog input{opacity:0;width:0;height:0}
+.pslider{position:absolute;inset:0;background:#cbd5e1;border-radius:9px;transition:.2s}
+.ptog input:checked+.pslider{background:var(--gr)}
+.pslider::before{content:'';position:absolute;height:14px;width:14px;left:2px;bottom:2px;background:#fff;border-radius:50%;transition:.2s}
+.ptog input:checked+.pslider::before{transform:translateX(16px)}
+/* Log table */
+.log-row{display:grid;grid-template-columns:120px 1fr 1fr 80px;gap:6px;padding:6px 8px;border-bottom:1px solid var(--bd);font-size:11px;align-items:center}
+.log-row:hover{background:#f8fafc}
+.log-deny{color:#ef4444}
+/* Sync status */
+.sync-proc-row{display:flex;align-items:center;gap:8px;padding:8px;border-bottom:1px solid var(--bd);font-size:12px}
+.sync-status-ok{color:#16a34a;font-size:11px}
+.sync-status-err{color:#dc2626;font-size:11px}
+.sync-status-warn{color:#d97706;font-size:11px}
+.sync-status-load{color:#6b7280;font-size:11px}
+
 /* ═══════════════════════════════════════════════
    LOGIN SCREEN
 ═══════════════════════════════════════════════ */
@@ -501,6 +531,7 @@ tr:hover td{background:#f8fafc!important}
     <div class="tab-sep"></div>
     <button class="atab" onclick="aTab('busca',this)">🔎 Busca Proc.</button>
     <button class="atab" id="tab-users-btn" onclick="aTab('usuarios',this)">👤 Usuários</button>
+    <button class="atab" id="tab-acessos-btn" onclick="aTab('acessos',this)">🔐 Controle Acesso</button>
     <button class="atab" onclick="aTab('gcal',this)">🔗 Google Cal</button>
     <button class="atab" onclick="aTab('config',this)">⚙️ Config</button>
   </div>
@@ -671,8 +702,92 @@ const cn=id=>(cli.find(c=>c.id===+id)||{}).nome||'—';
 // ═══════════════════════════════════════════════════════════════════
 // GESTÃO JURÍDICA CONSTANTS — após td0, dt() e currentUser
 // ═══════════════════════════════════════════════════════════════════
-const ROLES={admin:{l:'Administrador',cls:'r-admin',e:1,del:1,fin:1,usr:1,cfg:1},advogado:{l:'Advogado',cls:'r-advogado',e:1,del:1,fin:1,usr:0,cfg:1},colaborador:{l:'Colaborador',cls:'r-colaborador',e:1,del:0,fin:0,usr:0,cfg:0},estagiario:{l:'Estagiário',cls:'r-estagiario',e:0,del:0,fin:0,usr:0,cfg:0}};
-const perm=()=>ROLES[currentUser?.role]||ROLES.estagiario;
+// ── Matriz de permissões por módulo e ação ──
+// Cada perfil define: visualizar(v) criar(c) editar(e) excluir(d) por módulo
+// Módulos: clientes(cli) processos(proc) documentos(doc) agenda(age) financeiro(fin)
+//          tarefas(tar) relatorios(rel) configuracoes(cfg) usuarios(usr)
+const ROLES={
+  admin:{
+    l:'Administrador',cls:'r-admin',
+    cli:{v:1,c:1,e:1,d:1}, proc:{v:1,c:1,e:1,d:1}, doc:{v:1,c:1,e:1,d:1,dl:1},
+    age:{v:1,c:1,e:1,d:1}, fin:{v:1,c:1,e:1,d:1}, tar:{v:1,c:1,e:1,d:1},
+    rel:{v:1}, cfg:{v:1,e:1}, usr:{v:1,c:1,e:1,d:1},
+    e:1,del:1,fin_:1,usr_:1,cfg_:1
+  },
+  advogado:{
+    l:'Advogado',cls:'r-advogado',
+    cli:{v:1,c:1,e:1,d:0}, proc:{v:1,c:1,e:1,d:0}, doc:{v:1,c:1,e:1,d:0,dl:1},
+    age:{v:1,c:1,e:1,d:0}, fin:{v:1,c:1,e:1,d:0}, tar:{v:1,c:1,e:1,d:0},
+    rel:{v:1}, cfg:{v:0,e:0}, usr:{v:0,c:0,e:0,d:0},
+    e:1,del:0,fin_:1,usr_:0,cfg_:0
+  },
+  estagiario:{
+    l:'Estagiário',cls:'r-estagiario',
+    cli:{v:1,c:0,e:0,d:0}, proc:{v:1,c:0,e:0,d:0}, doc:{v:1,c:0,e:0,d:0,dl:0},
+    age:{v:1,c:0,e:0,d:0}, fin:{v:0,c:0,e:0,d:0}, tar:{v:1,c:1,e:0,d:0},
+    rel:{v:0}, cfg:{v:0,e:0}, usr:{v:0,c:0,e:0,d:0},
+    e:0,del:0,fin_:0,usr_:0,cfg_:0
+  },
+  colaborador:{
+    l:'Colaborador Administrativo',cls:'r-colaborador',
+    cli:{v:1,c:1,e:1,d:0}, proc:{v:0,c:0,e:0,d:0}, doc:{v:0,c:0,e:0,d:0,dl:0},
+    age:{v:1,c:1,e:1,d:1}, fin:{v:0,c:0,e:0,d:0}, tar:{v:1,c:1,e:1,d:0},
+    rel:{v:0}, cfg:{v:0,e:0}, usr:{v:0,c:0,e:0,d:0},
+    e:1,del:0,fin_:0,usr_:0,cfg_:0
+  },
+  financeiro:{
+    l:'Financeiro',cls:'r-financeiro',
+    cli:{v:1,c:0,e:0,d:0}, proc:{v:0,c:0,e:0,d:0}, doc:{v:0,c:0,e:0,d:0,dl:0},
+    age:{v:0,c:0,e:0,d:0}, fin:{v:1,c:1,e:1,d:0}, tar:{v:1,c:0,e:0,d:0},
+    rel:{v:1}, cfg:{v:0,e:0}, usr:{v:0,c:0,e:0,d:0},
+    e:0,del:0,fin_:1,usr_:0,cfg_:0
+  },
+  atendente:{
+    l:'Atendente',cls:'r-atendente',
+    cli:{v:1,c:1,e:0,d:0}, proc:{v:0,c:0,e:0,d:0}, doc:{v:0,c:0,e:0,d:0,dl:0},
+    age:{v:1,c:1,e:0,d:0}, fin:{v:0,c:0,e:0,d:0}, tar:{v:1,c:0,e:0,d:0},
+    rel:{v:0}, cfg:{v:0,e:0}, usr:{v:0,c:0,e:0,d:0},
+    e:0,del:0,fin_:0,usr_:0,cfg_:0
+  },
+  personalizado:{
+    l:'Usuário Personalizado',cls:'r-personalizado',
+    cli:{v:0,c:0,e:0,d:0}, proc:{v:0,c:0,e:0,d:0}, doc:{v:0,c:0,e:0,d:0,dl:0},
+    age:{v:0,c:0,e:0,d:0}, fin:{v:0,c:0,e:0,d:0}, tar:{v:0,c:0,e:0,d:0},
+    rel:{v:0}, cfg:{v:0,e:0}, usr:{v:0,c:0,e:0,d:0},
+    e:0,del:0,fin_:0,usr_:0,cfg_:0
+  },
+};
+// Retorna permissões do usuário atual, mesclando customPerms se houver
+const perm=()=>{
+  const base=ROLES[currentUser?.role]||ROLES.estagiario;
+  if(currentUser?.customPerms) return deepMerge(base,currentUser.customPerms);
+  return base;
+};
+// Verifica se usuário pode realizar ação num módulo
+const can=(mod,act)=>{const p=perm();return !!(p[mod]&&p[mod][act]);};
+// Mensagem padrão de acesso negado
+function denyAccess(area='esta área'){
+  document.getElementById('admin-cnt').innerHTML=`
+  <div style="display:flex;flex-direction:column;align-items:center;justify-content:center;min-height:300px;gap:16px;text-align:center;padding:32px">
+    <div style="font-size:56px">🔒</div>
+    <div style="font-size:18px;font-weight:700;color:var(--n)">Acesso Restrito</div>
+    <div style="max-width:400px;font-size:13px;color:var(--mu);line-height:1.6">
+      Você não possui autorização para acessar <b>${area}</b>.<br>
+      Solicite liberação ao administrador.
+    </div>
+    <div style="font-size:11px;color:var(--mu);background:#f8fafc;padding:8px 16px;border-radius:8px;border:1px solid var(--bd)">
+      Usuário: ${currentUser?.nome||'—'} · Perfil: ${ROLES[currentUser?.role]?.l||'—'}
+    </div>
+  </div>`;}
+// Deep merge de objetos (para customPerms)
+function deepMerge(base,over){
+  const r={...base};
+  Object.keys(over||{}).forEach(k=>{
+    if(typeof over[k]==='object'&&!Array.isArray(over[k]))r[k]={...(base[k]||{}),...over[k]};
+    else r[k]=over[k];
+  });
+  return r;
+}
 const avatarColor=['#3b82f6','#16a34a','#d97706','#9333ea','#ef4444','#0ea5e9','#f59e0b'];
 const ac=id=>avatarColor[id%avatarColor.length];
 const initials=n=>n.split(' ').filter(Boolean).slice(0,2).map(w=>w[0].toUpperCase()).join('');
@@ -713,6 +828,26 @@ const D_FIN=[
 ];
 // Agendamentos data
 let bk=[], gcfg={key:'',calId:'',script:'',on:false}, gcEvt=[];
+// Log de acesso
+let accessLog=[];
+function logAccess(modulo,acao,doc='',negado=false){
+  const entry={
+    id:Date.now(),
+    usuario:currentUser?.nome||'—',
+    email:currentUser?.email||'—',
+    perfil:ROLES[currentUser?.role]?.l||'—',
+    data:new Date().toLocaleDateString('pt-BR'),
+    hora:new Date().toLocaleTimeString('pt-BR',{hour:'2-digit',minute:'2-digit'}),
+    modulo,acao,doc,negado,
+    dispositivo:navigator.userAgent.substring(0,60)
+  };
+  accessLog.unshift(entry);
+  if(accessLog.length>500) accessLog=accessLog.slice(0,500);
+  try{localStorage.setItem('sa_log',JSON.stringify(accessLog.slice(0,200)));}catch(e){}
+}
+function loadLog(){
+  try{const d=localStorage.getItem('sa_log');if(d)accessLog=JSON.parse(d);}catch(e){}
+}
 // UI state
 let aTabCur='dash', calV=new Date(), selD=null;
 let tarFil='Todas', waCliId=null, emailCliId=null;
@@ -814,7 +949,9 @@ function showApp(){
   document.getElementById('uav').textContent=initials(nm);
   document.getElementById('uav').style.background=ac(currentUser.id);
   document.getElementById('hdr-oab').textContent=users.filter(u=>u.oab&&u.ativo).map(u=>u.oab).join(' · ')||'Marcus Souza I Advogado';
-  if(!perm().usr) document.getElementById('tab-users-btn').style.display='none';
+  if(!perm().usr_) document.getElementById('tab-users-btn').style.display='none';
+  const tabAce=document.getElementById('tab-acessos-btn');
+  if(tabAce)tabAce.style.display=currentUser?.role==='admin'?'':'none';
   startClock();updNotif();
   aTab('dash',document.querySelector('.atab'));
 }
@@ -890,13 +1027,34 @@ function aTab(tab,btn){
   aTabCur=tab;
   document.querySelectorAll('.atab').forEach(b=>b.classList.remove('on'));
   if(btn)btn.classList.add('on');
+  // Guards de permissão por aba
+  const guards={
+    clientes:()=>can('cli','v'),
+    processos:()=>can('proc','v'),
+    financeiro:()=>can('fin','v'),
+    tarefas:()=>can('tar','v'),
+    comunicacoes:()=>can('cli','v'),
+    relatorios:()=>can('rel','v'),
+    usuarios:()=>can('usr','v'),
+    config:()=>can('cfg','v'),
+  };
+  const guard=guards[tab];
+  if(guard&&!guard()){
+    const labels={clientes:'Clientes',processos:'Processos',financeiro:'Financeiro',
+      tarefas:'Tarefas',comunicacoes:'Comunicações',relatorios:'Relatórios',
+      usuarios:'Usuários',config:'Configurações'};
+    logAccess(tab,'acesso_negado','',true);
+    denyAccess(labels[tab]||tab);return;
+  }
   const r={
     dash:renderDash,clientes:renderCli,processos:renderProc,tarefas:renderTar,
     semana:renderSem,calmes:renderCal,financeiro:renderFin,comunicacoes:renderCom,
     agenda:renderAgenda,agcal:renderAgCal,kanban:renderKanban,agendamentos:renderAgendamentos,
-    metricas:renderMetricas,busca:renderBusca,usuarios:renderUsers,gcal:renderGCal,config:renderConfig
+    metricas:renderMetricas,busca:renderBusca,usuarios:renderUsers,gcal:renderGCal,config:renderConfig,
+    acessos:renderAcessos
   };
   document.getElementById('admin-cnt').innerHTML='';
+  logAccess(tab,'visualizar');
   (r[tab]||renderDash)();
 }
 
@@ -998,22 +1156,37 @@ function renderProc(){
   const sf=(document.getElementById('proc-sf')||{value:'Todos'}).value;
   const filt=proc.filter(p=>{const m=!q||p.num.includes(q)||cn(p.cliId).toLowerCase().includes(q);return m&&(sf==='Todos'||p.status===sf);});
   const p=perm();
-  let html=`<div class="fbar">
+  if(!can('proc','v')){denyAccess('Processos');return;}
+  let html=`<div class="fbar" style="flex-wrap:wrap;gap:6px">
     <input id="proc-q" style="max-width:230px" placeholder="🔍 Número ou cliente..." value="${q}" oninput="renderProc()">
     <select id="proc-sf" onchange="renderProc()" style="max-width:160px"><option>Todos</option><option>Em andamento</option><option>Finalizado</option><option>Suspenso</option></select>
     <span style="font-size:11px;color:var(--mu)">${filt.length} processo(s)</span>
-    ${p.e?`<button class="btn bp" onclick="openProcModal()">+ Novo Processo</button>`:''}
+    ${p.e?`<button class="btn bp" onclick="openProcModal()">+ Novo</button>`:''}
+    <button class="btn bsa bsm" onclick="djSyncAllProc()" title="Sincronizar todos com Datajud CNJ">⚡ Sync Datajud</button>
+    <span id="proc-sync-st" style="font-size:11px;color:var(--mu)"></span>
   </div>
-  <div class="card"><div style="font-size:11px;color:var(--mu);margin-bottom:7px">🔴 Atrasado | 🟡 Vence ≤7 dias | 🟢 OK</div>
+  <div class="card">
+  <div style="font-size:11px;color:var(--mu);margin-bottom:7px">🔴 Atrasado | 🟡 Vence ≤7 dias | 🟢 OK | ⚡ = Sincronizar com Datajud</div>
   <div class="tw"><table>
-    <thead><tr><th>Nº Processo</th><th>Cliente</th><th>Área</th><th>Vara</th><th>Status</th><th>Início</th><th>Próx. Mov.</th><th>Advogado</th><th>Obs.</th><th>Ações</th></tr></thead>
+    <thead><tr><th>Nº Processo</th><th>Cliente</th><th>Área</th><th>Vara</th><th>Status</th><th>Próx. Mov.</th><th>Advogado</th><th>⚡ Último Mov. Datajud</th><th>Ações</th></tr></thead>
     <tbody>${filt.map(r=>`<tr class="${isPast(r.prox)&&r.status==='Em andamento'?'late':''}">
-      <td class="mono">${r.num}</td><td style="font-weight:600;white-space:nowrap">${cn(r.cliId)}</td>
-      <td>${badge(r.tipo,'bb')}</td><td style="font-size:11px">${r.vara}</td>
-      <td>${sbadge(r.status)}</td><td style="font-size:11px;white-space:nowrap">${fmtD(r.ini)}</td>
+      <td class="mono" style="font-size:10px">${r.num}</td>
+      <td style="font-weight:600;white-space:nowrap;font-size:12px">${cn(r.cliId)}</td>
+      <td>${badge(r.tipo,'bb')}</td>
+      <td style="font-size:11px">${r.vara||'—'}</td>
+      <td>${sbadge(r.status)}</td>
       <td style="white-space:nowrap">${dcolor(r.prox,r.status==='Em andamento')}</td>
-      <td style="font-size:11px;white-space:nowrap">${r.adv}</td>
-      <td class="eli" style="font-size:11px;color:var(--mu)">${r.obs||'—'}</td>
+      <td style="font-size:11px;white-space:nowrap">${r.adv||'—'}</td>
+      <td style="min-width:180px">
+        <div style="display:flex;align-items:flex-start;gap:5px">
+          <button class="btn bsa xs" style="flex-shrink:0" onclick="event.stopPropagation();djSyncProcInline(${r.id},'${r.num}')" title="Consultar no Datajud">⚡</button>
+          <span id="djcell-proc-${r.id}" style="font-size:10px;line-height:1.4">
+            ${r.ultimoMovDJ
+              ? `<span style="color:#16a34a">✅ ${esc((r.ultimoMovDJ).substring(0,25))}</span><br><span style="color:var(--mu);font-size:9px">${r.djSyncedAt||''}</span>`
+              : '<span style="color:var(--mu)">—</span>'}
+          </span>
+        </div>
+      </td>
       <td><div style="display:flex;gap:3px">
         ${r.prox?`<button class="btn bca xs" onclick="addProcToCalendar(${r.id})">📅</button>`:''}
         <button class="btn bsa xs" onclick="searchProcNum('${r.num}','${r.vara}')">🔍</button>
@@ -1022,6 +1195,70 @@ function renderProc(){
       </div></td></tr>`).join('')}
     </tbody></table></div></div>`;
   document.getElementById('admin-cnt').innerHTML=html;
+}
+
+// Sync inline na tabela de processos (diferente do sync da aba Busca Proc.)
+async function djSyncProcInline(procId, numProc){
+  const cell=document.getElementById(`djcell-proc-${procId}`);
+  if(!cell)return;
+  cell.innerHTML='<span style="color:var(--mu);font-size:10px">⏳ consultando...</span>';
+  const numClean=numRaw(numProc);
+  const trib=detectTribunalCNJ(numProc);
+  const alias=trib?DJ_ENDPOINTS[trib]:null;
+  if(!alias){
+    cell.innerHTML=`<span class="sync-status-warn" title="Tribunal não identificado automaticamente pelo número CNJ. Verifique se o número está correto e no formato 0000000-00.0000.0.00.0000">⚠️ Tribunal não identificado<br><span style="font-size:9px">Verifique o número CNJ</span></span>`;
+    return;
+  }
+  try{
+    const data=await djSearch(alias,{
+      size:1,
+      query:{bool:{should:[{match:{numeroProcesso:numClean}},{term:{'numeroProcesso.keyword':numClean}}],minimum_should_match:1}},
+      _source:['movimentos','dataHoraUltimaAtualizacao','numeroProcesso','grau','orgaoJulgador']
+    });
+    const hits=(data&&data.hits&&data.hits.hits)||[];
+    if(!hits.length){
+      cell.innerHTML=`<span class="sync-status-warn" title="Processo não encontrado no Datajud. Possíveis causas: processo em segredo de justiça, número incorreto, tribunal não indexado pelo CNJ, ou dados ainda não sincronizados pelo tribunal.">⚠️ Não encontrado no Datajud<br><span style="font-size:9px;color:var(--mu)">Veja tooltip para detalhes</span></span>`;
+      return;
+    }
+    const s=hits[0]._source;
+    const movs=(s.movimentos||[]).sort((a,b)=>new Date(b.dataHora)-new Date(a.dataHora));
+    const ult=movs[0];
+    const ultimoMov=ult?ult.nome:'';
+    const ultimoData=fmtDJ(ult?.dataHora);
+    cell.innerHTML=ult
+      ?`<span class="sync-status-ok">✅ ${esc(ultimoMov.substring(0,25))}</span><br><span style="font-size:9px;color:var(--mu)">${ultimoData} · ${trib.toUpperCase()}</span>`
+      :`<span class="sync-status-warn">Sem movimentos</span>`;
+    // Persistir no processo
+    const pIdx=proc.findIndex(p=>numRaw(p.num)===numClean);
+    if(pIdx>=0){proc[pIdx].ultimoMovDJ=ultimoMov;proc[pIdx].ultimoMovData=ultimoData;proc[pIdx].djSyncedAt=new Date().toLocaleDateString('pt-BR');save();}
+    logAccess('processos',`sync Datajud: ${trib.toUpperCase()} ${numClean.substring(0,15)}`);
+  }catch(e){
+    const msg=e.message||'';
+    let dica='Erro ao consultar Datajud.';
+    if(msg.includes('fetch')||msg.includes('network'))dica='Sem conexão com a internet ou API CNJ indisponível no momento.';
+    else if(msg.includes('401')||msg.includes('403'))dica='APIKey CNJ inválida ou expirada.';
+    else if(msg.includes('503')||msg.includes('502'))dica='API Datajud temporariamente fora do ar. Tente em alguns minutos.';
+    else if(msg.includes('timeout'))dica='Timeout — API sobrecarregada. Tente novamente.';
+    else dica=msg.substring(0,80);
+    cell.innerHTML=`<span class="sync-status-err" title="${esc(dica)}">⚠️ Erro: ${esc(dica.substring(0,30))}</span><br><span style="font-size:9px;color:var(--mu)">Passe o mouse para ver detalhes</span>`;
+  }
+}
+
+// Sync em lote de todos os processos ativos na tabela de processos
+async function djSyncAllProc(){
+  const btn=document.getElementById('proc-sync-btn')||document.querySelector('[onclick*="djSyncAllProc"]');
+  const st=document.getElementById('proc-sync-st');
+  const ativos=proc.filter(p=>p.status!=='Finalizado'&&p.status!=='Arquivado');
+  if(!ativos.length){if(st)st.textContent='Nenhum processo ativo.';return;}
+  if(btn){btn.disabled=true;btn.textContent='⏳ Sincronizando...';}
+  if(st)st.textContent=`0/${ativos.length}`;
+  for(let i=0;i<ativos.length;i++){
+    if(st)st.textContent=`${i+1}/${ativos.length} — ${ativos[i].num.substring(0,20)}...`;
+    await djSyncProcInline(ativos[i].id,ativos[i].num);
+    await new Promise(r=>setTimeout(r,350));
+  }
+  if(btn){btn.disabled=false;btn.textContent='⚡ Sync Datajud';}
+  if(st)st.textContent=`✅ ${ativos.length} processos sincronizados em ${new Date().toLocaleTimeString('pt-BR',{hour:'2-digit',minute:'2-digit'})}`;
 }
 function openProcModal(id){
   document.getElementById('proc-id').value=id||'';
@@ -2118,17 +2355,45 @@ async function djSyncProc(procId, numProc){
     const movs = (s.movimentos||[]).sort((a,b)=>new Date(b.dataHora)-new Date(a.dataHora));
     const ult  = movs[0];
 
+    const ultimoMov = ult ? ult.nome : '';
+    const ultimoData = fmtDJ(ult?.dataHora);
+
     cellMov.innerHTML = ult
-      ? `<span style="color:#22c55e" title="${esc((ult.nome||''))} — ${fmtDJ(ult.dataHora)}">
-           ✅ ${esc((ult.nome||'').substring(0,28))}
+      ? `<span class="sync-status-ok" title="${esc(ultimoMov)} — ${ultimoData}">
+           ✅ ${esc(ultimoMov.substring(0,30))}
          </span>`
-      : '<span style="color:var(--mu)">Sem movimentos</span>';
+      : '<span class="sync-status-warn">Sem movimentos</span>';
 
     if(cellDt) cellDt.innerHTML =
-      `<span style="color:var(--mu)">${fmtDJ(s.dataHoraUltimaAtualizacao)}</span>`;
+      `<span class="sync-status-load">${fmtDJ(s.dataHoraUltimaAtualizacao)}</span>`;
+
+    // Salvar último movimento no processo local
+    const pIdx=proc.findIndex(p=>numRaw(p.num)===numClean);
+    if(pIdx>=0){
+      proc[pIdx].ultimoMovDJ=ultimoMov;
+      proc[pIdx].ultimoMovData=ultimoData;
+      proc[pIdx].djSyncedAt=new Date().toLocaleDateString('pt-BR');
+      save();
+    }
+    logAccess('processos',`sync Datajud: ${numClean.substring(0,15)}`);
 
   } catch(e){
-    cellMov.innerHTML = `<span style="color:#ef4444" title="${esc(e.message)}">Erro</span>`;
+    const msg=e.message||'Erro desconhecido';
+    let dica='';
+    if(msg.includes('Failed to fetch')||msg.includes('NetworkError'))
+      dica='Sem conexão com a internet ou API Datajud indisponível.';
+    else if(msg.includes('401')||msg.includes('403'))
+      dica='APIKey inválida ou expirada. Verifique a chave CNJ.';
+    else if(msg.includes('404'))
+      dica='Tribunal não encontrado no Datajud.';
+    else if(msg.includes('503')||msg.includes('502'))
+      dica='API Datajud temporariamente indisponível. Tente em alguns minutos.';
+    else if(msg.includes('timeout'))
+      dica='Timeout na consulta. API sobrecarregada.';
+    else dica=msg;
+
+    cellMov.innerHTML = `<span class="sync-status-err" title="${esc(dica)}">⚠️ ${esc(dica.substring(0,35))}</span>`;
+    if(cellDt) cellDt.innerHTML=`<span style="font-size:10px;color:#dc2626">ver detalhes (hover)</span>`;
   }
 }
 
@@ -2144,6 +2409,193 @@ async function djSyncAll(){
     await new Promise(r=>setTimeout(r,400)); // rate limit da API
   }
   if(st) st.textContent=`✅ Concluído — ${procAtivos.length} processos consultados`;
+}
+
+// ═══════════════════════════════════════════════════════════════════
+// CONTROLE DE ACESSOS E PERMISSÕES
+// ═══════════════════════════════════════════════════════════════════
+const MOD_LABELS={
+  cli:{l:'Clientes',i:'👥'},proc:{l:'Processos',i:'⚖️'},doc:{l:'Documentos',i:'📄'},
+  age:{l:'Agenda',i:'📅'},fin:{l:'Financeiro',i:'💰'},tar:{l:'Tarefas',i:'✅'},
+  rel:{l:'Relatórios',i:'📊'},cfg:{l:'Configurações',i:'⚙️'},usr:{l:'Usuários',i:'👤'}
+};
+const ACT_LABELS={v:'Visualizar',c:'Criar',e:'Editar',d:'Excluir',dl:'Download'};
+
+function renderAcessos(){
+  if(currentUser?.role!=='admin'){denyAccess('Controle de Acessos');return;}
+  logAccess('acessos','visualizar');
+  // Carregar logs
+  loadLog();
+  const statusBadge=u=>u.ativo?'<span class="badge bg">Ativo</span>':'<span class="badge br">Bloqueado</span>';
+  const lastAccess=u=>{const logs=accessLog.filter(l=>l.email===u.email&&!l.negado);
+    return logs.length?`${logs[0].data} ${logs[0].hora}`:'Nunca';};
+  const deniedCount=u=>accessLog.filter(l=>l.email===u.email&&l.negado).length;
+
+  let h=`
+  <div class="card hi" style="margin-bottom:12px">
+    <div class="stitle">🔐 Controle de Acessos e Permissões</div>
+    <div style="font-size:12px;color:var(--mu)">Gerencie perfis, permissões individuais e bloqueios. Somente o administrador tem acesso a esta área.</div>
+  </div>
+
+  <div class="card" style="margin-bottom:12px">
+    <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:10px">
+      <div class="stitle">👥 Usuários Cadastrados</div>
+      <button class="btn bp bsm" onclick="openUserModal()">+ Novo Usuário</button>
+    </div>
+    <div class="tw"><table>
+      <thead><tr>
+        <th></th><th>Usuário</th><th>Perfil</th><th>Status</th>
+        <th>Último Acesso</th><th>Tentativas Negadas</th><th>Ações</th>
+      </tr></thead>
+      <tbody>${users.map(u=>`
+        <tr style="opacity:${u.ativo?1:.6}">
+          <td><div class="av" style="width:32px;height:32px;font-size:11px;background:${ac(u.id)};color:#fff">${initials(u.nome)}</div></td>
+          <td>
+            <div style="font-weight:700;font-size:12px">${esc(u.nome)}</div>
+            <div style="font-size:10px;color:#2563eb">${esc(u.email)}</div>
+            <div style="font-size:10px;color:var(--mu)">${esc(u.cargo||'—')} ${u.oab?'· '+u.oab:''}</div>
+          </td>
+          <td><span class="urole ${ROLES[u.role]?.cls||'r-colaborador'}">${ROLES[u.role]?.l||u.role}</span></td>
+          <td>${statusBadge(u)}</td>
+          <td style="font-size:11px;color:var(--mu)">${lastAccess(u)}</td>
+          <td style="text-align:center">${deniedCount(u)>0?`<span style="color:#dc2626;font-weight:700">${deniedCount(u)}</span>`:'<span style="color:var(--mu)">0</span>'}</td>
+          <td>
+            <div style="display:flex;gap:4px;flex-wrap:wrap">
+              <button class="btn bsa xs" onclick="openPermModal(${u.id})" title="Gerenciar permissões">🔑 Permissões</button>
+              <button class="btn bgh xs" onclick="editUser(${u.id})" title="Editar dados">✏️</button>
+              ${u.id!==currentUser.id?`<button class="btn ${u.ativo?'bd_':'bg_'} xs" onclick="toggleUserAcesso(${u.id})" title="${u.ativo?'Bloquear':'Desbloquear'}">${u.ativo?'🔒':'🔓'}</button>`:''}
+            </div>
+          </td>
+        </tr>`).join('')}
+      </tbody>
+    </table></div>
+  </div>
+
+  <div class="card" style="margin-bottom:12px">
+    <div class="stitle">📋 Log de Acessos Recentes</div>
+    <div style="display:flex;gap:8px;margin-bottom:8px;flex-wrap:wrap">
+      <select id="log-filter-user" onchange="renderLogTable()" style="font-size:11px">
+        <option value="">Todos os usuários</option>
+        ${users.map(u=>`<option value="${u.email}">${u.nome}</option>`).join('')}
+      </select>
+      <select id="log-filter-type" onchange="renderLogTable()" style="font-size:11px">
+        <option value="">Todos os eventos</option>
+        <option value="negado">Apenas negados</option>
+        <option value="acesso">Apenas acessos</option>
+      </select>
+      <button class="btn bgh bsm" onclick="accessLog=[];localStorage.removeItem('sa_log');renderAcessos()">🗑️ Limpar Log</button>
+    </div>
+    <div id="log-table-cont"></div>
+  </div>`;
+
+  document.getElementById('admin-cnt').innerHTML=h;
+  renderLogTable();
+}
+
+function renderLogTable(){
+  const fUser=(document.getElementById('log-filter-user')||{}).value||'';
+  const fType=(document.getElementById('log-filter-type')||{}).value||'';
+  let logs=accessLog;
+  if(fUser)logs=logs.filter(l=>l.email===fUser);
+  if(fType==='negado')logs=logs.filter(l=>l.negado);
+  if(fType==='acesso')logs=logs.filter(l=>!l.negado);
+  const cont=document.getElementById('log-table-cont');
+  if(!cont)return;
+  if(!logs.length){cont.innerHTML='<div style="text-align:center;padding:16px;font-size:12px;color:var(--mu)">Nenhum registro encontrado.</div>';return;}
+  cont.innerHTML=`<div style="max-height:320px;overflow-y:auto">
+    <div class="log-row" style="font-weight:700;font-size:10px;text-transform:uppercase;color:var(--mu);background:#f8fafc">
+      <div>Data/Hora</div><div>Usuário · Perfil</div><div>Módulo · Ação</div><div>Status</div>
+    </div>
+    ${logs.slice(0,100).map(l=>`<div class="log-row ${l.negado?'log-deny':''}">
+      <div style="font-size:10px">${l.data}<br>${l.hora}</div>
+      <div><span style="font-weight:600;font-size:11px">${esc(l.usuario)}</span><br><span style="font-size:10px;color:var(--mu)">${esc(l.perfil)}</span></div>
+      <div><span style="font-size:11px">${esc(l.modulo)}</span><br><span style="font-size:10px;color:var(--mu)">${esc(l.acao)}${l.doc?' · '+esc(l.doc.substring(0,20)):''}</span></div>
+      <div>${l.negado?'<span style="color:#dc2626;font-size:10px;font-weight:700">⛔ NEGADO</span>':'<span style="color:#16a34a;font-size:10px">✅ OK</span>'}</div>
+    </div>`).join('')}
+  </div>`;
+}
+
+// Modal de permissões por usuário
+function openPermModal(userId){
+  const u=users.find(x=>x.id===userId);
+  if(!u)return;
+  const base=ROLES[u.role]||ROLES.estagiario;
+  const custom=u.customPerms||{};
+  const merged=deepMerge(base,custom);
+
+  let rows='';
+  Object.entries(MOD_LABELS).forEach(([mod,{l,i}])=>{
+    rows+=`<div class="perm-mod">
+      <div class="perm-mod-title">${i} ${l}</div>`;
+    Object.entries(ACT_LABELS).forEach(([act,albl])=>{
+      const val=merged[mod]&&merged[mod][act]?1:0;
+      rows+=`<div class="perm-row">
+        <span>${albl}</span>
+        <label class="ptog">
+          <input type="checkbox" id="pc-${mod}-${act}" ${val?'checked':''}>
+          <span class="pslider"></span>
+        </label>
+      </div>`;
+    });
+    rows+='</div>';
+  });
+
+  const modal=document.createElement('div');
+  modal.className='mo-desk on';
+  modal.id='m-perm-modal';
+  modal.innerHTML=`<div class="mbox" style="max-width:860px;max-height:85vh;overflow-y:auto">
+    <h3>🔑 Permissões — ${esc(u.nome)}</h3>
+    <div style="display:flex;align-items:center;gap:10px;margin-bottom:14px;flex-wrap:wrap">
+      <span class="urole ${ROLES[u.role]?.cls||'r-colaborador'}">${ROLES[u.role]?.l||u.role}</span>
+      <span style="font-size:11px;color:var(--mu)">Permissões personalizadas sobrepõem o perfil padrão</span>
+      <button class="btn bgh bsm" onclick="resetPermissions(${userId})">↺ Resetar ao perfil padrão</button>
+    </div>
+    <div class="perm-grid">${rows}</div>
+    <div class="mfoot" style="margin-top:14px">
+      <button class="btn bp" onclick="savePermissions(${userId})">💾 Salvar Permissões</button>
+      <button class="btn bgh" onclick="document.getElementById('m-perm-modal').remove()">Cancelar</button>
+    </div>
+  </div>`;
+  document.body.appendChild(modal);
+  modal.addEventListener('click',e=>{if(e.target===modal)modal.remove();});
+}
+
+function savePermissions(userId){
+  const u=users.find(x=>x.id===userId);if(!u)return;
+  const custom={};
+  Object.keys(MOD_LABELS).forEach(mod=>{
+    custom[mod]={};
+    Object.keys(ACT_LABELS).forEach(act=>{
+      const el=document.getElementById(`pc-${mod}-${act}`);
+      if(el)custom[mod][act]=el.checked?1:0;
+    });
+  });
+  u.customPerms=custom;
+  save();
+  document.getElementById('m-perm-modal')?.remove();
+  logAccess('usuarios',`permissões atualizadas para ${u.nome}`);
+  alert(`✅ Permissões de ${u.nome} atualizadas!`);
+  renderAcessos();
+}
+
+function resetPermissions(userId){
+  const u=users.find(x=>x.id===userId);if(!u)return;
+  if(!confirm(`Resetar permissões de ${u.nome} ao perfil padrão "${ROLES[u.role]?.l}"?`))return;
+  delete u.customPerms;
+  save();
+  document.getElementById('m-perm-modal')?.remove();
+  logAccess('usuarios',`permissões resetadas para ${u.nome}`);
+  renderAcessos();
+}
+
+function toggleUserAcesso(userId){
+  const u=users.find(x=>x.id===userId);if(!u)return;
+  const acao=u.ativo?'Bloquear':'Desbloquear';
+  if(!confirm(`${acao} acesso de ${u.nome}?`))return;
+  u.ativo=!u.ativo;
+  save();
+  logAccess('usuarios',`${acao.toLowerCase()} usuário ${u.nome}`);
+  renderAcessos();
 }
 
 // ═══════════════════════════════════════════════════════════════════
@@ -2507,7 +2959,7 @@ document.addEventListener('DOMContentLoaded',()=>{
   const ls=document.getElementById('ls');
   if(ls){ls.classList.remove('on');ls.style.display='none';}
   // Carregar dados
-  try{ load(); }catch(e){ console.warn('load() erro:',e); users=D_USERS; }
+  try{ load();loadLog(); }catch(e){ console.warn('load() erro:',e); users=D_USERS; }
   if(!users||!users.length) users=D_USERS;
   // Restaurar sessão
   const sid=parseInt(localStorage.getItem('sa_sess')||'0',10);
