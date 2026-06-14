@@ -365,6 +365,18 @@ tr:hover td{background:#f8fafc!important}
 .r-estagiario{background:#f0fdf4;color:#166534;border:1px solid #bbf7d0}
 .r-colaborador{background:#fffbeb;color:#92400e;border:1px solid #fde68a}
 .r-financeiro{background:#f5f3ff;color:#5b21b6;border:1px solid #ddd6fe}
+.pay-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(200px,1fr));gap:12px;margin:12px 0}
+.pay-card{background:var(--wh);border-radius:12px;border:1px solid var(--bd);padding:16px;display:flex;flex-direction:column;gap:8px;box-shadow:0 2px 8px rgba(0,0,0,.06)}
+.pay-card:hover{border-color:var(--g);box-shadow:0 4px 12px rgba(0,0,0,.1)}
+.pay-icon{font-size:28px;line-height:1}
+.pay-label{font-size:10px;font-weight:800;text-transform:uppercase;letter-spacing:.6px;color:var(--mu)}
+.pay-info{font-size:12px;color:var(--tx);line-height:1.5}
+.pay-btn{display:inline-flex;align-items:center;justify-content:center;gap:5px;padding:8px 14px;background:linear-gradient(135deg,#11c76f,#21D07A);color:#fff;border-radius:8px;font-size:12px;font-weight:700;text-decoration:none;border:none;cursor:pointer;transition:opacity .15s}
+.pay-btn:hover{opacity:.88}
+.pay-pix{background:linear-gradient(135deg,#32BCAD,#11c76f)}
+.pay-cc{background:linear-gradient(135deg,#2563eb,#3b82f6)}
+.pay-cd{background:linear-gradient(135deg,#7c3aed,#8b5cf6)}
+.pay-ted{background:linear-gradient(135deg,#d97706,#f59e0b)}
 .r-atendente{background:#ecfeff;color:#155e75;border:1px solid #a5f3fc}
 .r-personalizado{background:#f8fafc;color:#475569;border:1px solid #cbd5e1}
 .urole{display:inline-block;padding:2px 8px;border-radius:10px;font-size:10px;font-weight:700}
@@ -543,7 +555,7 @@ tr:hover td{background:#f8fafc!important}
 <div class="mo" id="mo-lgpd">
   <div class="mob"><div class="moh"></div><div class="moi">
     <div class="mot">🔒 Política de Privacidade</div>
-    <p style="font-size:12px;line-height:1.7;margin-bottom:14px">O Marcus Souza I Advogado trata seus dados com base na LGPD (Lei nº 13.709/2018).<br><br><strong>Dados coletados:</strong> nome, CPF, telefone, e-mail e documentos.<br><strong>Finalidade:</strong> Agendamento, análise jurídica e prestação de serviços.<br><strong>Compartilhamento:</strong> Não compartilhamos dados com terceiros, salvo obrigação legal.<br><strong>Seus direitos:</strong> Acesso, correção e exclusão. Contato: souzaadvogadosa@gmail.com</p>
+    <p style="font-size:12px;line-height:1.7;margin-bottom:14px">O Marcus Souza I Advogado trata seus dados com base na LGPD (Lei nº 13.709/2018).<br><br><strong>Dados coletados:</strong> nome, CPF, telefone, e-mail e documentos.<br><strong>Finalidade:</strong> Agendamento, análise jurídica e prestação de serviços.<br><strong>Compartilhamento:</strong> Não compartilhamos dados com terceiros, salvo obrigação legal.<br><strong>Seus direitos:</strong> Acesso, correção e exclusão. Contato: adv.souzamarcus@gmail.com</p>
     <button class="btn bgold bw" onclick="closeMo('mo-lgpd')">Entendido</button>
   </div></div>
 </div>
@@ -587,7 +599,7 @@ tr:hover td{background:#f8fafc!important}
   <h3>💰 <span id="m-fin-t">Novo Lançamento</span></h3>
   <input type="hidden" id="fin-id">
   <div class="frow"><div class="ff"><div class="fl">Cliente *</div><select id="fin-cli"></select></div><div class="ff" style="flex:2"><div class="fl">Descrição *</div><input id="fin-desc" placeholder="Ex: Honorários – Ação Trabalhista"></div><div class="ff"><div class="fl">Data</div><input type="date" id="fin-data"></div></div>
-  <div class="frow"><div class="ff"><div class="fl">Valor Contratado (R$)</div><input type="number" id="fin-ct" min="0" step="0.01"></div><div class="ff"><div class="fl">Valor Recebido (R$)</div><input type="number" id="fin-rc" min="0" step="0.01"></div><div class="ff"><div class="fl">Pagamento</div><select id="fin-pg"><option>PIX</option><option>Transferência</option><option>Boleto</option><option>Parcelado</option><option>Dinheiro</option><option>Cartão</option></select></div><div class="ff"><div class="fl">Status</div><select id="fin-st"><option>Pago</option><option>Parcial</option><option>Pendente</option></select></div></div>
+  <div class="frow"><div class="ff"><div class="fl">Valor Contratado (R$)</div><input type="number" id="fin-ct" min="0" step="0.01"></div><div class="ff"><div class="fl">Valor Recebido (R$)</div><input type="number" id="fin-rc" min="0" step="0.01"></div><div class="ff"><div class="fl">Pagamento</div><select id="fin-pg"><option>PIX</option><option>Cartão de Crédito</option><option>Cartão de Débito</option><option>Transferência Bancária</option><option>Boleto</option><option>Parcelado</option><option>Dinheiro</option></select></div><div class="ff"><div class="fl">Status</div><select id="fin-st"><option>Pago</option><option>Parcial</option><option>Pendente</option></select></div></div>
   <div class="mfoot"><button class="btn bp" onclick="saveFin()">💾 Salvar</button><button class="btn bgh" onclick="closeMo('m-fin')">Cancelar</button></div>
 </div></div>
 
@@ -1193,7 +1205,61 @@ function renderFin(){
   const filt=fin.filter(f=>!q||f.desc.toLowerCase().includes(q)||cn(f.cliId).toLowerCase().includes(q));
   const totC=fin.reduce((s,f)=>s+(+f.ct||0),0),totR=fin.reduce((s,f)=>s+(+f.rc||0),0),totP=totC-totR;
   let html=`<div class="krow">${kc('#eff6ff',fmt(totC),'#2563eb','Total Contratado')}${kc('#f0fdf4',fmt(totR),'#16a34a','Total Recebido')}${kc(totP>0?'#fef2f2':'#f8fafc',fmt(totP),totP>0?'#dc2626':'#94a3b8','A Receber')}${kc('#faf5ff',(totC>0?Math.round(totR/totC*100):0)+'%','#7c3aed','Taxa Recebimento')}</div>`;
-  html+=`<div class="fbar"><input id="fin-q" style="max-width:240px" placeholder="🔍 Buscar..." value="${q}" oninput="renderFin()">${p.e?`<button class="btn bp" onclick="openFinModal()">+ Novo Lançamento</button>`:''}</div>`;
+
+  // ── FORMAS DE PAGAMENTO ──────────────────────────────────────────
+  html+=`
+  <div class="card" style="margin-bottom:12px">
+    <div class="stit">💳 Formas de Pagamento</div>
+    <div class="pay-grid">
+
+      <div class="pay-card">
+        <div class="pay-icon">💳</div>
+        <div class="pay-label">Cartão de Crédito</div>
+        <div class="pay-info">Parcelamento disponível<br>Link seguro via PicPay</div>
+        <a href="https://link.picpay.com/p/17814621996a2ef4b7697a2" target="_blank" class="pay-btn pay-cc">💳 Pagar com Crédito</a>
+      </div>
+
+      <div class="pay-card">
+        <div class="pay-icon">💳</div>
+        <div class="pay-label">Cartão de Débito</div>
+        <div class="pay-info">Débito à vista<br>Link seguro via PicPay</div>
+        <a href="https://link.picpay.com/p/17814621996a2ef4b7697a2" target="_blank" class="pay-btn pay-cd">💳 Pagar com Débito</a>
+      </div>
+
+      <div class="pay-card">
+        <div class="pay-icon">⚡</div>
+        <div class="pay-label">PIX</div>
+        <div class="pay-info">Chave PIX:<br><strong style="font-family:monospace;font-size:11px">adv.souzamarcus@gmail.com</strong><br><span style="font-size:10px;color:var(--mu)">ou use o link PicPay</span></div>
+        <div style="display:flex;gap:6px;flex-wrap:wrap">
+          <button onclick="navigator.clipboard.writeText('adv.souzamarcus@gmail.com').then(()=>alert('✅ Chave PIX copiada!'))" class="pay-btn pay-pix" style="flex:1;font-size:11px">📋 Copiar Chave</button>
+          <a href="https://link.picpay.com/p/17814621996a2ef4b7697a2" target="_blank" class="pay-btn pay-pix" style="flex:1;font-size:11px">⚡ Link PIX</a>
+        </div>
+      </div>
+
+      <div class="pay-card">
+        <div class="pay-icon">🏦</div>
+        <div class="pay-label">Transferência Bancária (TED/DOC)</div>
+        <div class="pay-info">
+          <strong>Banco PicPay · Cód. 380</strong><br>
+          Agência: <strong>0001</strong><br>
+          Conta Corrente: <strong>93530512-2</strong><br>
+          Favorecido: <strong>Marcus Souza</strong><br>
+          <span style="font-size:10px;color:var(--mu)">Envie o comprovante por WhatsApp</span>
+        </div>
+        <button onclick="navigator.clipboard.writeText('Banco PicPay · Cód. 380 | Agência: 0001 | CC: 93530512-2 | Marcus Souza').then(()=>alert('✅ Dados bancários copiados!'))" class="pay-btn pay-ted" style="font-size:11px">📋 Copiar Dados</button>
+      </div>
+
+    </div>
+
+    <div style="background:#f8fafc;border:1px solid var(--bd);border-radius:8px;padding:10px;margin-top:4px;font-size:11px;color:var(--mu)">
+      💡 <strong>Link de pagamento único:</strong>
+      <a href="https://link.picpay.com/p/17814621996a2ef4b7697a2" target="_blank" style="color:var(--bl);font-family:monospace;font-size:10px;word-break:break-all">https://link.picpay.com/p/17814621996a2ef4b7697a2</a>
+      <button onclick="navigator.clipboard.writeText('https://link.picpay.com/p/17814621996a2ef4b7697a2').then(()=>alert('✅ Link copiado!'))" class="btn bghost bsm" style="margin-left:6px;font-size:10px">📋 Copiar Link</button>
+    </div>
+  </div>`;
+  // ── LANÇAMENTOS ──────────────────────────────────────────────────
+  html+=`<div class="fbar"><input id="fin-q" style="max-width:240px" placeholder="🔍 Buscar..." value="${q}" oninput="renderFin()">${p.e?`<button class="btn bp" onclick="openFinModal()">+ Novo Lançamento</button>`:''}
+  </div>`;
   html+=`<div class="card"><div class="tw"><table><thead><tr><th>Cliente</th><th>Descrição</th><th>Data</th><th>Contratado</th><th>Recebido</th><th>Pendente</th><th>Pagamento</th><th>Status</th>${p.e?'<th>Ações</th>':''}</tr></thead><tbody>${filt.map(f=>{const pen=(+f.ct||0)-(+f.rc||0);return`<tr><td style="font-weight:600;white-space:nowrap">${cn(f.cliId)}</td><td>${f.desc}</td><td style="white-space:nowrap;font-size:11px">${fmtD(f.data)}</td><td style="font-weight:600;white-space:nowrap">${fmt(f.ct||0)}</td><td style="color:#16a34a;font-weight:600;white-space:nowrap">${fmt(f.rc||0)}</td><td style="color:${pen>0?'#dc2626':'#16a34a'};font-weight:600;white-space:nowrap">${fmt(pen)}</td><td>${f.pg}</td><td>${fsbadge(f.st)}</td>${p.e?`<td><div style="display:flex;gap:3px"><button class="btn bgh xs" onclick="editFin(${f.id})">✏️</button>${p.del?`<button class="btn bd_ xs" onclick="delFin(${f.id})">🗑️</button>`:''}</div></td>`:''}</tr>`;}).join('')}<tr style="background:#f1f5f9;font-weight:700"><td colspan="3">TOTAIS</td><td style="color:#2563eb;white-space:nowrap">${fmt(totC)}</td><td style="color:#16a34a;white-space:nowrap">${fmt(totR)}</td><td style="color:${totP>0?'#dc2626':'#16a34a'};white-space:nowrap">${fmt(totP)}</td><td colspan="${p.e?3:2}"></td></tr></tbody></table></div></div>`;
   document.getElementById('admin-cnt').innerHTML=html;
 }
@@ -1227,7 +1293,7 @@ const WA_TPLS={
   update:n=>`Prezado(a) ${n},\n\nTemos novidades sobre o andamento do seu processo. Entre em contato para uma atualização completa.\n\n*Marcus Souza I Advogado*\n📞 (21) 96534-8183`,
 };
 const EMAIL_TPLS={
-  audiencia:{sub:'Lembrete de Audiência — Marcus Souza I Advogado',body:n=>`Prezado(a) ${n},\n\nEste é um lembrete referente à audiência agendada no seu processo.\n\nAtenciosamente,\nMarcus Souza I Advogado\nOAB/RJ 250.430\n(21) 96534-8183 | souzaadvogadosa@gmail.com`},
+  audiencia:{sub:'Lembrete de Audiência — Marcus Souza I Advogado',body:n=>`Prezado(a) ${n},\n\nEste é um lembrete referente à audiência agendada no seu processo.\n\nAtenciosamente,\nMarcus Souza I Advogado\nOAB/RJ 250.430\n(21) 96534-8183 | adv.souzamarcus@gmail.com`},
   prazo:{sub:'Alerta de Prazo Processual — Marcus Souza I Advogado',body:n=>`Prezado(a) ${n},\n\nInformamos que há um prazo processual importante se aproximando em seu processo. Entre em contato com urgência.\n\nAtenciosamente,\nMarcus Souza I Advogado`},
   docs:{sub:'Solicitação de Documentos — Marcus Souza I Advogado',body:n=>`Prezado(a) ${n},\n\nPara dar continuidade ao seu processo, necessitamos que nos envie alguns documentos.\n\nAtenciosamente,\nMarcus Souza I Advogado`},
   cobranca:{sub:'Honorários Advocatícios Pendentes — Marcus Souza I Advogado',body:n=>`Prezado(a) ${n},\n\nHá honorários advocatícios em aberto. Solicitamos a regularização.\n\nAtenciosamente,\nMarcus Souza I Advogado`},
@@ -2822,7 +2888,7 @@ function renderConfig(){
     <div class="drow"><div class="dl">Nome</div><div class="dv">Marcus Souza I Advogado</div></div>
     <div class="drow"><div class="dl">OAB</div><div class="dv">Dr. Marcus Souza (OAB/RJ 250.430)</div></div>
     <div class="drow"><div class="dl">Telefone</div><div class="dv">(21) 96534-8183 · (21) 96534-8183</div></div>
-    <div class="drow"><div class="dl">E-mail</div><div class="dv">souzaadvogadosa@gmail.com</div></div>
+    <div class="drow"><div class="dl">E-mail</div><div class="dv">adv.souzamarcus@gmail.com</div></div>
     <div class="drow"><div class="dl">Horário</div><div class="dv">Seg–Sex · 10h–18h · Somente agendamento</div></div>
   </div>
   <div class="card"><div class="stit">Dados do Sistema</div>
@@ -2883,6 +2949,7 @@ function showDet(id){
     </div>
     <div class="brow">
       <a href="https://wa.me/55${b.tel}?text=${encodeURIComponent('Olá '+b.nome.split(' ')[0]+'! Confirmamos seu atendimento para '+fd(b.data)+' às '+b.hora+'. Escritório Marcus Souza I Advogado — (21) 96534-8183.')}" target="_blank" class="btn bwa" style="flex:1">📱 WhatsApp</a>
+      <a href="https://link.picpay.com/p/17814621996a2ef4b7697a2" target="_blank" class="btn" style="flex:1;background:linear-gradient(135deg,#11c76f,#21D07A);color:#fff;text-decoration:none;display:inline-flex;align-items:center;justify-content:center">💳 Link Pagamento</a>
       <a href="${gcLink(b)}" target="_blank" class="btn bnav" style="flex:1">📅 Google Cal</a>
       <button class="btn bred" onclick="delDet('${b.id}')" style="flex:1">🗑️</button>
     </div>`;
@@ -3064,6 +3131,14 @@ function dcolor(d,active){if(!d)return'—';const i=isPast(d)&&active?'🔴 ':is
 function gcalUrl(title,date,endDate,desc,location){const s=date.replace(/-/g,'')+'T090000';const e=(endDate||date).replace(/-/g,'')+'T100000';return`https://calendar.google.com/calendar/render?action=TEMPLATE&text=${encodeURIComponent(title)}&dates=${s}/${e}&details=${encodeURIComponent(desc||'')}&location=${encodeURIComponent(location||'')}`;}
 function buildAdvSelect(id,selected){const sel=document.getElementById(id);if(!sel)return;sel.innerHTML=users.filter(u=>u.ativo&&(u.role==='admin'||u.role==='advogado')).map(u=>`<option value="${u.nome}" ${u.nome===selected?'selected':''}>${u.nome}</option>`).join('');}
 function buildCliSelect(id,selected){const sel=document.getElementById(id);if(!sel)return;sel.innerHTML='<option value="">— Selecionar —</option>'+cli.map(c=>`<option value="${c.id}" ${c.id===+selected?'selected':''}>${c.nome}</option>`).join('');}
+
+// ═══════════════════════════════════════════════════════════════════
+// DADOS DE PAGAMENTO
+// ═══════════════════════════════════════════════════════════════════
+const PAYMENT={picpay:'https://link.picpay.com/p/17814621996a2ef4b7697a2',pix:'adv.souzamarcus@gmail.com',banco:'PicPay (380)',ag:'0001',cc:'93530512-2',fav:'Marcus Souza'};
+function copyPayLink(){navigator.clipboard?.writeText(PAYMENT.picpay).then(()=>alert('✅ Link copiado!'));}
+function copyPixKey(){navigator.clipboard?.writeText(PAYMENT.pix).then(()=>alert('✅ Chave PIX copiada!'));}
+function copyBankData(){navigator.clipboard?.writeText('Banco '+PAYMENT.banco+' | Ag: '+PAYMENT.ag+' | CC: '+PAYMENT.cc+' | '+PAYMENT.fav).then(()=>alert('✅ Dados bancários copiados!'));}
 
 // ═══════════════════════════════════════════════════════════════════
 // EXPORT
