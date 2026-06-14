@@ -771,7 +771,18 @@ const D_FIN=[
   {id:5,cliId:5,desc:'Honorários – Direito de Família',ct:1200,rc:0,pg:'Parcelado',st:'Pendente',data:'2025-02-01'},
 ];
 // Agendamentos data
-let bk=[], gcfg={key:'',calId:'adv.souzamarcus@gmail.com',script:'',on:false}, gcEvt=[];
+let bk=[], gcfg={
+  key:'',                                       // Google Calendar API Key (para leitura pública)
+  calId:'adv.souzamarcus@gmail.com',            // ID do calendário principal
+  script:'',                                    // URL do Apps Script (para criar eventos)
+  on:false,
+  // Conta de serviço Google (para autenticação OAuth2 server-side via Apps Script)
+  serviceEmail:'escritorio-app@logical-bolt-499415-t9.iam.gserviceaccount.com',
+  projectId:'logical-bolt-499415-t9',
+  // Configurações do calendário público
+  calEmbedUrl:'https://calendar.google.com/calendar/embed?src=adv.souzamarcus%40gmail.com&ctz=America%2FSao_Paulo',
+  calIcsUrl:'https://calendar.google.com/calendar/ical/adv.souzamarcus%40gmail.com/public/basic.ics',
+}, gcEvt=[];
 // UI state
 let aTabCur='dash', calV=new Date(), selD=null;
 let tarFil='Todas', waCliId=null, emailCliId=null;
@@ -2445,41 +2456,153 @@ function toggleUser(id){if(id===currentUser.id)return alert('Não é possível d
 // GOOGLE CALENDAR
 // ═══════════════════════════════════════════════════════════════════
 function renderGCal(){
-  const isOn=gcfg.on&&gcfg.key;
-  let h=`<div class="al ${isOn?'al-ok':gcfg.key?'al-warn':'al-err'}">${isOn?'✅ Google Calendar conectado e ativo':gcfg.key?'⚠️ API Key cadastrada — verifique o Calendar ID':'🔴 Google Calendar não configurado'}</div>
-  <div class="card gl">
-    <div class="stit">Configuração da API</div>
-    <div class="fg"><div class="fl">Google Calendar API Key</div><input class="fi" id="gc-key" value="${gcfg.key}" placeholder="AIzaSy..." style="font-family:monospace;font-size:12px"></div>
-    <div class="fg"><div class="fl">Calendar ID</div><input class="fi" id="gc-cid" value="${gcfg.calId||'adv.souzamarcus@gmail.com'}" placeholder="seu@gmail.com"></div>
-  <div class="fg"><div class="fl">Visualização da Agenda</div>
-    <iframe src="https://calendar.google.com/calendar/embed?src=adv.souzamarcus%40gmail.com&ctz=America%2FSao_Paulo" style="border:1px solid var(--bd);border-radius:8px;width:100%;min-height:400px" frameborder="0" scrolling="no"></iframe>
+  const isOn=gcfg.on&&gcfg.script;
+  const hasKey=!!(gcfg.key);
+  const pendentes=bk.filter(b=>['solicitado','confirmado'].includes(b.status)&&b.data>=td0);
+  let h=`
+  <!-- Status -->
+  <div class="al ${isOn?'al-ok':gcfg.script?'al-warn':'al-err'}" style="margin-bottom:12px">
+    ${isOn?'✅ Google Calendar integrado e ativo — eventos podem ser criados automaticamente':
+      gcfg.script?'⚠️ Apps Script configurado — salve e teste a conexão':
+      '⚠️ Configure o Apps Script URL para criar eventos automaticamente'}
   </div>
-    <div class="fg"><div class="fl">Apps Script URL (criação automática de eventos)</div><input class="fi" id="gc-scr" value="${gcfg.script}" placeholder="https://script.google.com/macros/s/..."></div>
-    <div class="brow"><button class="btn bgold" onclick="saveGC()">💾 Salvar</button><button class="btn bghost" onclick="testGC()">🔍 Testar Conexão</button></div>
+
+  <!-- Agenda Incorporada -->
+  <div class="card gl" style="margin-bottom:12px">
+    <div class="stit">📅 Agenda — adv.souzamarcus@gmail.com</div>
+    <iframe src="${gcfg.calEmbedUrl||'https://calendar.google.com/calendar/embed?src=adv.souzamarcus%40gmail.com&ctz=America%2FSao_Paulo'}&mode=WEEK&showTitle=0&showNav=1&showPrint=0&showTabs=1&showCalendars=0"
+      style="border:1px solid var(--bd);border-radius:8px;width:100%;min-height:500px;display:block"
+      frameborder="0" scrolling="no" loading="lazy"></iframe>
+    <div style="display:flex;gap:8px;margin-top:8px;flex-wrap:wrap">
+      <a href="https://calendar.google.com/calendar/r" target="_blank" class="btn bghost bsm">🔗 Abrir no Google Calendar</a>
+      <a href="${gcfg.calIcsUrl||'https://calendar.google.com/calendar/ical/adv.souzamarcus%40gmail.com/public/basic.ics'}" class="btn bblue bsm">⬇️ Exportar .ICS</a>
+    </div>
+  </div>
+
+  <!-- Configuração Apps Script -->
+  <div class="card" style="margin-bottom:12px">
+    <div class="stit">⚙️ Configuração da Integração</div>
+
+    <div class="frow">
+      <div class="ff">
+        <div class="fl">Calendar ID (e-mail do calendário)</div>
+        <input class="fi" id="gc-cid" value="${gcfg.calId||'adv.souzamarcus@gmail.com'}" placeholder="adv.souzamarcus@gmail.com">
+        <div style="font-size:10px;color:var(--mu);margin-top:3px">Conta de serviço: ${gcfg.serviceEmail||'escritorio-app@logical-bolt-499415-t9.iam.gserviceaccount.com'}</div>
+      </div>
+      <div class="ff">
+        <div class="fl">Google Calendar API Key (leitura pública)</div>
+        <input class="fi" id="gc-key" value="${gcfg.key}" placeholder="AIzaSy..." style="font-family:monospace;font-size:11px">
+        <div style="font-size:10px;color:var(--mu);margin-top:3px">Usada para leitura de eventos via Calendar API v3</div>
+      </div>
+    </div>
+
+    <div class="fg">
+      <div class="fl">Apps Script URL <span style="color:var(--re)">*</span> (criação de eventos)</div>
+      <input class="fi" id="gc-scr" value="${gcfg.script}" placeholder="https://script.google.com/macros/s/.../exec">
+      <div style="font-size:10px;color:var(--mu);margin-top:3px">Obtenha em: script.google.com → Implantar → App da Web → Copiar URL</div>
+    </div>
+
+    <div class="brow">
+      <button class="btn bgold" onclick="saveGC()">💾 Salvar Configuração</button>
+      <button class="btn bghost" onclick="testGC()">🔍 Testar Apps Script</button>
+      <button class="btn bblue bsm" onclick="testGCalAPI()">🔍 Testar API Key</button>
+    </div>
     <div id="gc-res" style="margin-top:8px"></div>
   </div>
-  <div class="card">
-    <div class="stit">Sincronizar Agendamentos</div>
-    <div class="brow"><button class="btn bnav" onclick="syncGCal()">📅 Sincronizar Todos</button><button class="btn bblue" onclick="expICS()">⬇️ Exportar .ICS</button></div>
-    <div id="sync-res" style="margin-top:9px"></div>
+
+  <!-- Sincronização -->
+  <div class="card" style="margin-bottom:12px">
+    <div class="stit">🔄 Sincronizar Agendamentos (${pendentes.length} pendentes)</div>
+    <div style="font-size:12px;color:var(--mu);margin-bottom:10px">
+      Envia os agendamentos confirmados/solicitados para o Google Calendar via Apps Script.
+      ${!gcfg.script?'<span style="color:#dc2626">Configure o Apps Script URL acima primeiro.</span>':''}
+    </div>
+    <div style="display:flex;gap:8px;flex-wrap:wrap;margin-bottom:10px">
+      <button class="btn bnav" onclick="syncGCal()">📅 Sincronizar Todos (${pendentes.length})</button>
+      <button class="btn bblue bsm" onclick="expICS()">⬇️ Exportar .ICS</button>
+    </div>
+    <div id="sync-res"></div>
+
+    ${pendentes.length?`
     <div class="divider"></div>
-    <div class="stit">Adicionar Individualmente</div>
-    ${bk.filter(b=>b.status!=='cancelado'&&b.data>=td0).sort((a,b_)=>a.data.localeCompare(b_.data)).slice(0,8).map(b=>`<div style="display:flex;align-items:center;gap:7px;padding:7px 0;border-bottom:1px solid var(--bd)"><span style="font-size:15px">${BT[b.type].i}</span><div style="flex:1"><div style="font-size:11px;font-weight:700">${b.nome}</div><div style="font-size:10px;color:var(--mu)">${fd(b.data)} · ${b.hora}</div></div>${bdg(b.status)}<a href="${gcLink(b)}" target="_blank" class="btn bghost bsm" style="font-size:10px;padding:4px 8px">📅 Add</a></div>`).join('')}
+    <div class="stit" style="margin-top:10px">Adicionar Individualmente</div>
+    ${pendentes.sort((a,b_)=>a.data.localeCompare(b_.data)).slice(0,10).map(b=>`
+      <div style="display:flex;align-items:center;gap:8px;padding:8px 0;border-bottom:1px solid var(--bd);flex-wrap:wrap">
+        <span style="font-size:18px">${BT[b.type]?.i||'📅'}</span>
+        <div style="flex:1;min-width:160px">
+          <div style="font-size:12px;font-weight:700">${esc(b.nome)}</div>
+          <div style="font-size:10px;color:var(--mu)">${fd(b.data)} · ${b.hora} · ${BT[b.type]?.n||b.type}</div>
+        </div>
+        ${bdg(b.status)}
+        <div style="display:flex;gap:4px">
+          <a href="${gcLink(b)}" target="_blank" class="btn bghost bsm" style="font-size:10px">📅 Add manual</a>
+          ${gcfg.script?`<button class="btn bsa bsm" style="font-size:10px" onclick="syncOne('${b.id}')">⚡ Auto</button>`:''}
+        </div>
+      </div>`).join('')}`:'<div class="al al-ok">✅ Nenhum agendamento pendente de sincronização.</div>'}
   </div>
+
+  <!-- Apps Script Code -->
   <div class="card">
-    <div class="stit">Apps Script — Código para Instalar</div>
-    <div class="al al-gold" style="font-size:10px;margin-bottom:7px"><strong>Como instalar:</strong> script.google.com → Novo projeto → Cole o código → Implantar → App da Web → Qualquer pessoa → Copie a URL e cole acima.</div>
-    <button class="btn bghost bsm" onclick="cpScript()" style="margin-bottom:7px">📋 Copiar Código</button>
-    <div class="code">${esc(appsScript())}</div>
+    <div class="stit">📋 Apps Script — Código Completo</div>
+    <div class="al al-gold" style="font-size:11px;margin-bottom:10px">
+      <strong>Como instalar:</strong><br>
+      1. Acesse <a href="https://script.google.com" target="_blank" style="color:var(--gd)">script.google.com</a> → Novo projeto<br>
+      2. Cole o código abaixo substituindo o conteúdo existente<br>
+      3. Salve (Ctrl+S) → Implantar → Nova implantação → Tipo: App da Web<br>
+      4. Executar como: <strong>Eu (${gcfg.serviceEmail||'escritorio-app@...'})</strong><br>
+      5. Quem tem acesso: <strong>Qualquer pessoa</strong><br>
+      6. Clique em Implantar → Copie a URL e cole no campo acima<br>
+      7. Volte aqui, cole a URL e clique em Salvar
+    </div>
+    <button class="btn bghost bsm" onclick="cpScript()" style="margin-bottom:8px">📋 Copiar Código</button>
+    <div class="code" style="font-size:10px;line-height:1.5;max-height:360px;overflow-y:auto">${esc(appsScript())}</div>
   </div>`;
   document.getElementById('admin-cnt').innerHTML=h;
 }
-function saveGC(){gcfg.key=gi('gc-key');gcfg.calId=gi('gc-cid');gcfg.script=gi('gc-scr');gcfg.on=!!(gcfg.key&&gcfg.calId);saveGc();alert('✅ Configuração salva!');renderGCal();}
+function saveGC(){
+  gcfg.key=gi('gc-key');
+  gcfg.calId=gi('gc-cid')||'adv.souzamarcus@gmail.com';
+  gcfg.script=gi('gc-scr');
+  gcfg.on=!!(gcfg.script&&gcfg.calId);
+  // Atualizar URLs do calendário com o calId atual
+  const cenc=encodeURIComponent(gcfg.calId);
+  gcfg.calEmbedUrl=`https://calendar.google.com/calendar/embed?src=${cenc}&ctz=America%2FSao_Paulo`;
+  gcfg.calIcsUrl=`https://calendar.google.com/calendar/ical/${cenc}/public/basic.ics`;
+  saveGc();
+  alert('✅ Configuração salva!');
+  renderGCal();
+}
 async function testGC(){
-  const key=gi('gc-key'),calId=gi('gc-cid');const res=document.getElementById('gc-res');
-  if(!key||!calId){res.innerHTML=`<div class="al al-warn">Preencha API Key e Calendar ID antes de testar.</div>`;return;}
-  res.innerHTML=`<div class="al al-info">⏳ Testando...</div>`;
-  try{const url=`https://www.googleapis.com/calendar/v3/calendars/${encodeURIComponent(calId)}/events?key=${key}&timeMin=${new Date().toISOString()}&maxResults=5&singleEvents=true&orderBy=startTime`;const r=await fetch(url);const d=await r.json();if(d.error){res.innerHTML=`<div class="al al-err">❌ Erro: ${d.error.message}</div>`;}else{gcEvt=d.items||[];gcfg.on=true;saveGc();res.innerHTML=`<div class="al al-ok">✅ Conectado! ${gcEvt.length} evento(s) encontrado(s).</div>`;}}catch(e){res.innerHTML=`<div class="al al-err">❌ Falha: ${e.message}</div>`;}
+  const script=gi('gc-scr');const res=document.getElementById('gc-res');
+  if(!script){res.innerHTML='<div class="al al-warn">Cole o URL do Apps Script antes de testar.</div>';return;}
+  res.innerHTML='<div class="al al-info">⏳ Testando Apps Script com evento de teste...</div>';
+  const now=new Date();
+  const start=new Date(now.getTime()+60000).toISOString().replace('Z','-03:00').substring(0,22)+'-03:00';
+  const end=new Date(now.getTime()+1800000).toISOString().replace('Z','-03:00').substring(0,22)+'-03:00';
+  const payload={
+    calendarId:gi('gc-cid')||'adv.souzamarcus@gmail.com',
+    title:'[TESTE] Marcus Souza I Advogado — Sistema',
+    start,end,
+    clientName:'Teste do Sistema',
+    phone:'(21) 96534-8183',
+    email:'adv.souzamarcus@gmail.com',
+    serviceType:'Teste de integração',
+    description:'Evento de teste criado automaticamente pelo sistema. Pode ser excluído.',
+    location:'Sistema — Teste',
+    notes:'Projeto: logical-bolt-499415-t9',
+  };
+  try{
+    const r=await fetch(script,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(payload)});
+    const d=await r.json();
+    if(d.success){
+      gcfg.on=true;gcfg.script=script;saveGc();
+      res.innerHTML=`<div class="al al-ok">✅ Apps Script funcionando!<br>Evento criado: <strong>${d.title||'Teste'}</strong><br>ID: <code style="font-size:10px">${d.eventId||'—'}</code><br><span style="font-size:11px;color:var(--mu)">Verifique no Google Calendar e exclua o evento de teste.</span></div>`;
+    }else{
+      res.innerHTML=`<div class="al al-err">❌ Apps Script retornou erro:<br>${d.error}</div>`;
+    }
+  }catch(e){
+    res.innerHTML=`<div class="al al-err">❌ Falha na conexão com o Apps Script:<br>${e.message}<br><span style="font-size:11px">Verifique se a URL está correta e se o acesso está como "Qualquer pessoa".</span></div>`;
+  }
 }
 async function syncGCal(){
   const btn=document.getElementById('sync-btn');if(btn)btn.classList.add('spin');
@@ -2487,13 +2610,148 @@ async function syncGCal(){
   const res=document.getElementById('sync-res');
   if(!gcfg.script){toS.forEach(b=>window.open(gcLink(b),'_blank'));if(btn)btn.classList.remove('spin');if(res)res.innerHTML=`<div class="al al-warn">Configure o Apps Script para sincronização automática.</div>`;return;}
   let ok=0,err=0;
-  for(const b of toS){try{const t=BT[b.type];const payload={action:'createEvent',calendarId:gcfg.calId,title:`[${t.n}] - ${b.nome}`,start:`${b.data}T${b.hora}:00`,end:`${b.data}T${am(b.hora,t.d)}:00`,description:`Nome: ${b.nome}\nWhatsApp: ${b.tel}\nCPF: ${b.cpf}\nÁrea: ${b.area}\nResumo: ${b.resumo}\nModalidade: ${b.modal}\nProtocolo: ${b.id}`};const r=await fetch(gcfg.script,{method:'POST',body:JSON.stringify(payload)});const d=await r.json();if(d.success)ok++;else err++;}catch{err++;}}
+  for(const b of toS){
+    try{
+      const t=BT[b.type];
+      // Payload completo conforme contrato do Apps Script instalado
+      const payload={
+        calendarId: gcfg.calId||'adv.souzamarcus@gmail.com',
+        title: `[${t.n}] - ${b.nome}`,
+        start: `${b.data}T${b.hora}:00-03:00`,
+        end:   `${b.data}T${am(b.hora,t.d)}:00-03:00`,
+        clientName:  b.nome,
+        phone:       b.tel?`(${b.tel.substring(0,2)}) ${b.tel.substring(2,7)}-${b.tel.substring(7)}`:'Não informado',
+        email:       b.email||'Não informado',
+        serviceType: t.n,
+        description: b.resumo||'Sem descrição.',
+        location:    b.modal==='videoconferencia'?'Google Meet / Videoconferência':
+                     b.modal==='whatsapp'?'WhatsApp (21) 96534-8183':
+                     b.modal==='ligacao'?'Ligação telefônica':'Online',
+        notes: `Modalidade: ${b.modal}\nProtocolo: ${b.id}\nCidade: ${b.cidade||''}/${b.estado||'RJ'}\nÁrea jurídica: ${b.area||''}`,
+      };
+      const r=await fetch(gcfg.script,{
+        method:'POST',
+        headers:{'Content-Type':'application/json'},
+        body:JSON.stringify(payload)
+      });
+      const d=await r.json();
+      if(d.success){ok++;b.gcEventId=d.eventId;saveBk();}
+      else{err++;console.warn('Apps Script erro:',d.error);}
+    }catch(e){err++;console.warn('sync erro:',e.message);}
+  }
   if(res)res.innerHTML=`<div class="al ${!err?'al-ok':'al-warn'}">${!err?'✅':'⚠️'} Sincronizado: ${ok} evento(s)${err?`, ${err} erro(s)`:''}</div>`;
   if(btn)btn.classList.remove('spin');
 }
-function gcLink(b){const t=BT[b.type];const s=b.data.replace(/-/g,'')+'T'+b.hora.replace(':','')+'00';const e=b.data.replace(/-/g,'')+'T'+am(b.hora,t.d).replace(':','')+'00';return`https://calendar.google.com/calendar/render?action=TEMPLATE&text=${encodeURIComponent('['+t.n+'] - '+b.nome)}&dates=${s}/${e}&details=${encodeURIComponent('Nome: '+b.nome+'\nWhatsApp: '+b.tel+'\nCPF: '+b.cpf+'\nÁrea: '+b.area+'\nResumo: '+b.resumo+'\nProtocolo: '+b.id)}`;}
-function cpScript(){navigator.clipboard?.writeText(appsScript()).then(()=>alert('✅ Código copiado!'));}
-function appsScript(){return`// SOUZA ADVOCACIA — Google Apps Script\nfunction doPost(e) {\n  try {\n    const d = JSON.parse(e.postData.contents);\n    const cal = CalendarApp.getCalendarById(d.calendarId || 'primary');\n    const event = cal.createEvent(d.title, new Date(d.start), new Date(d.end), {\n      description: d.description || ''\n    });\n    event.addPopupReminder(60);\n    event.addPopupReminder(1440);\n    return ContentService.createTextOutput(\n      JSON.stringify({ success: true, eventId: event.getId() })\n    ).setMimeType(ContentService.MimeType.JSON);\n  } catch(err) {\n    return ContentService.createTextOutput(\n      JSON.stringify({ success: false, error: err.toString() })\n    ).setMimeType(ContentService.MimeType.JSON);\n  }\n}`;}
+function gcLink(b){
+  const t=BT[b.type];
+  const s=b.data.replace(/-/g,'')+'T'+b.hora.replace(':','')+'00';
+  const e=b.data.replace(/-/g,'')+'T'+am(b.hora,t.d).replace(':','')+'00';
+  const tel=b.tel?`(${b.tel.substring(0,2)}) ${b.tel.substring(2,7)}-${b.tel.substring(7)}`:b.tel||'';
+  const loc=b.modal==='videoconferencia'?'Google Meet / Videoconferência':
+             b.modal==='whatsapp'?'WhatsApp (21) 96534-8183':
+             b.modal==='ligacao'?'Ligação telefônica':'Online';
+  const det=`Marcus Souza I Advogado — Agendamento
+Cliente: ${b.nome}
+WhatsApp: ${tel}
+E-mail: ${b.email||''}
+Tipo: ${t.n}
+Área: ${b.area||''}
+Resumo: ${b.resumo||''}
+Modalidade: ${loc}
+Protocolo: ${b.id}
+Cidade: ${b.cidade||''}/${b.estado||'RJ'}`;
+  return`https://calendar.google.com/calendar/render?action=TEMPLATE&text=${encodeURIComponent('['+t.n+'] - '+b.nome)}&dates=${s}/${e}&details=${encodeURIComponent(det)}&location=${encodeURIComponent(loc)}&add=${encodeURIComponent(gcfg.calId||'adv.souzamarcus@gmail.com')}`;
+}
+function cpScript(){navigator.clipboard?.writeText(appsScript()).then(()=>alert('✅ Código copiado! Cole no Google Apps Script.')).catch(()=>{const t=document.createElement('textarea');t.value=appsScript();document.body.appendChild(t);t.select();document.execCommand('copy');document.body.removeChild(t);alert('✅ Código copiado!');});}
+
+// Testa a API Key do Google Calendar (leitura pública)
+async function testGCalAPI(){
+  const key=gi('gc-key'),calId=gi('gc-cid')||'adv.souzamarcus@gmail.com';
+  const res=document.getElementById('gc-res');
+  if(!key){res.innerHTML='<div class="al al-warn">Preencha a API Key antes de testar.</div>';return;}
+  res.innerHTML='<div class="al al-info">⏳ Testando API Key...</div>';
+  try{
+    const url=`https://www.googleapis.com/calendar/v3/calendars/${encodeURIComponent(calId)}/events?key=${key}&timeMin=${new Date().toISOString()}&maxResults=5&singleEvents=true&orderBy=startTime`;
+    const r=await fetch(url);const d=await r.json();
+    if(d.error){res.innerHTML=`<div class="al al-err">❌ API Key: ${d.error.message}</div>`;}
+    else{gcEvt=d.items||[];res.innerHTML=`<div class="al al-ok">✅ API Key OK! ${gcEvt.length} evento(s) próximos.</div>`;}
+  }catch(e){res.innerHTML=`<div class="al al-err">❌ Falha: ${e.message}</div>`;}
+}
+
+// Sincroniza um agendamento individual via Apps Script
+async function syncOne(bkId){
+  const b=bk.find(x=>x.id===bkId);if(!b||!gcfg.script)return;
+  const t=BT[b.type];
+  const payload={
+    calendarId:gcfg.calId||'adv.souzamarcus@gmail.com',
+    title:`[${t.n}] - ${b.nome}`,
+    start:`${b.data}T${b.hora}:00-03:00`,
+    end:`${b.data}T${am(b.hora,t.d)}:00-03:00`,
+    clientName:b.nome,
+    phone:b.tel?`(${b.tel.substring(0,2)}) ${b.tel.substring(2,7)}-${b.tel.substring(7)}`:b.tel||'',
+    email:b.email||'',
+    serviceType:t.n,
+    description:b.resumo||'',
+    location:b.modal==='videoconferencia'?'Google Meet / Videoconferência':b.modal==='whatsapp'?'WhatsApp (21) 96534-8183':'Ligação telefônica',
+    notes:`Modalidade: ${b.modal}\nProtocolo: ${b.id}\nCidade: ${b.cidade||''}/${b.estado||'RJ'}`,
+  };
+  try{
+    const r=await fetch(gcfg.script,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(payload)});
+    const d=await r.json();
+    if(d.success){b.gcEventId=d.eventId;saveBk();alert(`✅ Evento criado no Google Calendar!
+ID: ${d.eventId}`);}
+    else alert(`❌ Erro: ${d.error}`);
+  }catch(e){alert(`❌ Falha: ${e.message}`);}
+}
+function appsScript(){return `// MARCUS SOUZA I ADVOGADO — Google Apps Script
+// Projeto: logical-bolt-499415-t9
+// Conta de serviço: escritorio-app@logical-bolt-499415-t9.iam.gserviceaccount.com
+// Calendário: adv.souzamarcus@gmail.com
+// Como instalar: script.google.com → Novo projeto → Cole o código
+// → Implantar → App da Web → Executar como: Você → Acesso: Qualquer pessoa
+// → Implantar → Copie a URL e cole no sistema
+function doPost(e) {
+  try {
+    if (!e || !e.postData || !e.postData.contents) {
+      throw new Error("Nenhum dado enviado na requisição.");
+    }
+    const d = JSON.parse(e.postData.contents);
+    if (!d.title) throw new Error("Campo 'title' é obrigatório.");
+    if (!d.start) throw new Error("Campo 'start' é obrigatório.");
+    if (!d.end)   throw new Error("Campo 'end' é obrigatório.");
+    const calendarId = d.calendarId || 'adv.souzamarcus@gmail.com';
+    const cal = CalendarApp.getCalendarById(calendarId);
+    if (!cal) throw new Error("Calendário não encontrado: " + calendarId);
+    const startDate = new Date(d.start);
+    const endDate   = new Date(d.end);
+    if (isNaN(startDate.getTime())) throw new Error("Data inicial inválida.");
+    if (isNaN(endDate.getTime()))   throw new Error("Data final inválida.");
+    if (endDate <= startDate) throw new Error("Data final deve ser posterior à inicial.");
+    const description = [
+      "MARCUS SOUZA I ADVOGADO — AGENDAMENTO",
+      "Cliente: "      + (d.clientName  || "Não informado"),
+      "WhatsApp: "     + (d.phone       || "Não informado"),
+      "E-mail: "       + (d.email       || "Não informado"),
+      "Tipo: "         + (d.serviceType || "Não informado"),
+      "Descrição: "    + (d.description || "Sem descrição."),
+      "Local/Modal: "  + (d.location    || "Não informado"),
+      "Obs. internas: "+ (d.notes       || "Nenhuma."),
+    ].join("\\n");
+    const event = cal.createEvent(d.title, startDate, endDate, {
+      description: description,
+      location: d.location || "Atendimento online"
+    });
+    event.addPopupReminder(60);
+    event.addPopupReminder(1440);
+    return ContentService.createTextOutput(
+      JSON.stringify({ success: true, message: "Evento criado.", eventId: event.getId(), title: d.title })
+    ).setMimeType(ContentService.MimeType.JSON);
+  } catch (err) {
+    return ContentService.createTextOutput(
+      JSON.stringify({ success: false, error: err.toString() })
+    ).setMimeType(ContentService.MimeType.JSON);
+  }
+}`;}
 
 // ═══════════════════════════════════════════════════════════════════
 // CONFIG
@@ -2701,6 +2959,26 @@ function submitBooking(){
   if(!app.lgpd){alert('É necessário aceitar a Política de Privacidade.');return;}
   const b={id:gidb(),type:app.type,status:'solicitado',nome:app.nome,cpf:'',tel:app.tel,email:app.email,cidade:app.cidade,estado:app.estado,area:app.area,resumo:app.resumo,modal:app.modal,data:app.data,hora:app.hora,extra:app.extra,files:[...app.files],createdAt:new Date().toISOString(),obs:''};
   bk.push(b);saveBk();updNotif();
+  // Criar evento no Google Calendar automaticamente (se Apps Script configurado)
+  if(gcfg.script&&gcfg.on){
+    const t_=BT[b.type];
+    const payload_={
+      calendarId:gcfg.calId||'adv.souzamarcus@gmail.com',
+      title:`[${t_.n}] - ${b.nome}`,
+      start:`${b.data}T${b.hora}:00-03:00`,
+      end:`${b.data}T${am(b.hora,t_.d)}:00-03:00`,
+      clientName:b.nome,
+      phone:b.tel?`(${b.tel.substring(0,2)}) ${b.tel.substring(2,7)}-${b.tel.substring(7)}`:b.tel||'',
+      email:b.email||'',
+      serviceType:t_.n,
+      description:b.resumo||'',
+      location:b.modal==='videoconferencia'?'Google Meet / Videoconferência':b.modal==='whatsapp'?'WhatsApp (21) 96534-8183':'Ligação telefônica',
+      notes:`Modalidade: ${b.modal}\nProtocolo: ${b.id}\nCidade: ${b.cidade||''}/${b.estado||'RJ'}\nÁrea: ${b.area||''}`,
+    };
+    fetch(gcfg.script,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(payload_)})
+      .then(r=>r.json()).then(d=>{if(d.success){b.gcEventId=d.eventId;saveBk();}})
+      .catch(()=>{}); // silencioso — não bloqueia o agendamento
+  }
   const t=BT[b.type];const mmap={videoconferencia:'📹 Videoconferência',ligacao:'📞 Ligação',whatsapp:'💬 WhatsApp'};
   document.getElementById('suc-msg').textContent=`Olá, ${b.nome.split(' ')[0]}! Seu agendamento foi realizado. Em breve a equipe confirmará pelo WhatsApp.`;
   document.getElementById('suc-det').innerHTML=`<div class="ri2"><div class="rl">Tipo</div><div class="rv">${t.i} ${t.n}</div></div><div class="ri2"><div class="rl">Data</div><div class="rv">📅 ${fd(b.data)}</div></div><div class="ri2"><div class="rl">Horário</div><div class="rv">⏰ ${b.hora}</div></div><div class="ri2"><div class="rl">Modalidade</div><div class="rv">${mmap[b.modal]||b.modal}</div></div><div class="ri2"><div class="rl">Protocolo</div><div class="rv" style="font-family:monospace;font-size:11px">${b.id}</div></div>`;
