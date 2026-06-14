@@ -391,8 +391,8 @@ tr:hover td{background:#f8fafc!important}
   </div>
   <div class="cnt" style="padding-top:14px;display:flex;flex-direction:column;gap:9px">
     <button class="hbtn" onclick="go('s-type')"><div class="hbtn-ic" style="background:#eff6ff">📅</div><div><h3>Agendar Atendimento</h3><p>Escolha o tipo e horário disponível</p></div><span class="hbtn-arr">›</span></button>
-    <button class="hbtn" onclick="go('s-type');qtype('documentos')"><div class="hbtn-ic" style="background:#f0fdf4">📄</div><div><h3>Enviar Documentos</h3><p>Anexe documentos ao seu caso</p></div><span class="hbtn-arr">›</span></button>
-    <button class="hbtn" onclick="go('s-type');qtype('andamento')"><div class="hbtn-ic" style="background:#faf5ff">⚖️</div><div><h3>Andamento do Processo</h3><p>Atualize-se sobre seu caso</p></div><span class="hbtn-arr">›</span></button>
+    <button class="hbtn" onclick="selType('documentos')"><div class="hbtn-ic" style="background:#f0fdf4">📄</div><div><h3>Enviar Documentos</h3><p>Anexe documentos ao seu caso</p></div><span class="hbtn-arr">›</span></button>
+    <button class="hbtn" onclick="selType('andamento')"><div class="hbtn-ic" style="background:#faf5ff">⚖️</div><div><h3>Andamento do Processo</h3><p>Atualize-se sobre seu caso</p></div><span class="hbtn-arr">›</span></button>
     <a href="https://wa.me/5521965348183?text=Olá!%20Gostaria%20de%20falar%20com%20o%20escritório." target="_blank" class="hbtn"><div class="hbtn-ic" style="background:#f0fdf4">💬</div><div><h3>Falar com o Escritório</h3><p>WhatsApp (21) 96534-8183</p></div><span class="hbtn-arr">›</span></a>
     <div class="al al-warn" style="font-size:11px">⚠️ <strong>Importante:</strong> O agendamento não representa contratação automática. A análise depende dos documentos e fatos apresentados.</div>
   </div>
@@ -627,6 +627,7 @@ const BT={
   duvidas:{n:'Dúvidas Jurídicas',i:'❓',d:20},
   retorno:{n:'Retorno de Atendimento',i:'🔄',d:20},
   andamento:{n:'Andamento de Processo',i:'⚖️',d:20},
+  documentos:{n:'Envio de Documentos',i:'📄',d:15},
 };
 const SS={
   solicitado:{l:'Solicitado',c:'b-req',kb:'#eff6ff',kt:'#1d4ed8'},
@@ -641,7 +642,7 @@ const SS={
 };
 const AREAS=['Direito Previdenciário','BPC/LOAS','Direito dos Autistas','Direito Trabalhista','Direito Civil','Direito de Família','Direito do Consumidor','Direito de Trânsito','Direito Tributário','Direito do Idoso','ECA','Contratos','Imobiliário','Tributário','Empresarial','Outros'];
 const HRS=['10:00','10:30','11:00','11:30','12:00','12:30','13:00','13:30','14:00','14:30','15:00','15:30','16:00','16:30','17:00','17:30'];
-const TC={primeiro:'#2563eb',duvidas:'#d97706',retorno:'#6b7280',andamento:'#7c3aed'};
+const TC={primeiro:'#2563eb',duvidas:'#d97706',retorno:'#6b7280',andamento:'#7c3aed',documentos:'#16a34a'};
 
 // ═══════════════════════════════════════════════════════════════════
 // STATE — helpers primeiro (sem dependências externas)
@@ -770,7 +771,16 @@ function go(id){
 }
 function goAdmin(){
   document.querySelectorAll('.sc').forEach(s=>s.classList.remove('on'));
-  document.getElementById('ls').style.display='flex';
+  document.getElementById('admin-app').style.display='none';
+  const ls=document.getElementById('ls');
+  ls.style.display='flex';
+  ls.style.alignItems='center';
+  ls.style.justifyContent='center';
+  // limpar campos de login para nova tentativa
+  const le=document.getElementById('lemail'),lp=document.getElementById('lpwd');
+  if(le)le.value=''; if(lp)lp.value='';
+  const err=document.getElementById('lerr');
+  if(err)err.style.display='none';
 }
 function showApp(){
   document.querySelectorAll('.sc').forEach(s=>s.classList.remove('on'));
@@ -794,11 +804,21 @@ document.addEventListener('keydown',e=>{if(e.key==='Escape')document.querySelect
 // AUTH
 // ═══════════════════════════════════════════════════════════════════
 function doLogin(){
-  const email=document.getElementById('lemail').value.trim().toLowerCase();
-  const pwd=document.getElementById('lpwd').value;
+  const email=(document.getElementById('lemail').value||'').trim().toLowerCase();
+  const pwd=(document.getElementById('lpwd').value||'');
+  if(!email||!pwd){document.getElementById('lerr').textContent='Preencha e-mail e senha.';document.getElementById('lerr').style.display='block';return;}
   const u=users.find(x=>x.email.toLowerCase()===email&&x.pwd===pwd&&x.ativo);
-  if(!u){document.getElementById('lerr').style.display='block';return;}
-  currentUser=u;localStorage.setItem('sa_sess',u.id);showApp();
+  if(!u){
+    document.getElementById('lerr').textContent='E-mail ou senha incorretos.';
+    document.getElementById('lerr').style.display='block';
+    document.getElementById('lpwd').value='';
+    document.getElementById('lpwd').focus();
+    return;
+  }
+  document.getElementById('lerr').style.display='none';
+  currentUser=u;
+  localStorage.setItem('sa_sess',String(u.id));
+  showApp();
 }
 function doLogout(){closeMo('m-umenu');localStorage.removeItem('sa_sess');location.reload();}
 function showUserMenu(){
@@ -2249,8 +2269,14 @@ function showPending(){const p=bk.filter(b=>b.status==='solicitado');if(!p.lengt
 // ═══════════════════════════════════════════════════════════════════
 // PUBLIC BOOKING FLOW
 // ═══════════════════════════════════════════════════════════════════
-function qtype(t){setTimeout(()=>selType(t),100);}
+function qtype(t){
+  // Se já estamos na tela de tipos, selecionar direto
+  const st=document.getElementById('s-type');
+  if(st&&st.classList.contains('on')){selType(t);}
+  else{go('s-type');setTimeout(()=>selType(t),80);}
+}
 function selType(t){
+  if(!BT[t]){console.warn('Tipo inválido:',t);t='primeiro';}
   app={type:t,step:0,nome:'',cpf:'',tel:'',email:'',cidade:'',estado:'',area:'',resumo:'',modal:'whatsapp',data:'',hora:'',extra:{},files:[],lgpd:false};
   selDate=null;selTime=null;calM=new Date().getMonth();calY=new Date().getFullYear();
   go('s-form');renderStep(0);
@@ -2279,13 +2305,11 @@ function rStep0(){
 }
 function rStep1(){
   const t=app.type;let extra='';
-  if(t==='andamento')extra=`<div class="fg"><div class="fl">Nº do Processo</div><input class="fi" id="e-num" value="${app.extra.num||''}" placeholder="0000000-00.0000.8.00.0000"></div><div class="fg"><div class="fl">Parte Contrária</div><input class="fi" id="e-contra" value="${app.extra.contra||''}" placeholder="Se souber"></div>`;
-  else if(t==='previdenciario')extra=`<div class="fg"><div class="fl">Benefício Desejado *</div><select class="fsel" id="e-benef"><option value="">Selecione</option>${['Aposentadoria','Auxílio-doença','Aposentadoria por incapacidade','BPC/LOAS','Pensão por morte','Auxílio-acidente','Revisão de benefício','Outro'].map(x=>`<option>${x}</option>`).join('')}</select></div><div class="fg"><div class="fl">Já recebe benefício INSS?</div><select class="fsel" id="e-recebe"><option>Não</option><option>Sim</option></select></div>`;
-  else if(t==='trabalhista')extra=`<div class="fg"><div class="fl">Empresa *</div><input class="fi" id="e-emp" value="${app.extra.emp||''}" placeholder="Nome da empresa"></div><div class="frow"><div class="fg"><div class="fl">Admissão</div><input class="fi" type="date" id="e-adm"></div><div class="fg"><div class="fl">Demissão</div><input class="fi" type="date" id="e-dem"></div></div><div class="fg"><div class="fl">Assunto *</div><select class="fsel" id="e-tasst"><option value="">Selecione</option>${['Verbas rescisórias','Horas extras','Assédio moral','Acidente de trabalho','Reconhecimento de vínculo','FGTS','Insalubridade/periculosidade','Outro'].map(x=>`<option>${x}</option>`).join('')}</select></div>`;
-  else if(t==='consumidor')extra=`<div class="fg"><div class="fl">Empresa Envolvida *</div><input class="fi" id="e-cemp" value="${app.extra.emp||''}" placeholder="Nome da empresa"></div><div class="frow"><div class="fg"><div class="fl">Data do Problema</div><input class="fi" type="date" id="e-cdat"></div><div class="fg"><div class="fl">Valor Envolvido</div><input class="fi" id="e-cval" placeholder="R$ 0,00"></div></div><div class="fg"><div class="fl">Tipo</div><select class="fsel" id="e-ctip"><option value="">Selecione</option>${['Banco','Energia elétrica','Telefonia/internet','Produto com defeito','Cobrança indevida','Plano de saúde','Outro'].map(x=>`<option>${x}</option>`).join('')}</select></div>`;
-  else if(t==='autista')extra=`<div class="fg"><div class="fl">Nome do Beneficiário</div><input class="fi" id="e-bnm" placeholder="Nome da pessoa beneficiária"></div><div class="frow"><div class="fg"><div class="fl">Idade</div><input class="fi" type="number" id="e-id" placeholder="0"></div><div class="fg"><div class="fl">Diagnóstico</div><input class="fi" id="e-diag" placeholder="Ex: TEA Nível 2"></div></div><div class="fg"><div class="fl">Possui laudo?</div><select class="fsel" id="e-ldo"><option>Sim</option><option>Não</option><option>Em andamento</option></select></div><div class="fg"><div class="fl">Pedido no INSS?</div><select class="fsel" id="e-inss"><option>Não</option><option>Sim — em análise</option><option>Sim — negado</option></select></div>`;
-  else if(t==='documentos')extra=`<div class="fg"><div class="fl">Tipo de Documento *</div><input class="fi" id="e-tdoc" placeholder="Ex: CNIS, laudo médico..."></div>`;
-  else if(t==='retorno')extra=`<div class="fg"><div class="fl">Data do Último Atendimento</div><input class="fi" type="date" id="e-ult"></div><div class="fg"><div class="fl">Assunto do Retorno *</div><input class="fi" id="e-assr" placeholder="O que deseja tratar?"></div>`;
+  if(t==='andamento')extra=`<div class="fg"><div class="fl">Nº do Processo (se souber)</div><input class="fi" id="e-num" value="${app.extra.num||''}" placeholder="0000000-00.0000.8.00.0000"></div><div class="fg"><div class="fl">Parte Contrária (opcional)</div><input class="fi" id="e-contra" value="${app.extra.contra||''}" placeholder="Se souber"></div>`;
+  else if(t==='documentos')extra=`<div class="fg"><div class="fl">Tipo de Documento *</div><select class="fsel" id="e-tdoc"><option value="">Selecione o tipo</option>${['CNIS / Histórico INSS','Laudo médico','Carteira de Trabalho (CTPS)','Contrato de trabalho','Termo de rescisão','Nota fiscal / Recibo','Contrato de prestação de serviços','Boleto / Comprovante de pagamento','Documento pessoal (RG/CPF)','Sentença / Decisão judicial','Procuração','Outro documento'].map(x=>`<option>${x}</option>`).join('')}</select></div><div class="fg"><div class="fl">Complemento (opcional)</div><input class="fi" id="e-tdoc-obs" placeholder="Descreva se necessário"></div>`;
+  else if(t==='retorno')extra=`<div class="fg"><div class="fl">Data do Último Atendimento</div><input class="fi" type="date" id="e-ult"></div><div class="fg"><div class="fl">Assunto do Retorno *</div><input class="fi" id="e-assr" placeholder="O que deseja tratar neste retorno?"></div>`;
+  else if(t==='duvidas')extra=`<div class="fg"><div class="fl">Área da Dúvida</div><select class="fsel" id="e-aduvida"><option value="">Selecione</option>${['Trabalhista','Previdenciário/INSS','Consumidor','Família','Cível','Tributário','Outro'].map(x=>`<option>${x}</option>`).join('')}</select></div>`;
+  else if(t==='primeiro')extra=`<div class="fg"><div class="fl">Como nos encontrou?</div><select class="fsel" id="e-origem"><option value="">Selecione</option>${['Indicação de amigo/familiar','Google','Instagram','WhatsApp','Outro'].map(x=>`<option>${x}</option>`).join('')}</select></div>`;
   return`<div class="stit">Detalhes do Caso</div>
   <div class="fg"><div class="fl">Área Jurídica *</div><select class="fsel" id="f-area"><option value="">Selecione a área</option>${AREAS.map(a=>`<option ${app.area===a?'selected':''}>${a}</option>`).join('')}</select></div>
   ${extra}
@@ -2357,16 +2381,25 @@ function s0next(){
   renderStep(1);
 }
 function s1next(){
-  const area=gi('f-area'),res=gi('f-res').trim();if(!area||!res){alert('Preencha a área jurídica e o resumo.');return;}
+  const area=gi('f-area'),res=gi('f-res').trim();
+  if(!area||!res){alert('Preencha a área jurídica e o resumo do caso.');return;}
   app.area=area;app.resumo=res;
   const t=app.type;
-  if(t==='andamento')app.extra={...app.extra,num:gi('e-num'),contra:gi('e-contra')};
-  else if(t==='previdenciario'){const b=gi('e-benef');if(!b){alert('Selecione o benefício.');return;}app.extra={...app.extra,benef:b,recebe:gi('e-recebe')};}
-  else if(t==='trabalhista'){const e=gi('e-emp');if(!e){alert('Informe a empresa.');return;}app.extra={...app.extra,emp:e,adm:gi('e-adm'),dem:gi('e-dem'),tasst:gi('e-tasst')};}
-  else if(t==='consumidor'){const e=gi('e-cemp');if(!e){alert('Informe a empresa envolvida.');return;}app.extra={...app.extra,emp:e,cdat:gi('e-cdat'),cval:gi('e-cval'),ctip:gi('e-ctip')};}
-  else if(t==='autista')app.extra={...app.extra,bnm:gi('e-bnm'),id_:gi('e-id'),diag:gi('e-diag'),ldo:gi('e-ldo'),inss:gi('e-inss')};
-  else if(t==='documentos'){const d=gi('e-tdoc');if(!d){alert('Informe o tipo de documento.');return;}app.extra={...app.extra,tdoc:d};}
-  else if(t==='retorno'){const a=gi('e-assr');if(!a){alert('Informe o assunto do retorno.');return;}app.extra={...app.extra,ult:gi('e-ult'),assr:a};}
+  if(t==='andamento'){
+    app.extra={...app.extra,num:gi('e-num'),contra:gi('e-contra')};
+  } else if(t==='documentos'){
+    const d=gi('e-tdoc');
+    if(!d){alert('Selecione o tipo de documento.');return;}
+    app.extra={...app.extra,tdoc:d,obs:gi('e-tdoc-obs')};
+  } else if(t==='retorno'){
+    const a=gi('e-assr');
+    if(!a){alert('Informe o assunto do retorno.');return;}
+    app.extra={...app.extra,ult:gi('e-ult'),assr:a};
+  } else if(t==='duvidas'){
+    app.extra={...app.extra,aduvida:gi('e-aduvida')};
+  } else if(t==='primeiro'){
+    app.extra={...app.extra,origem:gi('e-origem')};
+  }
   renderStep(2);
 }
 function s2next(){if(!selDate||!selTime){alert('Selecione data e horário.');return;}app.data=selDate;app.hora=selTime;renderStep(3);}
@@ -2432,9 +2465,15 @@ function expICS(){
 // INIT
 // ═══════════════════════════════════════════════════════════════════
 document.addEventListener('DOMContentLoaded',()=>{
-  load();
-  const sid=+localStorage.getItem('sa_sess');
-  if(sid){const u=users.find(x=>x.id===sid&&x.ativo);if(u){currentUser=u;showApp();return;}}
+  try{ load(); } catch(e){ console.error('Erro ao carregar dados:',e); }
+  // garantir users[] populado
+  if(!users||!users.length) users=D_USERS;
+  // restaurar sessão anterior
+  const sid=parseInt(localStorage.getItem('sa_sess')||'0',10);
+  if(sid>0){
+    const u=users.find(x=>x.id===sid&&x.ativo);
+    if(u){ currentUser=u; showApp(); return; }
+  }
   go('s-home');
 });
 </script>
