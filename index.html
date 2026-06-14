@@ -360,51 +360,49 @@ tr:hover td{background:#f8fafc!important}
 ═══════════════════════════════════════════════ */
 #ls{position:fixed;inset:0;background:linear-gradient(135deg,#0f2444,var(--n) 50%,#2563eb);display:none;align-items:center;justify-content:center;z-index:9999;padding:16px}
 #ls.on{display:flex;align-items:center;justify-content:center}
+.lb{background:#fff;border-radius:16px;padding:28px 24px;width:100%;max-width:400px;text-align:center;box-shadow:0 25px 60px rgba(0,0,0,.35)}
+.urole{display:inline-block;padding:2px 8px;border-radius:10px;font-size:10px;font-weight:700}
 .r-admin{background:#fef2f2;color:#991b1b;border:1px solid #fecaca}
 .r-advogado{background:#eff6ff;color:#1d4ed8;border:1px solid #bfdbfe}
 .r-estagiario{background:#f0fdf4;color:#166534;border:1px solid #bbf7d0}
 .r-colaborador{background:#fffbeb;color:#92400e;border:1px solid #fde68a}
 .r-financeiro{background:#f5f3ff;color:#5b21b6;border:1px solid #ddd6fe}
-.pay-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(200px,1fr));gap:12px;margin:12px 0}
-.pay-card{background:var(--wh);border-radius:12px;border:1px solid var(--bd);padding:16px;display:flex;flex-direction:column;gap:8px;box-shadow:0 2px 8px rgba(0,0,0,.06)}
-.pay-card:hover{border-color:var(--g);box-shadow:0 4px 12px rgba(0,0,0,.1)}
-.pay-icon{font-size:28px;line-height:1}
-.pay-label{font-size:10px;font-weight:800;text-transform:uppercase;letter-spacing:.6px;color:var(--mu)}
-.pay-info{font-size:12px;color:var(--tx);line-height:1.5}
-.pay-btn{display:inline-flex;align-items:center;justify-content:center;gap:5px;padding:8px 14px;background:linear-gradient(135deg,#11c76f,#21D07A);color:#fff;border-radius:8px;font-size:12px;font-weight:700;text-decoration:none;border:none;cursor:pointer;transition:opacity .15s}
-.pay-btn:hover{opacity:.88}
-.pay-pix{background:linear-gradient(135deg,#32BCAD,#11c76f)}
-.pay-cc{background:linear-gradient(135deg,#2563eb,#3b82f6)}
-.pay-cd{background:linear-gradient(135deg,#7c3aed,#8b5cf6)}
-.pay-ted{background:linear-gradient(135deg,#d97706,#f59e0b)}
 .r-atendente{background:#ecfeff;color:#155e75;border:1px solid #a5f3fc}
 .r-personalizado{background:#f8fafc;color:#475569;border:1px solid #cbd5e1}
-.urole{display:inline-block;padding:2px 8px;border-radius:10px;font-size:10px;font-weight:700}
-.perm-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(190px,1fr));gap:8px;margin:10px 0}
+.perm-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(180px,1fr));gap:8px;margin:10px 0}
 .perm-mod{background:#f8fafc;border:1px solid var(--bd);border-radius:8px;padding:10px}
 .perm-mod-title{font-size:10px;font-weight:800;text-transform:uppercase;letter-spacing:.6px;color:var(--n);margin-bottom:8px}
 .perm-row{display:flex;align-items:center;justify-content:space-between;padding:3px 0;font-size:11px}
-.ptog{position:relative;width:34px;height:18px;cursor:pointer}
-.ptog input{opacity:0;width:0;height:0}
+.ptog{position:relative;width:34px;height:18px;cursor:pointer}.ptog input{opacity:0;width:0;height:0}
 .pslider{position:absolute;inset:0;background:#cbd5e1;border-radius:9px;transition:.2s}
 .ptog input:checked+.pslider{background:var(--gr)}
 .pslider::before{content:'';position:absolute;height:14px;width:14px;left:2px;bottom:2px;background:#fff;border-radius:50%;transition:.2s}
 .ptog input:checked+.pslider::before{transform:translateX(16px)}
-.log-row{display:grid;grid-template-columns:100px 1fr 1fr 70px;gap:4px;padding:5px 8px;border-bottom:1px solid var(--bd);font-size:11px;align-items:center}
-.log-row:hover{background:#f8fafc}
-.sync-ok{color:#16a34a;font-size:11px}
-.sync-err{color:#dc2626;font-size:11px}
-.sync-warn{color:#d97706;font-size:11px}
-.sync-load{color:#6b7280;font-size:11px}
-.lb{background:#fff;border-radius:16px;padding:28px 24px;width:100%;max-width:420px;text-align:center;box-shadow:0 25px 60px rgba(0,0,0,.35)}
-.user-chips{display:flex;flex-wrap:wrap;gap:8px;justify-content:center;margin:12px 0}
-.uchip-login{display:flex;flex-direction:column;align-items:center;gap:4px;padding:10px 12px;background:#f8fafc;border:1.5px solid var(--bd);border-radius:10px;cursor:pointer;transition:all .14s;min-width:80px;text-decoration:none}
-.uchip-login:hover,.uchip-login.sel{border-color:var(--g);background:var(--gb)}
-.uchip-login .av{width:36px;height:36px;font-size:13px}
-.uchip-login .ucn{font-size:10px;font-weight:700;color:var(--n);margin-top:2px;max-width:80px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
-.uchip-login .ucp{font-size:9px;color:var(--mu)}
-.login-divider{display:flex;align-items:center;gap:8px;margin:10px 0;color:var(--mu);font-size:11px}
-.login-divider::before,.login-divider::after{content:'';flex:1;height:1px;background:var(--bd)}
+.log-row{display:grid;grid-template-columns:100px 1fr 1fr 70px;gap:4px;padding:5px 8px;border-bottom:1px solid var(--bd);font-size:11px}
+.sync-ok{color:#16a34a;font-size:11px}.sync-err{color:#dc2626;font-size:11px}.sync-warn{color:#d97706;font-size:11px}.sync-load{color:#6b7280;font-size:11px}
+.pay-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(200px,1fr));gap:12px;margin:12px 0}
+.pay-card{background:var(--wh);border-radius:12px;border:1px solid var(--bd);padding:16px;display:flex;flex-direction:column;gap:8px;box-shadow:0 2px 8px rgba(0,0,0,.06)}
+.pay-icon{font-size:28px}.pay-label{font-size:10px;font-weight:800;text-transform:uppercase;letter-spacing:.6px;color:var(--mu)}
+.pay-info{font-size:12px;color:var(--tx);line-height:1.5}
+.pay-btn{display:inline-flex;align-items:center;justify-content:center;padding:8px 14px;background:linear-gradient(135deg,#11c76f,#21D07A);color:#fff;border-radius:8px;font-size:12px;font-weight:700;text-decoration:none;border:none;cursor:pointer}
+/* IA Chat */
+.ia-bubble{max-width:80%;padding:10px 14px;border-radius:14px;font-size:13px;line-height:1.5;margin-bottom:8px}
+.ia-bubble.ia{background:#f0f4ff;color:#1e3a5f;border-bottom-left-radius:4px}
+.ia-bubble.usr{background:var(--g);color:#fff;border-bottom-right-radius:4px;align-self:flex-end}
+.ia-messages{display:flex;flex-direction:column;padding:16px;height:360px;overflow-y:auto;gap:4px}
+.ia-typing{display:flex;gap:4px;padding:8px 12px;align-items:center}
+.ia-dot{width:6px;height:6px;background:#94a3b8;border-radius:50%;animation:iabounce .8s infinite alternate}
+.ia-dot:nth-child(2){animation-delay:.2s}.ia-dot:nth-child(3){animation-delay:.4s}
+@keyframes iabounce{to{transform:translateY(-4px);background:var(--g)}}
+/* User chips login */
+.user-chips{display:flex;flex-wrap:wrap;gap:8px;justify-content:center;margin:10px 0}
+.uchip{display:flex;flex-direction:column;align-items:center;gap:3px;padding:8px 10px;background:#f8fafc;border:1.5px solid var(--bd);border-radius:10px;cursor:pointer;transition:all .14s;min-width:70px}
+.uchip:hover,.uchip.sel{border-color:var(--g);background:#f0fdf4}
+.uchip .av{width:32px;height:32px;font-size:11px}
+.uchip .ucn{font-size:10px;font-weight:700;color:var(--n);max-width:70px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.uchip .ucp{font-size:9px;color:var(--mu)}
+.login-div{display:flex;align-items:center;gap:8px;margin:8px 0;color:var(--mu);font-size:11px}
+.login-div::before,.login-div::after{content:'';flex:1;height:1px;background:var(--bd)}
 .lb .ico{font-size:42px;margin-bottom:8px}.lb h2{font-size:18px;font-weight:700;color:var(--n);margin-bottom:3px}
 .lb .sub{font-size:12px;color:var(--mu);margin-bottom:22px}
 .lerr{color:#dc2626;font-size:12px;margin-bottom:8px;display:none;text-align:left;padding:6px 8px;background:#fef2f2;border-radius:6px}
@@ -490,47 +488,23 @@ tr:hover td{background:#f8fafc!important}
 <!-- LOGIN -->
 <div id="ls">
   <div class="lb">
-    <svg viewBox="0 0 70 70" width="44" height="44" fill="none" style="margin:0 auto 8px;display:block">
-      <polygon points="35,4 62,19 62,51 35,66 8,51 8,19" fill="#060e22" stroke="rgba(200,169,106,0.3)" stroke-width="1.5"/>
-      <polygon points="35,27 40,30 40,40 35,43 30,40 30,30" fill="#C8A96A"/>
-    </svg>
-    <h2 style="font-size:16px;font-weight:700;color:#0B1A3B;margin-bottom:2px">Marcus Souza I Advogado</h2>
-    <p class="sub" style="margin-bottom:16px">Sistema de Gestão Jurídica</p>
-
-    <!-- Seletor rápido — preenchido dinamicamente via renderUserChips() -->
-    <div id="user-chips-wrap" style="display:none;margin-bottom:12px">
-      <div style="font-size:10px;color:#7A7D8E;margin-bottom:7px;font-weight:700;text-transform:uppercase;letter-spacing:.5px">Acessar como</div>
-      <div class="user-chips" id="user-chips"></div>
-      <div class="login-divider">ou entre com e-mail e senha</div>
+    <div class="ico">⚖️</div>
+    <h2 style="font-size:16px;margin-bottom:2px">Marcus Souza I Advogado</h2>
+    <p class="sub" style="margin-bottom:14px;font-size:11px">Sistema de Gestão Jurídica</p>
+    <div id="uchips-wrap" style="display:none;margin-bottom:10px">
+      <div style="font-size:10px;color:var(--mu);margin-bottom:6px;font-weight:700;text-transform:uppercase">Acessar como</div>
+      <div class="user-chips" id="uchips"></div>
+      <div class="login-div">ou entre com e-mail</div>
     </div>
-
-    <input type="email" id="lemail" class="fi" placeholder="E-mail de acesso"
-      style="text-align:left;margin-bottom:8px"
-      onkeydown="if(event.key==='Enter')document.getElementById('lpwd').focus()"
-      oninput="selectChipByEmail(this.value)">
+    <input type="email" id="lemail" class="fi" placeholder="E-mail de acesso" style="text-align:left;margin-bottom:8px" onkeydown="if(event.key==='Enter')document.getElementById('lpwd').focus()">
     <div style="position:relative">
-      <input type="password" id="lpwd" class="fi" placeholder="Senha"
-        onkeydown="if(event.key==='Enter')doLogin()"
-        style="padding-right:42px">
-      <button type="button" onclick="togglePwd('lpwd',this)"
-        style="position:absolute;right:10px;top:50%;transform:translateY(-50%);background:none;border:none;cursor:pointer;font-size:16px;color:var(--mu);padding:4px;line-height:1"
-        title="Mostrar/ocultar senha">👁️</button>
+      <input type="password" id="lpwd" class="fi" placeholder="Senha" onkeydown="if(event.key==='Enter')doLogin()" style="padding-right:42px">
+      <button type="button" onclick="togglePwd('lpwd',this)" style="position:absolute;right:10px;top:50%;transform:translateY(-50%);background:none;border:none;cursor:pointer;font-size:16px;color:var(--mu);padding:4px">👁️</button>
     </div>
-
     <div class="lerr" id="lerr" style="display:none;margin-top:8px"></div>
-
-    <button class="btn bgold" style="width:100%;padding:12px;margin-top:10px;font-size:14px;letter-spacing:.3px" onclick="doLogin()">
-      Entrar no Sistema
-    </button>
-    <button onclick="go('s-home')" style="margin-top:10px;background:none;border:none;color:var(--mu);cursor:pointer;font-size:12px;width:100%">
-      ‹ Voltar ao Site
-    </button>
-    <button onclick="resetAndLogin()" style="margin-top:6px;background:none;border:1px solid rgba(200,169,106,.25);color:rgba(200,169,106,.7);cursor:pointer;font-size:10px;width:100%;padding:6px;border-radius:7px">
-      🔄 Problemas para entrar?
-    </button>
-    <button onclick="importarAcessos()" style="margin-top:4px;background:none;border:1px solid rgba(200,169,106,.2);color:rgba(200,169,106,.6);cursor:pointer;font-size:10px;width:100%;padding:6px;border-radius:7px">
-      📲 Primeiro acesso neste aparelho? Importar acessos
-    </button>
+    <button class="btn bgold" style="width:100%;padding:12px;margin-top:10px;font-size:14px" onclick="doLogin()">Entrar no Sistema</button>
+    <button onclick="go('s-home')" style="margin-top:10px;background:none;border:none;color:var(--mu);cursor:pointer;font-size:12px;width:100%">‹ Voltar ao Site</button>
+    <button onclick="importarAcessos()" style="margin-top:5px;background:none;border:1px solid rgba(200,169,106,.25);color:rgba(200,169,106,.7);cursor:pointer;font-size:10px;width:100%;padding:6px;border-radius:7px">📲 Primeiro acesso neste aparelho?</button>
   </div>
 </div>
 
@@ -574,6 +548,7 @@ tr:hover td{background:#f8fafc!important}
     <button class="atab" onclick="aTab('busca',this)">🔎 Busca Proc.</button>
     <button class="atab" id="tab-users-btn" onclick="aTab('usuarios',this)">👤 Usuários</button>
     <button class="atab" id="tab-acessos-btn" onclick="aTab('acessos',this)">🔐 Controle Acesso</button>
+    <button class="atab" onclick="aTab('ia',this)">🤖 Assistente IA</button>
     <button class="atab" onclick="aTab('gcal',this)">🔗 Google Cal</button>
     <button class="atab" onclick="aTab('config',this)">⚙️ Config</button>
   </div>
@@ -636,7 +611,7 @@ tr:hover td{background:#f8fafc!important}
   <h3>💰 <span id="m-fin-t">Novo Lançamento</span></h3>
   <input type="hidden" id="fin-id">
   <div class="frow"><div class="ff"><div class="fl">Cliente *</div><select id="fin-cli"></select></div><div class="ff" style="flex:2"><div class="fl">Descrição *</div><input id="fin-desc" placeholder="Ex: Honorários – Ação Trabalhista"></div><div class="ff"><div class="fl">Data</div><input type="date" id="fin-data"></div></div>
-  <div class="frow"><div class="ff"><div class="fl">Valor Contratado (R$)</div><input type="number" id="fin-ct" min="0" step="0.01"></div><div class="ff"><div class="fl">Valor Recebido (R$)</div><input type="number" id="fin-rc" min="0" step="0.01"></div><div class="ff"><div class="fl">Pagamento</div><select id="fin-pg"><option>PIX</option><option>Cartão de Crédito</option><option>Cartão de Débito</option><option>Transferência Bancária</option><option>Boleto</option><option>Parcelado</option><option>Dinheiro</option></select></div><div class="ff"><div class="fl">Status</div><select id="fin-st"><option>Pago</option><option>Parcial</option><option>Pendente</option></select></div></div>
+  <div class="frow"><div class="ff"><div class="fl">Valor Contratado (R$)</div><input type="number" id="fin-ct" min="0" step="0.01"></div><div class="ff"><div class="fl">Valor Recebido (R$)</div><input type="number" id="fin-rc" min="0" step="0.01"></div><div class="ff"><div class="fl">Pagamento</div><select id="fin-pg"><option>PIX</option><option>Transferência</option><option>Boleto</option><option>Parcelado</option><option>Dinheiro</option><option>Cartão</option></select></div><div class="ff"><div class="fl">Status</div><select id="fin-st"><option>Pago</option><option>Parcial</option><option>Pendente</option></select></div></div>
   <div class="mfoot"><button class="btn bp" onclick="saveFin()">💾 Salvar</button><button class="btn bgh" onclick="closeMo('m-fin')">Cancelar</button></div>
 </div></div>
 
@@ -675,91 +650,14 @@ tr:hover td{background:#f8fafc!important}
 </div></div>
 
 <!-- Modal: Usuário -->
-<div class="mo-desk" id="m-user"><div class="mbox" style="max-width:540px">
+<div class="mo-desk" id="m-user"><div class="mbox">
   <h3>👤 <span id="m-user-t">Novo Usuário</span></h3>
   <input type="hidden" id="user-id">
-
-  <!-- Identificação -->
-  <div class="stit" style="margin-bottom:8px">Identificação</div>
-  <div class="frow">
-    <div class="ff" style="flex:2">
-      <div class="fl">Nome Completo *</div>
-      <input id="user-nome" placeholder="Dr. Nome Sobrenome" class="fi">
-    </div>
-    <div class="ff">
-      <div class="fl">Cargo / Função</div>
-      <input id="user-cargo" placeholder="Ex: Advogado Sócio" class="fi">
-    </div>
-  </div>
-  <div class="frow">
-    <div class="ff">
-      <div class="fl">OAB (opcional)</div>
-      <input id="user-oab" placeholder="OAB/RJ 000.000" class="fi">
-    </div>
-    <div class="ff">
-      <div class="fl">Telefone</div>
-      <input id="user-tel" placeholder="(21) 99999-9999" class="fi">
-    </div>
-  </div>
-
-  <!-- Acesso -->
-  <div class="stit" style="margin:12px 0 8px">Credenciais de Acesso</div>
-  <div class="frow">
-    <div class="ff" style="flex:2">
-      <div class="fl">E-mail * (usado no login)</div>
-      <input type="email" id="user-email" placeholder="email@souzaadv.com" class="fi">
-    </div>
-    <div class="ff">
-      <div class="fl">Perfil de Acesso *</div>
-      <select id="user-role" class="fsel" onchange="updateRoleDesc()">
-        <option value="admin">👑 Administrador</option>
-        <option value="advogado">⚖️ Advogado</option>
-        <option value="estagiario">🎓 Estagiário</option>
-        <option value="colaborador">🗂️ Colaborador Administrativo</option>
-        <option value="financeiro">💰 Financeiro</option>
-        <option value="atendente">📞 Atendente</option>
-        <option value="personalizado">🔧 Usuário Personalizado</option>
-      </select>
-    </div>
-  </div>
-  <div class="frow">
-    <div class="ff">
-      <div class="fl">Senha * <span id="user-pwd-hint" style="font-size:10px;color:var(--mu)">(deixe em branco para manter)</span></div>
-      <div style="position:relative">
-        <input type="password" id="user-pwd" placeholder="Mínimo 6 caracteres" class="fi" oninput="checkPwdMatch()" style="padding-right:42px">
-        <button type="button" onclick="togglePwd('user-pwd',this)"
-          style="position:absolute;right:10px;top:50%;transform:translateY(-50%);background:none;border:none;cursor:pointer;font-size:16px;color:var(--mu);padding:4px;line-height:1"
-          title="Mostrar/ocultar">👁️</button>
-      </div>
-    </div>
-    <div class="ff">
-      <div class="fl">Confirmar Senha</div>
-      <div style="position:relative">
-        <input type="password" id="user-pwd2" placeholder="Repetir senha" class="fi" oninput="checkPwdMatch()" style="padding-right:42px">
-        <button type="button" onclick="togglePwd('user-pwd2',this)"
-          style="position:absolute;right:10px;top:50%;transform:translateY(-50%);background:none;border:none;cursor:pointer;font-size:16px;color:var(--mu);padding:4px;line-height:1"
-          title="Mostrar/ocultar">👁️</button>
-      </div>
-      <div id="pwd-match" style="font-size:10px;margin-top:3px"></div>
-    </div>
-  </div>
-  <div class="frow">
-    <div class="ff">
-      <div class="fl">Status</div>
-      <select id="user-ativo" class="fsel">
-        <option value="1">✅ Ativo</option>
-        <option value="0">🔒 Inativo / Bloqueado</option>
-      </select>
-    </div>
-    <div class="ff" id="user-role-desc" style="background:#f8fafc;border:1px solid var(--bd);border-radius:8px;padding:8px;font-size:11px;color:var(--mu)">
-      Selecione um perfil para ver as permissões.
-    </div>
-  </div>
-
-  <div class="mfoot">
-    <button class="btn bp" onclick="saveUser()">💾 Salvar Usuário</button>
-    <button class="btn bgh" onclick="closeMo('m-user')">Cancelar</button>
-  </div>
+  <div class="frow"><div class="ff" style="flex:2"><div class="fl">Nome Completo *</div><input id="user-nome" placeholder="Dr. Nome Sobrenome"></div><div class="ff"><div class="fl">Cargo</div><input id="user-cargo" placeholder="Ex: Advogado, Estagiário..."></div></div>
+  <div class="frow"><div class="ff" style="flex:2"><div class="fl">E-mail *</div><input type="email" id="user-email" placeholder="email@souzaadv.com"></div><div class="ff"><div class="fl">Telefone</div><input id="user-tel" placeholder="(21) 99999-9999"></div></div>
+  <div class="frow"><div class="ff"><div class="fl">OAB</div><input id="user-oab" placeholder="OAB/RJ 000.000"></div><div class="ff"><div class="fl">Senha *</div><input type="password" id="user-pwd" placeholder="Mínimo 6 caracteres"></div><div class="ff"><div class="fl">Função</div><select id="user-role"><option value="advogado">Advogado</option><option value="colaborador">Colaborador</option><option value="estagiario">Estagiário</option><option value="admin">Administrador</option></select></div></div>
+  <div class="frow"><div class="ff"><div class="fl">Status</div><select id="user-ativo"><option value="1">Ativo</option><option value="0">Inativo</option></select></div></div>
+  <div class="mfoot"><button class="btn bp" onclick="saveUser()">💾 Salvar</button><button class="btn bgh" onclick="closeMo('m-user')">Cancelar</button></div>
 </div></div>
 
 <!-- Modal: Menu Usuário -->
@@ -822,42 +720,34 @@ const cn=id=>(cli.find(c=>c.id===+id)||{}).nome||'—';
 // GESTÃO JURÍDICA CONSTANTS — após td0, dt() e currentUser
 // ═══════════════════════════════════════════════════════════════════
 const ROLES={
-  admin:{l:'Administrador',cls:'r-admin',
-    cli:{v:1,c:1,e:1,d:1},proc:{v:1,c:1,e:1,d:1},age:{v:1,c:1,e:1,d:1},
-    fin:{v:1,c:1,e:1,d:1},tar:{v:1,c:1,e:1,d:1},rel:{v:1},cfg:{v:1,e:1},usr:{v:1,c:1,e:1,d:1},
-    e:1,del:1,fin_:1,usr_:1,cfg_:1},
-  advogado:{l:'Advogado',cls:'r-advogado',
-    cli:{v:1,c:1,e:1,d:0},proc:{v:1,c:1,e:1,d:0},age:{v:1,c:1,e:1,d:0},
-    fin:{v:1,c:1,e:1,d:0},tar:{v:1,c:1,e:1,d:0},rel:{v:1},cfg:{v:0,e:0},usr:{v:0,c:0,e:0,d:0},
-    e:1,del:0,fin_:1,usr_:0,cfg_:0},
-  estagiario:{l:'Estagiário',cls:'r-estagiario',
-    cli:{v:1,c:0,e:0,d:0},proc:{v:1,c:0,e:0,d:0},age:{v:1,c:0,e:0,d:0},
-    fin:{v:0,c:0,e:0,d:0},tar:{v:1,c:1,e:0,d:0},rel:{v:0},cfg:{v:0,e:0},usr:{v:0,c:0,e:0,d:0},
-    e:0,del:0,fin_:0,usr_:0,cfg_:0},
-  colaborador:{l:'Colaborador Administrativo',cls:'r-colaborador',
-    cli:{v:1,c:1,e:1,d:0},proc:{v:0,c:0,e:0,d:0},age:{v:1,c:1,e:1,d:1},
-    fin:{v:0,c:0,e:0,d:0},tar:{v:1,c:1,e:1,d:0},rel:{v:0},cfg:{v:0,e:0},usr:{v:0,c:0,e:0,d:0},
-    e:1,del:0,fin_:0,usr_:0,cfg_:0},
-  financeiro:{l:'Financeiro',cls:'r-financeiro',
-    cli:{v:1,c:0,e:0,d:0},proc:{v:0,c:0,e:0,d:0},age:{v:0,c:0,e:0,d:0},
-    fin:{v:1,c:1,e:1,d:0},tar:{v:1,c:0,e:0,d:0},rel:{v:1},cfg:{v:0,e:0},usr:{v:0,c:0,e:0,d:0},
-    e:0,del:0,fin_:1,usr_:0,cfg_:0},
-  atendente:{l:'Atendente',cls:'r-atendente',
-    cli:{v:1,c:1,e:0,d:0},proc:{v:0,c:0,e:0,d:0},age:{v:1,c:1,e:0,d:0},
-    fin:{v:0,c:0,e:0,d:0},tar:{v:1,c:0,e:0,d:0},rel:{v:0},cfg:{v:0,e:0},usr:{v:0,c:0,e:0,d:0},
-    e:0,del:0,fin_:0,usr_:0,cfg_:0},
-  personalizado:{l:'Usuário Personalizado',cls:'r-personalizado',
-    cli:{v:0,c:0,e:0,d:0},proc:{v:0,c:0,e:0,d:0},age:{v:0,c:0,e:0,d:0},
-    fin:{v:0,c:0,e:0,d:0},tar:{v:0,c:0,e:0,d:0},rel:{v:0},cfg:{v:0,e:0},usr:{v:0,c:0,e:0,d:0},
-    e:0,del:0,fin_:0,usr_:0,cfg_:0},
+  admin:{l:'Administrador',cls:'r-admin',cli:{v:1,c:1,e:1,d:1},proc:{v:1,c:1,e:1,d:1},age:{v:1,c:1,e:1,d:1},fin:{v:1,c:1,e:1,d:1},tar:{v:1,c:1,e:1,d:1},rel:{v:1},cfg:{v:1,e:1},usr:{v:1,c:1,e:1,d:1},e:1,del:1,fin_:1,usr_:1,cfg_:1},
+  advogado:{l:'Advogado',cls:'r-advogado',cli:{v:1,c:1,e:1,d:0},proc:{v:1,c:1,e:1,d:0},age:{v:1,c:1,e:1,d:0},fin:{v:1,c:1,e:1,d:0},tar:{v:1,c:1,e:1,d:0},rel:{v:1},cfg:{v:0,e:0},usr:{v:0,c:0,e:0,d:0},e:1,del:0,fin_:1,usr_:0,cfg_:0},
+  estagiario:{l:'Estagiário',cls:'r-estagiario',cli:{v:1,c:0,e:0,d:0},proc:{v:1,c:0,e:0,d:0},age:{v:1,c:0,e:0,d:0},fin:{v:0,c:0,e:0,d:0},tar:{v:1,c:1,e:0,d:0},rel:{v:0},cfg:{v:0,e:0},usr:{v:0,c:0,e:0,d:0},e:0,del:0,fin_:0,usr_:0,cfg_:0},
+  colaborador:{l:'Colaborador Administrativo',cls:'r-colaborador',cli:{v:1,c:1,e:1,d:0},proc:{v:0,c:0,e:0,d:0},age:{v:1,c:1,e:1,d:1},fin:{v:0,c:0,e:0,d:0},tar:{v:1,c:1,e:1,d:0},rel:{v:0},cfg:{v:0,e:0},usr:{v:0,c:0,e:0,d:0},e:1,del:0,fin_:0,usr_:0,cfg_:0},
+  financeiro:{l:'Financeiro',cls:'r-financeiro',cli:{v:1,c:0,e:0,d:0},proc:{v:0,c:0,e:0,d:0},age:{v:0,c:0,e:0,d:0},fin:{v:1,c:1,e:1,d:0},tar:{v:1,c:0,e:0,d:0},rel:{v:1},cfg:{v:0,e:0},usr:{v:0,c:0,e:0,d:0},e:0,del:0,fin_:1,usr_:0,cfg_:0},
+  atendente:{l:'Atendente',cls:'r-atendente',cli:{v:1,c:1,e:0,d:0},proc:{v:0,c:0,e:0,d:0},age:{v:1,c:1,e:0,d:0},fin:{v:0,c:0,e:0,d:0},tar:{v:1,c:0,e:0,d:0},rel:{v:0},cfg:{v:0,e:0},usr:{v:0,c:0,e:0,d:0},e:0,del:0,fin_:0,usr_:0,cfg_:0},
+  personalizado:{l:'Usuário Personalizado',cls:'r-personalizado',cli:{v:0,c:0,e:0,d:0},proc:{v:0,c:0,e:0,d:0},age:{v:0,c:0,e:0,d:0},fin:{v:0,c:0,e:0,d:0},tar:{v:0,c:0,e:0,d:0},rel:{v:0},cfg:{v:0,e:0},usr:{v:0,c:0,e:0,d:0},e:0,del:0,fin_:0,usr_:0,cfg_:0},
 };
 const perm=()=>{const b=ROLES[currentUser?.role]||ROLES.estagiario;if(currentUser?.customPerms){const r={...b};Object.keys(currentUser.customPerms).forEach(k=>{if(typeof r[k]==='object')r[k]={...r[k],...currentUser.customPerms[k]};else r[k]=currentUser.customPerms[k];});return r;}return b;};
 const can=(mod,act)=>{const p=perm();return !!(p[mod]&&p[mod][act]);};
-function denyAccess(area){document.getElementById('admin-cnt').innerHTML=`<div style="display:flex;flex-direction:column;align-items:center;justify-content:center;min-height:300px;gap:16px;text-align:center;padding:32px"><div style="font-size:56px">🔒</div><div style="font-size:18px;font-weight:700;color:var(--n)">Acesso Restrito</div><div style="max-width:400px;font-size:13px;color:var(--mu);line-height:1.6">Você não possui autorização para acessar <b>${area}</b>.<br>Solicite liberação ao administrador.</div></div>`;}
+function denyAccess(area){document.getElementById('admin-cnt').innerHTML=`<div style="display:flex;flex-direction:column;align-items:center;justify-content:center;min-height:300px;gap:16px;text-align:center;padding:32px"><div style="font-size:56px">&#128274;</div><div style="font-size:18px;font-weight:700">Acesso Restrito</div><div style="max-width:400px;font-size:13px;color:var(--mu)">Você não possui autorização para acessar <b>${area}</b>.<br>Solicite liberação ao administrador.</div></div>`;}
 let accessLog=[];
-function logAccess(mod,acao,negado=false){const e={id:Date.now(),usuario:currentUser?.nome||'—',perfil:ROLES[currentUser?.role]?.l||'—',data:new Date().toLocaleDateString('pt-BR'),hora:new Date().toLocaleTimeString('pt-BR',{hour:'2-digit',minute:'2-digit'}),mod,acao,negado};accessLog.unshift(e);if(accessLog.length>300)accessLog=accessLog.slice(0,300);try{localStorage.setItem('sa_log',JSON.stringify(accessLog.slice(0,100)));}catch(e){}}
+function logAccess(mod,acao,negado=false){const e={id:Date.now(),usuario:currentUser?.nome||'',perfil:ROLES[currentUser?.role]?.l||'',data:new Date().toLocaleDateString('pt-BR'),hora:new Date().toLocaleTimeString('pt-BR',{hour:'2-digit',minute:'2-digit'}),mod,acao,negado};accessLog.unshift(e);if(accessLog.length>300)accessLog=accessLog.slice(0,300);try{localStorage.setItem('sa_log',JSON.stringify(accessLog.slice(0,100)));}catch(e){}}
 function loadLog(){try{const d=localStorage.getItem('sa_log');if(d)accessLog=JSON.parse(d);}catch(e){}}
 function deepMerge(b,o){const r={...b};Object.keys(o||{}).forEach(k=>{if(typeof o[k]==='object'&&!Array.isArray(o[k]))r[k]={...(b[k]||{}),...o[k]};else r[k]=o[k];});return r;}
+// Pagamento
+const PAYMENT={picpay:'https://link.picpay.com/p/17814621996a2ef4b7697a2',pix:'adv.souzamarcus@gmail.com',banco:'PicPay (380)',ag:'0001',cc:'93530512-2',fav:'Marcus Souza'};
+function copyPayLink(){navigator.clipboard?.writeText(PAYMENT.picpay).then(()=>alert('Link copiado!'));}
+function copyPixKey(){navigator.clipboard?.writeText(PAYMENT.pix).then(()=>alert('Chave PIX copiada!'));}
+function copyBankData(){navigator.clipboard?.writeText('Banco '+PAYMENT.banco+' | Ag: '+PAYMENT.ag+' | CC: '+PAYMENT.cc+' | '+PAYMENT.fav).then(()=>alert('Dados copiados!'));}
+// Chips de usuário no login
+function renderUserChips(){const wrap=document.getElementById('uchips-wrap');const cont=document.getElementById('uchips');if(!wrap||!cont)return;const ativos=users.filter(u=>u.ativo);if(ativos.length<2){wrap.style.display='none';return;}wrap.style.display='block';cont.innerHTML=ativos.map(u=>`<div class="uchip" id="uc-${u.id}" onclick="selectChip(${u.id})"><div class="av" style="background:${ac(u.id)};color:#fff;width:32px;height:32px;font-size:11px">${initials(u.nome)}</div><div class="ucn">${esc(u.nome.split(' ')[0])}</div><div class="ucp">${ROLES[u.role]?.l||u.role}</div></div>`).join('');}
+function selectChip(uid){const u=users.find(x=>x.id===uid);if(!u)return;document.querySelectorAll('.uchip').forEach(c=>c.classList.remove('sel'));document.getElementById('uc-'+uid)?.classList.add('sel');const le=document.getElementById('lemail');const lp=document.getElementById('lpwd');if(le)le.value=u.email;if(lp){lp.value='';lp.focus();}}
+// Sincronização entre aparelhos
+function exportarDados(){const d={v:2,at:new Date().toISOString(),by:currentUser?.nome,users:users.map(u=>({...u})),cli,proc,tar,fin};const a=document.createElement('a');a.href='data:application/json;charset=utf-8,'+encodeURIComponent(JSON.stringify(d,null,2));a.download='sistema-'+td0+'.json';a.click();}
+function importarDados(){const inp=document.createElement('input');inp.type='file';inp.accept='.json';inp.onchange=async e=>{const f=e.target.files[0];if(!f)return;try{const d=JSON.parse(await f.text());if(!d.v||!d.users?.length){alert('Arquivo inválido.');return;}if(!confirm('Importar dados? Os dados locais serão substituídos.'))return;users=d.users;if(d.cli)cli=d.cli;if(d.proc)proc=d.proc;if(d.tar)tar=d.tar;if(d.fin)fin=d.fin;['users','cli','proc','tar','fin'].forEach(k=>localStorage.setItem('sa_'+k,JSON.stringify(k==='users'?users:k==='cli'?cli:k==='proc'?proc:k==='tar'?tar:fin)));alert('Dados importados! Faça o login.');location.reload();}catch(err){alert('Erro: '+err.message);}};inp.click();}
+function exportarAcessos(){const d={v:2,t:'acessos',at:new Date().toISOString(),users:users.map(u=>({...u}))};const b64=btoa(unescape(encodeURIComponent(JSON.stringify(d))));navigator.clipboard?.writeText(b64).then(()=>alert('Código copiado! Cole no outro aparelho em "Importar acessos".'));}
+function importarAcessos(){const c=prompt('Cole o código de acessos:','');if(!c)return;try{const d=JSON.parse(decodeURIComponent(escape(atob(c.trim()))));if(!d.users||d.t!=='acessos'){alert('Código inválido.');return;}users=d.users;localStorage.setItem('sa_users',JSON.stringify(users));alert('Acessos importados! Faça o login.');location.reload();}catch(e){alert('Código inválido.');}}
 const avatarColor=['#3b82f6','#16a34a','#d97706','#9333ea','#ef4444','#0ea5e9','#f59e0b'];
 const ac=id=>avatarColor[id%avatarColor.length];
 const initials=n=>n.split(' ').filter(Boolean).slice(0,2).map(w=>w[0].toUpperCase()).join('');
@@ -900,14 +790,12 @@ const D_FIN=[
 let bk=[], gcfg={
   key:'AIzaSyDHFr7UvhP3SCH2yJy1YE7IVeDroqryKSU',
   calId:'adv.souzamarcus@gmail.com',
-  script:'',
-  on:false,
+  script:'',on:false,
   serviceEmail:'escritorio-app@logical-bolt-499415-t9.iam.gserviceaccount.com',
-  projectId:'logical-bolt-499415-t9',
   calEmbedUrl:'https://calendar.google.com/calendar/embed?src=adv.souzamarcus%40gmail.com&ctz=America%2FSao_Paulo',
   calIcsUrl:'https://calendar.google.com/calendar/ical/adv.souzamarcus%40gmail.com/public/basic.ics',
   calIcsPriv:'https://calendar.google.com/calendar/ical/adv.souzamarcus%40gmail.com/private-236753512d79bbf560da21cc4142dcc8/basic.ics',
-  calSubscribe:'https://calendar.google.com/calendar/u/1?cid=YWR2LnNvdXphbWFyY3VzQGdtYWlsLmNvbQ',
+  calSub:'https://calendar.google.com/calendar/u/1?cid=YWR2LnNvdXphbWFyY3VzQGdtYWlsLmNvbQ',
 }, gcEvt=[];
 // UI state
 let aTabCur='dash', calV=new Date(), selD=null;
@@ -967,8 +855,7 @@ function seedBk(){
 function go(id){
   document.querySelectorAll('.sc').forEach(s=>s.classList.remove('on'));
   document.getElementById('admin-app').style.display='none';
-  const ls=document.getElementById('ls');
-  ls.classList.remove('on');ls.style.display='none';
+  const ls=document.getElementById('ls');ls.classList.remove('on');ls.style.display='none';
   const s=document.getElementById(id);if(s){s.classList.add('on');s.scrollTop=0;}
 }
 function goAdmin(){
@@ -978,48 +865,13 @@ function goAdmin(){
   ls.classList.add('on');ls.style.display='flex';
   ls.style.alignItems='center';ls.style.justifyContent='center';
   const le=document.getElementById('lemail'),lp=document.getElementById('lpwd'),er=document.getElementById('lerr');
-  if(le){le.value='';setTimeout(()=>{renderUserChips();le.focus();},80);}
-  if(lp)lp.value='';if(er)er.style.display='none';
-}
-
-// Renderiza chips de usuários ativos na tela de login
-function renderUserChips(){
-  const wrap=document.getElementById('user-chips-wrap');
-  const cont=document.getElementById('user-chips');
-  if(!wrap||!cont)return;
-  const ativos=users.filter(u=>u.ativo);
-  if(ativos.length<2){wrap.style.display='none';return;}
-  wrap.style.display='block';
-  cont.innerHTML=ativos.map(u=>`
-    <div class="uchip-login" id="chip-${u.id}" onclick="selectChip(${u.id})">
-      <div class="av" style="background:${ac(u.id)};color:#fff;width:36px;height:36px;font-size:13px">${initials(u.nome)}</div>
-      <div class="ucn">${u.nome.split(' ').slice(0,2).join(' ')}</div>
-      <div class="ucp">${ROLES[u.role]?.l||u.role}</div>
-    </div>`).join('');
-}
-
-// Seleciona usuário pelo chip e preenche o e-mail
-function selectChip(uid){
-  const u=users.find(x=>x.id===uid);if(!u)return;
-  document.querySelectorAll('.uchip-login').forEach(c=>c.classList.remove('sel'));
-  const chip=document.getElementById('chip-'+uid);
-  if(chip)chip.classList.add('sel');
-  const le=document.getElementById('lemail');
-  const lp=document.getElementById('lpwd');
-  if(le)le.value=u.email;
-  if(lp){lp.value='';lp.focus();}
-}
-
-// Destaca o chip quando e-mail é digitado manualmente
-function selectChipByEmail(email){
-  document.querySelectorAll('.uchip-login').forEach(c=>c.classList.remove('sel'));
-  const u=users.find(x=>x.email.toLowerCase()===email.toLowerCase());
-  if(u){const chip=document.getElementById('chip-'+u.id);if(chip)chip.classList.add('sel');}
+  if(le){le.value='';setTimeout(()=>le.focus(),80);}if(lp)lp.value='';
+  if(er)er.style.display='none';
+  renderUserChips();
 }
 function showApp(){
   document.querySelectorAll('.sc').forEach(s=>s.classList.remove('on'));
-  const ls=document.getElementById('ls');
-  ls.classList.remove('on');ls.style.display='none';
+  const ls=document.getElementById('ls');ls.classList.remove('on');ls.style.display='none';
   document.getElementById('admin-app').style.display='block';
   const nm=currentUser.nome;
   document.getElementById('uname').textContent=nm.split(' ')[1]?'Dr. '+nm.split(' ').slice(-1)[0]:nm;
@@ -1030,6 +882,7 @@ function showApp(){
   const aceBtn=document.getElementById('tab-acessos-btn');
   if(aceBtn)aceBtn.style.display=currentUser?.role==='admin'?'':'none';
   startClock();updNotif();
+  setTimeout(djStartMonitor,2000);
   aTab('dash',document.querySelector('.atab'));
 }
 function openMo(id){document.getElementById(id).classList.add('on');}
@@ -1044,44 +897,25 @@ function doLogin(){
   const email=(document.getElementById('lemail').value||'').trim().toLowerCase();
   const pwd=(document.getElementById('lpwd').value||'');
   const lerr=document.getElementById('lerr');
-  if(!email||!pwd){
-    lerr.innerHTML='Preencha e-mail e senha.';
-    lerr.style.display='block';return;
-  }
+  if(!email||!pwd){lerr.innerHTML='Preencha e-mail e senha.';lerr.style.display='block';return;}
   if(!users||!users.length)users=D_USERS;
-  if(!users.some(u=>u.email==='marcus@souzaadv.com'&&u.ativo)){
-    users=D_USERS;localStorage.removeItem('sa_users');
-  }
+  if(!users.some(u=>u.email==='marcus@souzaadv.com'&&u.ativo)){users=D_USERS;localStorage.removeItem('sa_users');}
   const byEmail=users.find(x=>x.email.toLowerCase()===email);
   const u=byEmail&&byEmail.pwd===pwd&&byEmail.ativo?byEmail:null;
   if(!u){
-    if(!byEmail){
-      lerr.innerHTML='❌ E-mail não cadastrado.<br><span style="font-size:10px">Verifique ou contate o administrador.</span>';
-    }else if(byEmail&&!byEmail.ativo){
-      lerr.innerHTML='🔒 Usuário bloqueado.<br><span style="font-size:10px">Contate o administrador para reativar.</span>';
-    }else{
-      lerr.innerHTML='❌ Senha incorreta.<br><span style="font-size:10px">Tente novamente.</span>';
-    }
+    if(!byEmail) lerr.innerHTML='&#10060; E-mail não cadastrado.';
+    else if(!byEmail.ativo) lerr.innerHTML='&#128274; Usuário bloqueado.';
+    else lerr.innerHTML='&#10060; Senha incorreta.';
     lerr.style.display='block';
     document.getElementById('lpwd').value='';
     document.getElementById('lpwd').focus();
     return;
   }
   lerr.style.display='none';
-  currentUser=u;
-  localStorage.setItem('sa_sess',String(u.id));
-  showApp();
+  currentUser=u;localStorage.setItem('sa_sess',String(u.id));showApp();
 }
 function doLogout(){closeMo('m-umenu');djStopMonitor();localStorage.removeItem('sa_sess');location.reload();}
-
-// Alternar visibilidade da senha
-function togglePwd(fieldId, btn){
-  const f=document.getElementById(fieldId);if(!f)return;
-  const show=f.type==='password';
-  f.type=show?'text':'password';
-  btn.textContent=show?'🙈':'👁️';
-  btn.title=show?'Ocultar senha':'Mostrar senha';
-}
+function togglePwd(fid,btn){const f=document.getElementById(fid);if(!f)return;const s=f.type==='password';f.type=s?'text':'password';btn.textContent=s?'🙈':'👁️';}
 function showUserMenu(){
   document.getElementById('umenu-info').innerHTML=`
     <div style="display:flex;align-items:center;gap:10px;margin-bottom:10px">
@@ -1107,13 +941,13 @@ function aTab(tab,btn){
   if(btn)btn.classList.add('on');
   const guards={clientes:()=>can('cli','v'),processos:()=>can('proc','v'),financeiro:()=>can('fin','v'),tarefas:()=>can('tar','v'),comunicacoes:()=>can('cli','v'),usuarios:()=>can('usr','v'),config:()=>can('cfg','v')};
   const gl={clientes:'Clientes',processos:'Processos',financeiro:'Financeiro',tarefas:'Tarefas',comunicacoes:'Comunicações',usuarios:'Usuários',config:'Configurações'};
-  if(guards[tab]&&!guards[tab]()){logAccess(tab,'acesso negado',true);denyAccess(gl[tab]||tab);return;}
+  if(guards[tab]&&!guards[tab]()){logAccess(tab,'negado',true);denyAccess(gl[tab]||tab);return;}
   const r={
     dash:renderDash,clientes:renderCli,processos:renderProc,tarefas:renderTar,
     semana:renderSem,calmes:renderCal,financeiro:renderFin,comunicacoes:renderCom,
     agenda:renderAgenda,agcal:renderAgCal,kanban:renderKanban,agendamentos:renderAgendamentos,
-    metricas:renderMetricas,busca:renderBusca,usuarios:renderUsers,gcal:renderGCal,config:renderConfig,
-    acessos:renderAcessos
+    metricas:renderMetricas,busca:renderBusca,usuarios:renderUsers,gcal:renderGCal,
+    config:renderConfig,acessos:renderAcessos,ia:renderIA
   };
   document.getElementById('admin-cnt').innerHTML='';
   logAccess(tab,'visualizar');
@@ -1226,24 +1060,14 @@ function renderProc(){
   </div>
   <div class="card"><div style="font-size:11px;color:var(--mu);margin-bottom:7px">🔴 Atrasado | 🟡 Vence ≤7 dias | 🟢 OK</div>
   <div class="tw"><table>
-    <div style="display:flex;gap:8px;margin-bottom:8px;flex-wrap:wrap;align-items:center">
-      <button class="btn bsa bsm" onclick="djSyncAll()" id="proc-sync-btn">⚡ Sync Datajud</button>
-      <span id="proc-sync-st" style="font-size:11px;color:var(--mu)"></span>
-    </div>
-    <thead><tr><th>Nº Processo</th><th>Cliente</th><th>Área</th><th>Vara</th><th>Status</th><th>Próx. Mov.</th><th>Adv.</th><th>⚡ Datajud</th><th>Ações</th></tr></thead>
+    <thead><tr><th>Nº Processo</th><th>Cliente</th><th>Área</th><th>Vara</th><th>Status</th><th>Início</th><th>Próx. Mov.</th><th>Advogado</th><th>Obs.</th><th>Ações</th></tr></thead>
     <tbody>${filt.map(r=>`<tr class="${isPast(r.prox)&&r.status==='Em andamento'?'late':''}">
-      <td class="mono" style="font-size:10px">${r.num}</td>
-      <td style="font-weight:600;white-space:nowrap;font-size:12px">${cn(r.cliId)}</td>
-      <td>${badge(r.tipo,'bb')}</td><td style="font-size:11px">${r.vara||'—'}</td>
-      <td>${sbadge(r.status)}</td>
+      <td class="mono">${r.num}</td><td style="font-weight:600;white-space:nowrap">${cn(r.cliId)}</td>
+      <td>${badge(r.tipo,'bb')}</td><td style="font-size:11px">${r.vara}</td>
+      <td>${sbadge(r.status)}</td><td style="font-size:11px;white-space:nowrap">${fmtD(r.ini)}</td>
       <td style="white-space:nowrap">${dcolor(r.prox,r.status==='Em andamento')}</td>
-      <td style="font-size:11px;white-space:nowrap">${r.adv||'—'}</td>
-      <td style="min-width:160px">
-        <div style="display:flex;align-items:flex-start;gap:4px">
-          <button class="btn bsa xs" style="flex-shrink:0" onclick="event.stopPropagation();djSyncProc(${r.id},'${r.num}','dj-${r.id}')" title="Consultar Datajud">⚡</button>
-          <span id="dj-${r.id}" style="font-size:10px;line-height:1.4">${r.djMov?`<span class="sync-ok">✅ ${esc((r.djMov).substring(0,22))}</span><br><span style="font-size:9px;color:var(--mu)">${r.djSyncAt||''}</span>`:'<span class="sync-load">—</span>'}</span>
-        </div>
-      </td>
+      <td style="font-size:11px;white-space:nowrap">${r.adv}</td>
+      <td class="eli" style="font-size:11px;color:var(--mu)">${r.obs||'—'}</td>
       <td><div style="display:flex;gap:3px">
         ${r.prox?`<button class="btn bca xs" onclick="addProcToCalendar(${r.id})">📅</button>`:''}
         <button class="btn bsa xs" onclick="searchProcNum('${r.num}','${r.vara}')">🔍</button>
@@ -1384,61 +1208,7 @@ function renderFin(){
   const filt=fin.filter(f=>!q||f.desc.toLowerCase().includes(q)||cn(f.cliId).toLowerCase().includes(q));
   const totC=fin.reduce((s,f)=>s+(+f.ct||0),0),totR=fin.reduce((s,f)=>s+(+f.rc||0),0),totP=totC-totR;
   let html=`<div class="krow">${kc('#eff6ff',fmt(totC),'#2563eb','Total Contratado')}${kc('#f0fdf4',fmt(totR),'#16a34a','Total Recebido')}${kc(totP>0?'#fef2f2':'#f8fafc',fmt(totP),totP>0?'#dc2626':'#94a3b8','A Receber')}${kc('#faf5ff',(totC>0?Math.round(totR/totC*100):0)+'%','#7c3aed','Taxa Recebimento')}</div>`;
-
-  // ── FORMAS DE PAGAMENTO ──────────────────────────────────────────
-  html+=`
-  <div class="card" style="margin-bottom:12px">
-    <div class="stit">💳 Formas de Pagamento</div>
-    <div class="pay-grid">
-
-      <div class="pay-card">
-        <div class="pay-icon">💳</div>
-        <div class="pay-label">Cartão de Crédito</div>
-        <div class="pay-info">Parcelamento disponível<br>Link seguro via PicPay</div>
-        <a href="https://link.picpay.com/p/17814621996a2ef4b7697a2" target="_blank" class="pay-btn pay-cc">💳 Pagar com Crédito</a>
-      </div>
-
-      <div class="pay-card">
-        <div class="pay-icon">💳</div>
-        <div class="pay-label">Cartão de Débito</div>
-        <div class="pay-info">Débito à vista<br>Link seguro via PicPay</div>
-        <a href="https://link.picpay.com/p/17814621996a2ef4b7697a2" target="_blank" class="pay-btn pay-cd">💳 Pagar com Débito</a>
-      </div>
-
-      <div class="pay-card">
-        <div class="pay-icon">⚡</div>
-        <div class="pay-label">PIX</div>
-        <div class="pay-info">Chave PIX:<br><strong style="font-family:monospace;font-size:11px">adv.souzamarcus@gmail.com</strong><br><span style="font-size:10px;color:var(--mu)">ou use o link PicPay</span></div>
-        <div style="display:flex;gap:6px;flex-wrap:wrap">
-          <button onclick="navigator.clipboard.writeText('adv.souzamarcus@gmail.com').then(()=>alert('✅ Chave PIX copiada!'))" class="pay-btn pay-pix" style="flex:1;font-size:11px">📋 Copiar Chave</button>
-          <a href="https://link.picpay.com/p/17814621996a2ef4b7697a2" target="_blank" class="pay-btn pay-pix" style="flex:1;font-size:11px">⚡ Link PIX</a>
-        </div>
-      </div>
-
-      <div class="pay-card">
-        <div class="pay-icon">🏦</div>
-        <div class="pay-label">Transferência Bancária (TED/DOC)</div>
-        <div class="pay-info">
-          <strong>Banco PicPay · Cód. 380</strong><br>
-          Agência: <strong>0001</strong><br>
-          Conta Corrente: <strong>93530512-2</strong><br>
-          Favorecido: <strong>Marcus Souza</strong><br>
-          <span style="font-size:10px;color:var(--mu)">Envie o comprovante por WhatsApp</span>
-        </div>
-        <button onclick="navigator.clipboard.writeText('Banco PicPay · Cód. 380 | Agência: 0001 | CC: 93530512-2 | Marcus Souza').then(()=>alert('✅ Dados bancários copiados!'))" class="pay-btn pay-ted" style="font-size:11px">📋 Copiar Dados</button>
-      </div>
-
-    </div>
-
-    <div style="background:#f8fafc;border:1px solid var(--bd);border-radius:8px;padding:10px;margin-top:4px;font-size:11px;color:var(--mu)">
-      💡 <strong>Link de pagamento único:</strong>
-      <a href="https://link.picpay.com/p/17814621996a2ef4b7697a2" target="_blank" style="color:var(--bl);font-family:monospace;font-size:10px;word-break:break-all">https://link.picpay.com/p/17814621996a2ef4b7697a2</a>
-      <button onclick="navigator.clipboard.writeText('https://link.picpay.com/p/17814621996a2ef4b7697a2').then(()=>alert('✅ Link copiado!'))" class="btn bghost bsm" style="margin-left:6px;font-size:10px">📋 Copiar Link</button>
-    </div>
-  </div>`;
-  // ── LANÇAMENTOS ──────────────────────────────────────────────────
-  html+=`<div class="fbar"><input id="fin-q" style="max-width:240px" placeholder="🔍 Buscar..." value="${q}" oninput="renderFin()">${p.e?`<button class="btn bp" onclick="openFinModal()">+ Novo Lançamento</button>`:''}
-  </div>`;
+  html+=`<div class="fbar"><input id="fin-q" style="max-width:240px" placeholder="🔍 Buscar..." value="${q}" oninput="renderFin()">${p.e?`<button class="btn bp" onclick="openFinModal()">+ Novo Lançamento</button>`:''}</div>`;
   html+=`<div class="card"><div class="tw"><table><thead><tr><th>Cliente</th><th>Descrição</th><th>Data</th><th>Contratado</th><th>Recebido</th><th>Pendente</th><th>Pagamento</th><th>Status</th>${p.e?'<th>Ações</th>':''}</tr></thead><tbody>${filt.map(f=>{const pen=(+f.ct||0)-(+f.rc||0);return`<tr><td style="font-weight:600;white-space:nowrap">${cn(f.cliId)}</td><td>${f.desc}</td><td style="white-space:nowrap;font-size:11px">${fmtD(f.data)}</td><td style="font-weight:600;white-space:nowrap">${fmt(f.ct||0)}</td><td style="color:#16a34a;font-weight:600;white-space:nowrap">${fmt(f.rc||0)}</td><td style="color:${pen>0?'#dc2626':'#16a34a'};font-weight:600;white-space:nowrap">${fmt(pen)}</td><td>${f.pg}</td><td>${fsbadge(f.st)}</td>${p.e?`<td><div style="display:flex;gap:3px"><button class="btn bgh xs" onclick="editFin(${f.id})">✏️</button>${p.del?`<button class="btn bd_ xs" onclick="delFin(${f.id})">🗑️</button>`:''}</div></td>`:''}</tr>`;}).join('')}<tr style="background:#f1f5f9;font-weight:700"><td colspan="3">TOTAIS</td><td style="color:#2563eb;white-space:nowrap">${fmt(totC)}</td><td style="color:#16a34a;white-space:nowrap">${fmt(totR)}</td><td style="color:${totP>0?'#dc2626':'#16a34a'};white-space:nowrap">${fmt(totP)}</td><td colspan="${p.e?3:2}"></td></tr></tbody></table></div></div>`;
   document.getElementById('admin-cnt').innerHTML=html;
 }
@@ -1625,282 +1395,28 @@ function renderMetricas(){
 }
 
 // ═══════════════════════════════════════════════════════════════════
-// DATAJUD — API PÚBLICA CNJ (Pull only — Resolução 331/2020)
-// URL: POST https://api-publica.datajud.cnj.jus.br/{alias}/_search
-// Header: Authorization: APIKey {chave}
-// Body: {"query":{"match":{"numeroProcesso":"00000000000000000000"}}}
-// ═══════════════════════════════════════════════════════════════════
-const DJ_KEY  = 'cDZHYzlZa0JadVREZDJCendQbXY6SkJlTzNjLV9TRENyQk1RdnFKZGRQdw==';
-const DJ_BASE = 'https://api-publica.datajud.cnj.jus.br/';
-const DJ_EP = {
-  tjac:'api_publica_tjac',tjal:'api_publica_tjal',tjam:'api_publica_tjam',
-  tjap:'api_publica_tjap',tjba:'api_publica_tjba',tjce:'api_publica_tjce',
-  tjdft:'api_publica_tjdft',tjes:'api_publica_tjes',tjgo:'api_publica_tjgo',
-  tjma:'api_publica_tjma',tjmg:'api_publica_tjmg',tjms:'api_publica_tjms',
-  tjmt:'api_publica_tjmt',tjpa:'api_publica_tjpa',tjpb:'api_publica_tjpb',
-  tjpr:'api_publica_tjpr',tjpe:'api_publica_tjpe',tjpi:'api_publica_tjpi',
-  tjrj:'api_publica_tjrj',tjrn:'api_publica_tjrn',tjrs:'api_publica_tjrs',
-  tjro:'api_publica_tjro',tjrr:'api_publica_tjrr',tjsc:'api_publica_tjsc',
-  tjse:'api_publica_tjse',tjsp:'api_publica_tjsp',tjto:'api_publica_tjto',
-  trf1:'api_publica_trf1',trf2:'api_publica_trf2',trf3:'api_publica_trf3',
-  trf4:'api_publica_trf4',trf5:'api_publica_trf5',trf6:'api_publica_trf6',
-  trt1:'api_publica_trt1',trt2:'api_publica_trt2',trt3:'api_publica_trt3',
-  trt4:'api_publica_trt4',trt5:'api_publica_trt5',trt6:'api_publica_trt6',
-  trt7:'api_publica_trt7',trt8:'api_publica_trt8',trt9:'api_publica_trt9',
-  trt10:'api_publica_trt10',trt11:'api_publica_trt11',trt12:'api_publica_trt12',
-  trt13:'api_publica_trt13',trt14:'api_publica_trt14',trt15:'api_publica_trt15',
-  trt16:'api_publica_trt16',trt17:'api_publica_trt17',trt18:'api_publica_trt18',
-  trt19:'api_publica_trt19',trt20:'api_publica_trt20',trt21:'api_publica_trt21',
-  trt22:'api_publica_trt22',trt23:'api_publica_trt23',trt24:'api_publica_trt24',
-  tst:'api_publica_tst',stj:'api_publica_stj',tse:'api_publica_tse',stm:'api_publica_stm',
-};
+// DATAJUD API
+const DATAJUD_KEY='cDZHYzlZa0JadVREZDJCendQbXY6SkJlTzNjLV9TRENyQk1RdnFKZGRQdw==';
+const DATAJUD_BASE='https://api-publica.datajud.cnj.jus.br/';
+const DJ_EP={tjac:'api_publica_tjac',tjal:'api_publica_tjal',tjam:'api_publica_tjam',tjap:'api_publica_tjap',tjba:'api_publica_tjba',tjce:'api_publica_tjce',tjdft:'api_publica_tjdft',tjes:'api_publica_tjes',tjgo:'api_publica_tjgo',tjma:'api_publica_tjma',tjmg:'api_publica_tjmg',tjms:'api_publica_tjms',tjmt:'api_publica_tjmt',tjpa:'api_publica_tjpa',tjpb:'api_publica_tjpb',tjpr:'api_publica_tjpr',tjpe:'api_publica_tjpe',tjpi:'api_publica_tjpi',tjrj:'api_publica_tjrj',tjrn:'api_publica_tjrn',tjrs:'api_publica_tjrs',tjro:'api_publica_tjro',tjrr:'api_publica_tjrr',tjsc:'api_publica_tjsc',tjse:'api_publica_tjse',tjsp:'api_publica_tjsp',tjto:'api_publica_tjto',trf1:'api_publica_trf1',trf2:'api_publica_trf2',trf3:'api_publica_trf3',trf4:'api_publica_trf4',trf5:'api_publica_trf5',trf6:'api_publica_trf6',trt1:'api_publica_trt1',trt2:'api_publica_trt2',trt3:'api_publica_trt3',trt4:'api_publica_trt4',trt5:'api_publica_trt5',trt6:'api_publica_trt6',trt7:'api_publica_trt7',trt8:'api_publica_trt8',trt9:'api_publica_trt9',trt10:'api_publica_trt10',trt11:'api_publica_trt11',trt12:'api_publica_trt12',trt13:'api_publica_trt13',trt14:'api_publica_trt14',trt15:'api_publica_trt15',trt16:'api_publica_trt16',trt17:'api_publica_trt17',trt18:'api_publica_trt18',trt19:'api_publica_trt19',trt20:'api_publica_trt20',trt21:'api_publica_trt21',trt22:'api_publica_trt22',trt23:'api_publica_trt23',trt24:'api_publica_trt24',tst:'api_publica_tst',stj:'api_publica_stj',tse:'api_publica_tse',stm:'api_publica_stm'};
 function numRaw(n){return String(n||'').replace(/\D/g,'');}
-function fmtDJ(s){if(!s)return'—';if(/^\d{14}$/.test(String(s))){const v=String(s);return`${v.slice(6,8)}/${v.slice(4,6)}/${v.slice(0,4)}`;}try{return new Date(s).toLocaleDateString('pt-BR',{day:'2-digit',month:'2-digit',year:'numeric'});}catch(e){return String(s);}}
+function fmtDJ(s){if(!s)return'--';if(/^\d{14}$/.test(String(s))){const v=String(s);return v.slice(6,8)+'/'+v.slice(4,6)+'/'+v.slice(0,4);}try{return new Date(s).toLocaleDateString('pt-BR',{day:'2-digit',month:'2-digit',year:'numeric'});}catch(e){return String(s);}}
 function djAssuntos(raw){if(!raw||!raw.length)return[];const f=[];raw.forEach(a=>{if(Array.isArray(a))a.forEach(x=>{if(x&&x.nome)f.push(x);});else if(a&&a.nome)f.push(a);});return f;}
-function detectTribCNJ(num){
-  const d=num.replace(/\D/g,'');if(d.length!==20)return null;
-  const seg=d[13],tt=d.substring(14,16);
-  const m={'8':{'01':'tjac','02':'tjal','03':'tjam','04':'tjap','05':'tjba','06':'tjce','07':'tjdft','08':'tjes','09':'tjgo','10':'tjma','11':'tjmt','12':'tjms','13':'tjmg','14':'tjpa','15':'tjpb','16':'tjpr','17':'tjpe','18':'tjpi','19':'tjrj','20':'tjrn','21':'tjrs','22':'tjro','23':'tjrr','24':'tjsc','25':'tjse','26':'tjsp','27':'tjto'},
-   '9':{'01':'trt1','02':'trt2','03':'trt3','04':'trt4','05':'trt5','06':'trt6','07':'trt7','08':'trt8','09':'trt9','10':'trt10','11':'trt11','12':'trt12','13':'trt13','14':'trt14','15':'trt15','16':'trt16','17':'trt17','18':'trt18','19':'trt19','20':'trt20','21':'trt21','22':'trt22','23':'trt23','24':'trt24','00':'tst'},
-   '4':{'01':'trf1','02':'trf2','03':'trf3','04':'trf4','05':'trf5','06':'trf6'},
-   '3':{'00':'stj'},'2':{'00':'tse'},'6':{'00':'stm'}};
-  return(m[seg]&&m[seg][tt])||null;
+function detectTribCNJ(num){const d=num.replace(/\D/g,'');if(d.length!==20)return null;const seg=d[13],tt=d.substring(14,16);const m={'8':{'01':'tjac','02':'tjal','03':'tjam','04':'tjap','05':'tjba','06':'tjce','07':'tjdft','08':'tjes','09':'tjgo','10':'tjma','11':'tjmt','12':'tjms','13':'tjmg','14':'tjpa','15':'tjpb','16':'tjpr','17':'tjpe','18':'tjpi','19':'tjrj','20':'tjrn','21':'tjrs','22':'tjro','23':'tjrr','24':'tjsc','25':'tjse','26':'tjsp','27':'tjto'},'9':{'01':'trt1','02':'trt2','03':'trt3','04':'trt4','05':'trt5','06':'trt6','07':'trt7','08':'trt8','09':'trt9','10':'trt10','11':'trt11','12':'trt12','13':'trt13','14':'trt14','15':'trt15','16':'trt16','17':'trt17','18':'trt18','19':'trt19','20':'trt20','21':'trt21','22':'trt22','23':'trt23','24':'trt24','00':'tst'},'4':{'01':'trf1','02':'trf2','03':'trf3','04':'trf4','05':'trf5','06':'trf6'},'3':{'00':'stj'},'2':{'00':'tse'},'6':{'00':'stm'}};return(m[seg]&&m[seg][tt])||null;}
+function djErrMsg(status,msg){if(status===401||status===403)return'APIKey invalida. Atualize em datajud-wiki.cnj.jus.br';if(status===429)return'Limite de requisicoes. Aguarde.';if(status===502||status===503||status===504)return'Datajud indisponivel. Tente em alguns minutos.';if(msg&&(msg.includes('fetch')||msg.includes('network')))return'Sem conexao com a internet.';return msg||'Erro HTTP '+status;}
+async function djFetch(alias,body){const url=DATAJUD_BASE+alias+'/_search';for(let i=0;i<=1;i++){try{const ctrl=new AbortController();const tid=setTimeout(()=>ctrl.abort(),15000);const r=await fetch(url,{method:'POST',headers:{'Authorization':'APIKey '+DATAJUD_KEY,'Content-Type':'application/json'},body:JSON.stringify(body),signal:ctrl.signal});clearTimeout(tid);if(!r.ok){let m='';try{const j=await r.json();m=j.error?.reason||'';}catch(e){}throw{status:r.status,message:djErrMsg(r.status,m)};}return await r.json();}catch(e){if(i<1&&(e.name==='AbortError'||e.name==='TypeError')){await new Promise(r=>setTimeout(r,1000));continue;}throw new Error(e.message||djErrMsg(0,String(e)));}}
 }
-function djErrMsg(status,msg){
-  if(status===401||status===403)return'APIKey inválida ou expirada. Atualize em datajud-wiki.cnj.jus.br/api-publica/acesso/';
-  if(status===429)return'Limite de requisições atingido. Aguarde e tente novamente.';
-  if(status===502||status===503||status===504)return'API Datajud temporariamente indisponível. Tente em alguns minutos.';
-  if(msg&&(msg.includes('fetch')||msg.includes('network')))return'Sem conexão com a internet ou CORS bloqueado.';
-  if(msg&&msg.includes('timeout'))return'Timeout — API sobrecarregada.';
-  return msg||`HTTP ${status}`;
-}
-// Consulta principal — POST com match simples (padrão doc. CNJ)
-async function djFetch(alias,body,retries=1){
-  const url=`${DJ_BASE}${alias}/_search`;
-  for(let i=0;i<=retries;i++){
-    try{
-      const ctrl=new AbortController();
-      const tid=setTimeout(()=>ctrl.abort(),15000);
-      const r=await fetch(url,{method:'POST',headers:{'Authorization':`APIKey ${DJ_KEY}`,'Content-Type':'application/json'},body:JSON.stringify(body),signal:ctrl.signal});
-      clearTimeout(tid);
-      if(!r.ok){let m='';try{const j=await r.json();m=j.error?.reason||'';}catch(e){}throw{status:r.status,message:djErrMsg(r.status,m)};}
-      return await r.json();
-    }catch(e){if(i<retries&&(e.name==='AbortError'||e.name==='TypeError')){await new Promise(r=>setTimeout(r,1000*(i+1)));continue;}throw new Error(e.message||djErrMsg(0,String(e)));}
-  }
-}
-// Consulta por número CNJ — query match exata (doc. oficial CNJ)
-async function djConsultar(numProc){
-  const nd=numRaw(numProc);
-  if(nd.length!==20)throw new Error(`Número inválido: "${numProc}". Deve ter 20 dígitos. Formato: NNNNNNN-DD.AAAA.J.TT.OOOO`);
-  const trib=detectTribCNJ(numProc);
-  const alias=trib?DJ_EP[trib]:null;
-  if(!alias)throw new Error(`Tribunal não identificado. Verifique dígitos 14-15 (tribunal) e 13 (segmento) do número CNJ.`);
-  // Query exata conforme documentação CNJ — match simples com número sem máscara
-  const data=await djFetch(alias,{size:1,query:{match:{numeroProcesso:nd}}});
-  return{hits:data?.hits?.hits||[],trib,alias,nd};
-}
-// Sync de processo individual — atualiza célula na tabela e persiste
-async function djSyncProc(procId,numProc,cellId){
-  const cell=document.getElementById(cellId||`dj-${procId}`);
-  if(cell)cell.innerHTML='<span class="sync-load">⏳ consultando CNJ...</span>';
-  try{
-    const{hits,trib,nd}=await djConsultar(numProc);
-    if(!hits.length){
-      if(cell)cell.innerHTML=`<span class="sync-warn" title="Não encontrado no Datajud.\nCausas: sigilo (nivelSigilo>0), número incorreto, tribunal não indexado ou dado não enviado pelo tribunal.">⚠️ Não encontrado</span>`;
-      return;
-    }
-    const s=hits[0]._source;
-    const movs=(s.movimentos||[]).sort((a,b)=>new Date(b.dataHora)-new Date(a.dataHora));
-    const ult=movs[0];
-    const grauN={G1:'1º Grau',G2:'2º Grau',JE:'Juizado',TR:'Turma',SU:'Superior'}[s.grau]||s.grau||'';
-    if(cell)cell.innerHTML=ult
-      ?`<span class="sync-ok" title="Tribunal: ${trib?.toUpperCase()}\nÓrgão: ${esc(s.orgaoJulgador?.nome||'')}\nÚltimo mov.: ${esc(ult.nome)} (${fmtDJ(ult.dataHora)})\nAtualização Datajud: ${fmtDJ(s.dataHoraUltimaAtualizacao)}\nTotal movimentos: ${movs.length}">✅ ${esc((ult.nome||'').substring(0,26))}<br><span style="font-size:9px;color:var(--mu)">${fmtDJ(ult.dataHora)} · ${trib?.toUpperCase()||''}</span></span>`
-      :`<span class="sync-warn">Sem movimentos</span>`;
-    // Persistir dados no processo local
-    const pi=proc.findIndex(p=>numRaw(p.num)===nd);
-    if(pi>=0){proc[pi].djMov=ult?.nome||'';proc[pi].djMovDt=fmtDJ(ult?.dataHora);proc[pi].djSyncAt=new Date().toLocaleDateString('pt-BR');proc[pi].djGrau=grauN;proc[pi].djOrgao=s.orgaoJulgador?.nome||'';save();}
-    logAccess('processos',`sync OK: ${trib?.toUpperCase()||''} ${nd.substring(0,15)}`);
-  }catch(e){
-    const d=e.message||'Erro';
-    if(cell)cell.innerHTML=`<span class="sync-err" title="${esc(d)}\n\nVerifique:\n• Conexão com internet\n• Número CNJ (20 dígitos)\n• APIKey em datajud-wiki.cnj.jus.br">⚠️ ${esc(d.substring(0,28))}</span>`;
-  }
-}
-// Sync em lote — Pull manual de todos os processos ativos
-async function djSyncAll(){
-  const st=document.getElementById('proc-sync-st');
-  const btn=document.querySelector('[onclick*="djSyncAll"]');
-  const ativos=proc.filter(p=>p.status!=='Finalizado'&&p.status!=='Arquivado');
-  if(!ativos.length){if(st)st.textContent='Nenhum processo ativo.';return;}
-  if(btn){btn.disabled=true;btn.textContent='⏳ Consultando...';}
-  let ok=0,err=0;
-  for(let i=0;i<ativos.length;i++){
-    if(st)st.textContent=`⏳ ${i+1}/${ativos.length}`;
-    try{await djSyncProc(ativos[i].id,ativos[i].num);ok++;}catch(e){err++;}
-    await new Promise(r=>setTimeout(r,400));
-  }
-  if(btn){btn.disabled=false;btn.textContent='⚡ Sync Datajud';}
-  if(st)st.textContent=`✅ ${ok} OK${err?` · ⚠️ ${err} erro(s)`:''} — ${new Date().toLocaleTimeString('pt-BR',{hour:'2-digit',minute:'2-digit'})}`;
-  renderProc();
-}
-// Estado da aba Busca Processual
-let djLast=null,djAfter=null,djAlias=null,djQuery=null,djPage=0,djTotal=0;
+async function djConsultar(numProc){const nd=numRaw(numProc);if(nd.length!==20)throw new Error('Numero invalido: '+numProc+'. Deve ter 20 digitos.');const trib=detectTribCNJ(numProc);const alias=trib?DJ_EP[trib]:null;if(!alias)throw new Error('Tribunal nao identificado. Verifique os digitos 13-15 do numero CNJ.');const data=await djFetch(alias,{size:1,query:{match:{numeroProcesso:nd}}});return{hits:data?.hits?.hits||[],trib,alias,nd};}
+async function djSyncProc(procId,numProc,cellId){const cell=document.getElementById(cellId||'dj-'+procId);if(cell)cell.innerHTML='<span class="sync-load">&#9203; consultando...</span>';try{const{hits,trib,nd}=await djConsultar(numProc);if(!hits.length){if(cell)cell.innerHTML='<span class="sync-warn">&#9888; Nao encontrado</span>';return;}const s=hits[0]._source;const movs=(s.movimentos||[]).sort((a,b)=>new Date(b.dataHora)-new Date(a.dataHora));const ult=movs[0];const grauN={'G1':'1 Grau','G2':'2 Grau','JE':'Juizado'}[s.grau]||s.grau||'';if(cell)cell.innerHTML=ult?'<span class="sync-ok">&#10003; '+esc((ult.nome||'').substring(0,26))+'</span><br><span style="font-size:9px;color:var(--mu)">'+fmtDJ(ult.dataHora)+' &middot; '+(trib||'').toUpperCase()+'</span>':'<span class="sync-warn">Sem movimentos</span>';const pi=proc.findIndex(p=>numRaw(p.num)===nd);if(pi>=0){proc[pi].djMov=ult?.nome||'';proc[pi].djMovDt=fmtDJ(ult?.dataHora);proc[pi].djSyncAt=new Date().toLocaleDateString('pt-BR');save();}logAccess('processos','sync: '+nd.substring(0,15));}catch(e){if(cell)cell.innerHTML='<span class="sync-err" title="'+esc(e.message)+'">&#9888; '+esc((e.message||'Erro').substring(0,28))+'</span>';}}
+async function djSyncAll(){const st=document.getElementById('proc-sync-st');const ativos=proc.filter(p=>p.status!=='Finalizado');if(!ativos.length){if(st)st.textContent='Nenhum processo ativo.';return;}let ok=0,err=0;for(let i=0;i<ativos.length;i++){if(st)st.textContent=(i+1)+'/'+ativos.length;try{await djSyncProc(ativos[i].id,ativos[i].num);ok++;}catch(e){err++;}await new Promise(r=>setTimeout(r,400));}if(st)st.textContent='&#10003; '+ok+' OK'+(err?' &middot; &#9888; '+err+' erro(s)':'');renderProc();}
+let djMonTimer=null;
+function djStartMonitor(){djStopMonitor();djMonTimer=setInterval(async()=>{const ativos=proc.filter(p=>p.status!=='Finalizado');for(const p of ativos){try{const{hits,nd}=await djConsultar(p.num);if(!hits.length)continue;const s=hits[0]._source;const movs=(s.movimentos||[]).sort((a,b)=>new Date(b.dataHora)-new Date(a.dataHora));const ult=movs[0];const pi=proc.findIndex(x=>x.id===p.id);if(pi>=0&&ult?.nome&&ult.nome!==proc[pi].djMov){proc[pi].djMov=ult.nome;proc[pi].djMovDt=fmtDJ(ult.dataHora);proc[pi].djSyncAt=new Date().toLocaleDateString('pt-BR');save();logAccess('processos','novo movimento: '+ult.nome,false);}}catch(e){}await new Promise(r=>setTimeout(r,500));}},(4*60*60*1000));}
+function djStopMonitor(){if(djMonTimer){clearInterval(djMonTimer);djMonTimer=null;}}
 
-// ═══════════════════════════════════════════════════════════════════
 // BUSCA PROCESSUAL — DATAJUD API PÚBLICA CNJ (Resolução CNJ 331/2020)
 // ═══════════════════════════════════════════════════════════════════
 
 // ── Configuração ──────────────────────────────────────────────────
-const DATAJUD_KEY  = 'cDZHYzlZa0JadVREZDJCendQbXY6SkJlTzNjLV9TRENyQk1RdnFKZGRQdw==';
-const DATAJUD_BASE = 'https://api-publica.datajud.cnj.jus.br/';
-
-// ── Mapa tribunal → alias endpoint ────────────────────────────────
-const DJ_ENDPOINTS = {
-  // Estaduais
-  tjac:'api_publica_tjac', tjal:'api_publica_tjal', tjam:'api_publica_tjam',
-  tjap:'api_publica_tjap', tjba:'api_publica_tjba', tjce:'api_publica_tjce',
-  tjdft:'api_publica_tjdft', tjes:'api_publica_tjes', tjgo:'api_publica_tjgo',
-  tjma:'api_publica_tjma', tjmg:'api_publica_tjmg', tjms:'api_publica_tjms',
-  tjmt:'api_publica_tjmt', tjpa:'api_publica_tjpa', tjpb:'api_publica_tjpb',
-  tjpr:'api_publica_tjpr', tjpe:'api_publica_tjpe', tjpi:'api_publica_tjpi',
-  tjrj:'api_publica_tjrj', tjrn:'api_publica_tjrn', tjrs:'api_publica_tjrs',
-  tjro:'api_publica_tjro', tjrr:'api_publica_tjrr', tjsc:'api_publica_tjsc',
-  tjse:'api_publica_tjse', tjsp:'api_publica_tjsp', tjto:'api_publica_tjto',
-  // Federais
-  trf1:'api_publica_trf1', trf2:'api_publica_trf2', trf3:'api_publica_trf3',
-  trf4:'api_publica_trf4', trf5:'api_publica_trf5', trf6:'api_publica_trf6',
-  // Trabalho
-  trt1:'api_publica_trt1',   trt2:'api_publica_trt2',   trt3:'api_publica_trt3',
-  trt4:'api_publica_trt4',   trt5:'api_publica_trt5',   trt6:'api_publica_trt6',
-  trt7:'api_publica_trt7',   trt8:'api_publica_trt8',   trt9:'api_publica_trt9',
-  trt10:'api_publica_trt10', trt11:'api_publica_trt11', trt12:'api_publica_trt12',
-  trt13:'api_publica_trt13', trt14:'api_publica_trt14', trt15:'api_publica_trt15',
-  trt16:'api_publica_trt16', trt17:'api_publica_trt17', trt18:'api_publica_trt18',
-  trt19:'api_publica_trt19', trt20:'api_publica_trt20', trt21:'api_publica_trt21',
-  trt22:'api_publica_trt22', trt23:'api_publica_trt23', trt24:'api_publica_trt24',
-  // Superiores / Eleitorais / Militar
-  tst:'api_publica_tst', stj:'api_publica_stj', tse:'api_publica_tse', stm:'api_publica_stm',
-  'tre-rj':'api_publica_tre-rj', 'tre-sp':'api_publica_tre-sp',
-};
-
-// ── Auto-detecção do tribunal pelo número CNJ ──────────────────────
-// Estrutura: NNNNNNN DD AAAA J TT OOOO  (20 dígitos sem formatação)
-// Posição 13 = segmento de justiça; 14-15 = código do tribunal
-function detectTribunalCNJ(num) {
-  const d = num.replace(/\D/g,'');
-  if (d.length !== 20) return null;
-  const seg = d[13];
-  const tt  = d.substring(14,16);
-  const mapa = {
-    '8': {'01':'tjac','02':'tjal','03':'tjam','04':'tjap','05':'tjba','06':'tjce',
-          '07':'tjdft','08':'tjes','09':'tjgo','10':'tjma','11':'tjmt','12':'tjms',
-          '13':'tjmg','14':'tjpa','15':'tjpb','16':'tjpr','17':'tjpe','18':'tjpi',
-          '19':'tjrj','20':'tjrn','21':'tjrs','22':'tjro','23':'tjrr','24':'tjsc',
-          '25':'tjse','26':'tjsp','27':'tjto'},
-    '9': {'01':'trt1','02':'trt2','03':'trt3','04':'trt4','05':'trt5','06':'trt6',
-          '07':'trt7','08':'trt8','09':'trt9','10':'trt10','11':'trt11','12':'trt12',
-          '13':'trt13','14':'trt14','15':'trt15','16':'trt16','17':'trt17','18':'trt18',
-          '19':'trt19','20':'trt20','21':'trt21','22':'trt22','23':'trt23','24':'trt24',
-          '00':'tst'},
-    '4': {'01':'trf1','02':'trf2','03':'trf3','04':'trf4','05':'trf5','06':'trf6'},
-    '3': {'00':'stj'},
-    '2': {'00':'tse'},
-    '6': {'00':'stm'},
-  };
-  return (mapa[seg] && mapa[seg][tt]) || null;
-}
-
-// ── Helpers ────────────────────────────────────────────────────────
-function numRaw(n){ return String(n||'').replace(/\D/g,''); }
-
-function fmtDJ(s){
-  if(!s) return '—';
-  if(/^\d{14}$/.test(String(s))){
-    const v=String(s); return `${v.slice(6,8)}/${v.slice(4,6)}/${v.slice(0,4)}`;
-  }
-  try { return new Date(s).toLocaleDateString('pt-BR',{day:'2-digit',month:'2-digit',year:'numeric'}); }
-  catch(e){ return String(s); }
-}
-
-// Normaliza assuntos: a API pode retornar array de arrays ou array de objetos
-function djAssuntos(raw){
-  if(!raw||!raw.length) return [];
-  const flat = [];
-  raw.forEach(a=>{
-    if(Array.isArray(a)) a.forEach(x=>{ if(x&&x.nome) flat.push(x); });
-    else if(a&&a.nome) flat.push(a);
-  });
-  return flat;
-}
-
-// ── Chamada HTTP à API (padrão POST conforme documentação CNJ) ─────
-async function djSearch(alias, body) {
-  const url = `${DATAJUD_BASE}${alias}/_search`;
-  const r = await fetch(url, {
-    method: 'POST',
-    headers: {
-      'Authorization': `APIKey ${DATAJUD_KEY}`,
-      'Content-Type': 'application/json',
-    },
-    body: JSON.stringify(body),
-  });
-  if(!r.ok){
-    let msg = `HTTP ${r.status}`;
-    try { const j=await r.json(); msg = j.error?.reason || msg; } catch(e){}
-    throw new Error(msg);
-  }
-  return r.json();
-}
-
-// ── Estado global da aba ───────────────────────────────────────────
-let djLastResult  = null;   // último processo consultado
-let djSearchAfter = null;   // ponteiro de paginação
-let djCurrentAlias= null;   // alias da busca avançada atual
-let djCurrentQuery= null;   // query da busca avançada atual
-let djCurrentPage = 0;      // página atual da busca avançada
-let djCurrentTotal= 0;      // total de resultados da busca avançada
-
-// ── CSS inline da aba ──────────────────────────────────────────────
-const DJ_CSS = `
-<style id="dj-styles">
-.dj-tabs{display:flex;gap:4px;margin-bottom:12px;border-bottom:2px solid var(--bo);padding-bottom:0;}
-.dj-tab{padding:7px 16px;border-radius:6px 6px 0 0;font-size:12px;font-weight:600;cursor:pointer;
-  color:var(--mu);background:transparent;border:none;transition:.15s;}
-.dj-tab.on{background:var(--ac);color:#fff;}
-.dj-panel{display:none;} .dj-panel.on{display:block;}
-.dj-card{background:var(--c);border:1px solid var(--bo);border-radius:10px;padding:16px;margin-bottom:12px;}
-.dj-tag{display:inline-block;padding:2px 8px;border-radius:4px;font-size:11px;font-weight:600;margin:2px;}
-.dj-tag.cls{background:#1a3320;color:#86efac;}
-.dj-tag.grau{background:#1e3a5f;color:#7dd3fc;}
-.dj-tag.sub{background:#2d1b4e;color:#c4b5fd;}
-.dj-tag.mov{background:#1a2e1a;color:#4ade80;}
-.dj-grid{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin:10px 0;}
-.dj-field{background:var(--bg);border-radius:6px;padding:8px;}
-.dj-field-l{font-size:10px;text-transform:uppercase;color:var(--mu);margin-bottom:2px;}
-.dj-field-v{font-size:13px;font-weight:600;color:var(--ft);}
-.dj-mov-list{max-height:360px;overflow-y:auto;padding-right:4px;}
-.dj-mov-row{display:flex;gap:8px;align-items:flex-start;padding:7px 0;border-bottom:1px solid var(--bo);}
-.dj-mov-row:last-child{border:none;}
-.dj-mov-dt{font-size:11px;color:var(--mu);min-width:85px;padding-top:1px;}
-.dj-mov-nm{font-size:12px;color:var(--ft);flex:1;line-height:1.4;}
-.dj-mov-comp{font-size:10px;color:var(--mu);display:block;margin-top:2px;}
-.dj-mov-org{font-size:10px;color:var(--mu);min-width:100px;text-align:right;padding-top:1px;}
-.dj-proc-num{font-size:14px;font-weight:700;font-family:monospace;color:var(--ac);letter-spacing:.5px;}
-.dj-badge-trib{background:var(--ac);color:#fff;border-radius:4px;padding:3px 10px;font-size:11px;font-weight:700;}
-.dj-loading{text-align:center;padding:40px;color:var(--mu);font-size:13px;}
-.dj-err{background:#3b1515;border:1px solid #dc2626;border-radius:8px;padding:14px;color:#fca5a5;margin:10px 0;font-size:13px;}
-.dj-ok{background:#0f2e18;border:1px solid #16a34a;border-radius:8px;padding:10px 14px;color:#86efac;font-size:12px;margin:6px 0;}
-.dj-adv-result{border:1px solid var(--bo);border-radius:8px;overflow:hidden;margin-top:10px;}
-.dj-adv-row{display:grid;grid-template-columns:1fr 1fr 1fr 1fr;gap:6px;padding:8px 10px;border-bottom:1px solid var(--bo);font-size:12px;cursor:pointer;transition:.1s;}
-.dj-adv-row:hover{background:var(--bg);}
-.dj-adv-row:last-child{border:none;}
-.dj-adv-head{background:var(--bg);font-size:10px;font-weight:700;text-transform:uppercase;color:var(--mu);}
-.dj-pag{display:flex;gap:8px;align-items:center;margin-top:10px;flex-wrap:wrap;}
-.dj-sync-cell{font-size:11px;}
-</style>`;
-
-// ══════════════════════════════════════════════════════════════════
-// RENDER PRINCIPAL DA ABA
-// ══════════════════════════════════════════════════════════════════
 function renderBusca(){
   const procAtivos = proc.filter(p=>p.status!=='Finalizado');
 
@@ -2552,241 +2068,39 @@ async function djSyncAll(){
 }
 
 // ═══════════════════════════════════════════════════════════════════
-// CONTROLE DE ACESSOS E PERMISSÕES
-// ═══════════════════════════════════════════════════════════════════
-const MOD_LBL={cli:{l:'Clientes',i:'👥'},proc:{l:'Processos',i:'⚖️'},age:{l:'Agenda',i:'📅'},fin:{l:'Financeiro',i:'💰'},tar:{l:'Tarefas',i:'✅'},rel:{l:'Relatórios',i:'📊'},cfg:{l:'Config',i:'⚙️'},usr:{l:'Usuários',i:'👤'}};
-const ACT_LBL={v:'Visualizar',c:'Criar',e:'Editar',d:'Excluir'};
-
-function renderAcessos(){
-  if(currentUser?.role!=='admin'){denyAccess('Controle de Acessos');return;}
-  loadLog();
-  const sbadge_=u=>u.ativo?'<span class="badge bg">Ativo</span>':'<span class="badge br">Bloqueado</span>';
-  const lastAcc=u=>{const l=accessLog.filter(x=>x.usuario===u.nome&&!x.negado);return l.length?`${l[0].data} ${l[0].hora}`:'Nunca';};
-  const denied=u=>accessLog.filter(x=>x.usuario===u.nome&&x.negado).length;
-  let h=`<div class="card hi" style="margin-bottom:12px"><div class="stitle">🔐 Controle de Acessos e Permissões</div><div style="font-size:12px;color:var(--mu)">Somente o administrador tem acesso a esta área. Gerencie perfis, permissões e bloqueios.</div></div>
-  <div class="card" style="margin-bottom:12px">
-    <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:10px"><div class="stitle">👥 Usuários</div><button class="btn bp bsm" onclick="openUserModal()">+ Novo</button></div>
-    <div class="tw"><table><thead><tr><th></th><th>Usuário</th><th>Perfil</th><th>Status</th><th>Último Acesso</th><th>Negados</th><th>Ações</th></tr></thead><tbody>
-    ${users.map(u=>`<tr style="opacity:${u.ativo?1:.6}">
-      <td><div class="av" style="width:30px;height:30px;font-size:11px;background:${ac(u.id)};color:#fff">${initials(u.nome)}</div></td>
-      <td><div style="font-weight:700;font-size:12px">${esc(u.nome)}</div><div style="font-size:10px;color:#2563eb">${esc(u.email)}</div><div style="font-size:10px;color:var(--mu)">${esc(u.cargo||'')} ${u.oab?'· '+u.oab:''}</div></td>
-      <td><span class="urole ${ROLES[u.role]?.cls||'r-colaborador'}">${ROLES[u.role]?.l||u.role}</span></td>
-      <td>${sbadge_(u)}</td>
-      <td style="font-size:11px;color:var(--mu)">${lastAcc(u)}</td>
-      <td style="text-align:center">${denied(u)>0?`<span style="color:#dc2626;font-weight:700">${denied(u)}</span>`:'<span style="color:var(--mu)">0</span>'}</td>
-      <td><div style="display:flex;gap:3px;flex-wrap:wrap">
-        <button class="btn bsa xs" onclick="openPermModal(${u.id})" title="Permissões">🔑</button>
-        <button class="btn bgh xs" onclick="editUser(${u.id})">✏️</button>
-        ${u.id!==currentUser.id?`<button class="btn ${u.ativo?'bd_':'bg_'} xs" onclick="toggleAcesso(${u.id})">${u.ativo?'🔒':'🔓'}</button>`:''}
-      </div></td>
-    </tr>`).join('')}
-    </tbody></table></div>
-  </div>
-  <div class="card">
-    <div class="stitle">📋 Log de Acessos</div>
-    <div style="display:flex;gap:8px;margin-bottom:8px">
-      <select id="log-fu" onchange="renderLogT()" style="font-size:11px"><option value="">Todos</option>${users.map(u=>`<option value="${u.nome}">${u.nome}</option>`).join('')}</select>
-      <select id="log-ft" onchange="renderLogT()" style="font-size:11px"><option value="">Todos</option><option value="negado">Negados</option><option value="ok">Permitidos</option></select>
-      <button class="btn bgh bsm" onclick="accessLog=[];localStorage.removeItem('sa_log');renderAcessos()">🗑️ Limpar</button>
-    </div>
-    <div id="log-cont"></div>
-  </div>`;
-  document.getElementById('admin-cnt').innerHTML=h;
-  renderLogT();
-}
-function renderLogT(){
-  const fu=(document.getElementById('log-fu')||{}).value||'';
-  const ft=(document.getElementById('log-ft')||{}).value||'';
-  let logs=accessLog;
-  if(fu)logs=logs.filter(l=>l.usuario===fu);
-  if(ft==='negado')logs=logs.filter(l=>l.negado);
-  if(ft==='ok')logs=logs.filter(l=>!l.negado);
-  const c=document.getElementById('log-cont');if(!c)return;
-  if(!logs.length){c.innerHTML='<div style="text-align:center;padding:16px;font-size:12px;color:var(--mu)">Nenhum registro.</div>';return;}
-  c.innerHTML=`<div style="max-height:280px;overflow-y:auto">
-    <div class="log-row" style="font-weight:700;font-size:10px;text-transform:uppercase;color:var(--mu);background:#f8fafc"><div>Data/Hora</div><div>Usuário</div><div>Módulo · Ação</div><div>Status</div></div>
-    ${logs.slice(0,80).map(l=>`<div class="log-row"><div style="font-size:10px">${l.data}<br>${l.hora}</div><div style="font-size:11px;font-weight:600">${esc(l.usuario)}<br><span style="font-size:10px;color:var(--mu)">${esc(l.perfil)}</span></div><div style="font-size:11px">${esc(l.mod)}<br><span style="font-size:10px;color:var(--mu)">${esc(l.acao)}</span></div><div>${l.negado?'<span style="color:#dc2626;font-size:10px;font-weight:700">⛔ NEGADO</span>':'<span style="color:#16a34a;font-size:10px">✅</span>'}</div></div>`).join('')}
-  </div>`;
-}
-function openPermModal(userId){
-  const u=users.find(x=>x.id===userId);if(!u)return;
-  const base=ROLES[u.role]||ROLES.estagiario;
-  const merged=u.customPerms?deepMerge(base,u.customPerms):base;
-  let rows='';
-  Object.entries(MOD_LBL).forEach(([mod,{l,i}])=>{
-    rows+=`<div class="perm-mod"><div class="perm-mod-title">${i} ${l}</div>`;
-    Object.entries(ACT_LBL).forEach(([act,albl])=>{
-      const val=merged[mod]&&merged[mod][act]?1:0;
-      rows+=`<div class="perm-row"><span>${albl}</span><label class="ptog"><input type="checkbox" id="pc-${mod}-${act}" ${val?'checked':''}><span class="pslider"></span></label></div>`;
-    });
-    rows+='</div>';
-  });
-  const m=document.createElement('div');m.className='mo-desk on';m.id='m-perm-modal';
-  m.innerHTML=`<div class="mbox" style="max-width:820px;max-height:85vh;overflow-y:auto">
-    <h3>🔑 Permissões — ${esc(u.nome)}</h3>
-    <div style="display:flex;align-items:center;gap:10px;margin-bottom:14px;flex-wrap:wrap">
-      <span class="urole ${ROLES[u.role]?.cls||'r-colaborador'}">${ROLES[u.role]?.l||u.role}</span>
-      <span style="font-size:11px;color:var(--mu)">Permissões personalizadas sobrepõem o perfil padrão</span>
-      <button class="btn bgh bsm" onclick="resetPerm(${userId})">↺ Resetar</button>
-    </div>
-    <div class="perm-grid">${rows}</div>
-    <div class="mfoot" style="margin-top:14px">
-      <button class="btn bp" onclick="savePerm(${userId})">💾 Salvar</button>
-      <button class="btn bgh" onclick="document.getElementById('m-perm-modal').remove()">Cancelar</button>
-    </div>
-  </div>`;
-  document.body.appendChild(m);
-  m.addEventListener('click',e=>{if(e.target===m)m.remove();});
-}
-function savePerm(uid){
-  const u=users.find(x=>x.id===uid);if(!u)return;
-  const cp={};
-  Object.keys(MOD_LBL).forEach(mod=>{cp[mod]={};Object.keys(ACT_LBL).forEach(act=>{const el=document.getElementById(`pc-${mod}-${act}`);if(el)cp[mod][act]=el.checked?1:0;});});
-  u.customPerms=cp;save();
-  document.getElementById('m-perm-modal')?.remove();
-  logAccess('usuarios',`permissões salvas: ${u.nome}`);
-  alert(`✅ Permissões de ${u.nome} salvas!`);renderAcessos();
-}
-function resetPerm(uid){
-  const u=users.find(x=>x.id===uid);if(!u)return;
-  if(!confirm(`Resetar permissões de ${u.nome} ao perfil padrão?`))return;
-  delete u.customPerms;save();
-  document.getElementById('m-perm-modal')?.remove();
-  renderAcessos();
-}
-function toggleAcesso(uid){
-  const u=users.find(x=>x.id===uid);if(!u)return;
-  if(!confirm(`${u.ativo?'Bloquear':'Desbloquear'} ${u.nome}?`))return;
-  u.ativo=!u.ativo;save();logAccess('usuarios',`${u.ativo?'desbloqueado':'bloqueado'}: ${u.nome}`);renderAcessos();
-}
-
-// ═══════════════════════════════════════════════════════════════════
 // USUÁRIOS
 // ═══════════════════════════════════════════════════════════════════
 function renderUsers(){
   const p=perm();
-  const lastAcc=u=>{const l=accessLog.filter(x=>x.usuario===u.nome&&!x.negado&&x.mod==='login');return l.length?l[0].data+' '+l[0].hora:'Nunca';};
-  let html=`
-  <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:12px;flex-wrap:wrap;gap:8px">
-    <div>
-      <div style="font-size:14px;font-weight:700;color:var(--n)">${users.length} usuário(s) cadastrado(s)</div>
-      <div style="font-size:11px;color:var(--mu)">${users.filter(u=>u.ativo).length} ativo(s) · ${users.filter(u=>!u.ativo).length} bloqueado(s)</div>
-    </div>
-    ${p.usr_?`<button class="btn bp" onclick="openUserModal()">+ Novo Usuário</button>`:''}
-  </div>
-  <div class="card"><div class="tw"><table>
-    <thead><tr>
-      <th></th><th>Nome e Cargo</th><th>E-mail / Login</th>
-      <th>Perfil</th><th>Status</th><th>Último Acesso</th>
-      ${p.usr_?'<th>Ações</th>':''}
-    </tr></thead>
-    <tbody>${users.map(u=>`
-      <tr style="opacity:${u.ativo?1:.5}">
-        <td><div class="av" style="width:34px;height:34px;font-size:12px;background:${ac(u.id)};color:#fff">${initials(u.nome)}</div></td>
-        <td>
-          <div style="font-weight:700;font-size:12px">${esc(u.nome)}</div>
-          <div style="font-size:10px;color:var(--mu)">${esc(u.cargo||'—')}${u.oab?' · '+u.oab:''}</div>
-        </td>
-        <td>
-          <div style="font-size:11px;color:#2563eb">${esc(u.email)}</div>
-          <div style="font-size:10px;color:var(--mu)">${u.tel||'—'}</div>
-        </td>
-        <td><span class="urole ${ROLES[u.role]?.cls||'r-colaborador'}">${ROLES[u.role]?.l||u.role}</span></td>
-        <td>${u.ativo?badge('Ativo','bg'):badge('Bloqueado','br')}</td>
-        <td style="font-size:10px;color:var(--mu)">${lastAcc(u)}</td>
-        ${p.usr_?`<td><div style="display:flex;gap:3px">
-          <button class="btn bsa xs" onclick="openPermModal(${u.id})" title="Permissões">🔑</button>
-          <button class="btn bgh xs" onclick="editUser(${u.id})" title="Editar">✏️</button>
-          ${u.id!==currentUser.id?`<button class="btn ${u.ativo?'bd_':'bg_'} xs" onclick="toggleUser(${u.id})" title="${u.ativo?'Bloquear':'Desbloquear'}">${u.ativo?'🔒':'🔓'}</button>`:''}
-        </div></td>`:''}
-      </tr>`).join('')}
-    </tbody>
-  </table></div></div>`;
+  let html=`<div class="fbar">${p.usr?`<button class="btn bp" onclick="openUserModal()">+ Novo Usuário</button>`:''}</div>`;
+  html+=`<div class="card"><div class="tw"><table><thead><tr><th></th><th>Nome</th><th>E-mail</th><th>OAB</th><th>Cargo</th><th>Função</th><th>Status</th><th>Telefone</th>${p.usr?'<th>Ações</th>':''}</tr></thead><tbody>${users.map(u=>`<tr style="opacity:${u.ativo?1:.55}">
+    <td><div class="av" style="width:32px;height:32px;font-size:12px;background:${ac(u.id)};color:#fff">${initials(u.nome)}</div></td>
+    <td style="font-weight:700">${u.nome}</td><td style="font-size:11px;color:#2563eb">${u.email}</td>
+    <td style="font-size:11px">${u.oab||'—'}</td><td style="font-size:11px">${u.cargo||'—'}</td>
+    <td><span class="urole ${ROLES[u.role]?.cls||'r-colaborador'}">${ROLES[u.role]?.l||u.role}</span></td>
+    <td>${u.ativo?badge('Ativo','bg'):badge('Inativo','bga')}</td>
+    <td style="font-size:11px">${u.tel||'—'}</td>
+    ${p.usr?`<td><div style="display:flex;gap:3px"><button class="btn bgh xs" onclick="editUser(${u.id})">✏️</button>${u.id!==currentUser.id?`<button class="btn ${u.ativo?'bd_':'bg_'} xs" onclick="toggleUser(${u.id})">${u.ativo?'🔒':'🔓'}</button>`:''}</div></td>`:''}</tr>`).join('')}</tbody></table></div></div>`;
   document.getElementById('admin-cnt').innerHTML=html;
 }
 function openUserModal(id){
   document.getElementById('user-id').value=id||'';
   document.getElementById('m-user-t').textContent=id?'Editar Usuário':'Novo Usuário';
-  const pwdHint=document.getElementById('user-pwd-hint');
-  if(id){
-    const u=users.find(x=>x.id===id);
-    ['nome','cargo','email','tel','oab'].forEach(f=>document.getElementById('user-'+f).value=u[f]||'');
-    document.getElementById('user-pwd').value='';
-    if(document.getElementById('user-pwd2'))document.getElementById('user-pwd2').value='';
-    document.getElementById('user-role').value=u.role;
-    document.getElementById('user-ativo').value=u.ativo?'1':'0';
-    if(pwdHint)pwdHint.textContent='(deixe em branco para manter a senha atual)';
-  }else{
-    ['nome','cargo','email','tel','oab','pwd'].forEach(f=>{const el=document.getElementById('user-'+f);if(el)el.value='';});
-    if(document.getElementById('user-pwd2'))document.getElementById('user-pwd2').value='';
-    document.getElementById('user-role').value='advogado';
-    document.getElementById('user-ativo').value='1';
-    if(pwdHint)pwdHint.textContent='(obrigatório para novo usuário)';
-  }
-  const pmatch=document.getElementById('pwd-match');if(pmatch)pmatch.textContent='';
+  if(id){const u=users.find(x=>x.id===id);['nome','cargo','email','tel','oab'].forEach(f=>document.getElementById('user-'+f).value=u[f]||'');document.getElementById('user-pwd').value=u.pwd||'';document.getElementById('user-role').value=u.role;document.getElementById('user-ativo').value=u.ativo?'1':'0';}
+  else{['nome','cargo','email','tel','oab','pwd'].forEach(f=>document.getElementById('user-'+f).value='');document.getElementById('user-role').value='advogado';document.getElementById('user-ativo').value='1';}
   openMo('m-user');
-  setTimeout(updateRoleDesc,50);
 }
 function populateUserForm(u){['nome','cargo','email','tel','oab'].forEach(f=>document.getElementById('user-'+f).value=u[f]||'');document.getElementById('user-id').value=u.id;document.getElementById('user-pwd').value=u.pwd||'';document.getElementById('user-role').value=u.role;document.getElementById('user-ativo').value=u.ativo?'1':'0';}
 const editUser=id=>openUserModal(id);
 function saveUser(){
-  const nome=document.getElementById('user-nome').value.trim();
-  const email=document.getElementById('user-email').value.trim().toLowerCase();
-  const pwd=document.getElementById('user-pwd').value;
-  const pwd2=(document.getElementById('user-pwd2')||{value:''}).value;
+  const nome=document.getElementById('user-nome').value.trim();const email=document.getElementById('user-email').value.trim();const pwd=document.getElementById('user-pwd').value;
+  if(!nome||!email)return alert('Preencha nome e e-mail.');
   const id=+document.getElementById('user-id').value;
-  if(!nome){alert('Preencha o nome completo.');document.getElementById('user-nome').focus();return;}
-  if(!email||!email.includes('@')){alert('Preencha um e-mail válido.');document.getElementById('user-email').focus();return;}
-  const emailDup=users.find(u=>u.email.toLowerCase()===email&&u.id!==id);
-  if(emailDup){alert('E-mail já cadastrado para: '+emailDup.nome);return;}
-  if(!id&&!pwd){alert('Defina uma senha para o novo usuário.');document.getElementById('user-pwd').focus();return;}
-  if(pwd&&pwd.length<6){alert('A senha deve ter no mínimo 6 caracteres.');return;}
-  if(pwd&&pwd2&&pwd!==pwd2){alert('As senhas não coincidem. Verifique.');document.getElementById('user-pwd2')?.focus();return;}
-  const existingPwd=id?(users.find(u=>u.id===id)||{}).pwd:'';
-  const o={nome,cargo:document.getElementById('user-cargo').value.trim(),email,pwd:pwd||existingPwd,
-    oab:document.getElementById('user-oab').value.trim(),tel:document.getElementById('user-tel').value.trim(),
-    role:document.getElementById('user-role').value,ativo:document.getElementById('user-ativo').value==='1'};
-  if(id){
-    const idx=users.findIndex(u=>u.id===id);
-    if(idx>=0)users[idx]={...users[idx],...o};
-  }else{
-    users.push({...o,id:gid2()});
-  }
-  save();closeMo('m-user');
-  if(currentUser&&currentUser.id===id){
-    currentUser={...currentUser,...o};
-    document.getElementById('uname').textContent='Dr. '+currentUser.nome.split(' ').slice(-1)[0];
-    document.getElementById('uav').textContent=initials(currentUser.nome);
-  }
-  logAccess('usuarios',id?'editou: '+nome:'criou: '+nome);
-  alert(id?'✅ Usuário atualizado!':'✅ Usuário criado!\nLogin: '+email+'\nSenha: '+pwd);
-  const cnt=document.getElementById('admin-cnt');
-  if(cnt&&cnt.innerHTML.includes('Usuários Cadastrados'))renderAcessos();
-  else renderUsers();
-}
-
-function checkPwdMatch(){
-  const p1=document.getElementById('user-pwd')?.value||'';
-  const p2=document.getElementById('user-pwd2')?.value||'';
-  const el=document.getElementById('pwd-match');if(!el)return;
-  if(!p1||!p2){el.textContent='';return;}
-  if(p1===p2){el.textContent='✅ Senhas coincidem';el.style.color='#16a34a';}
-  else{el.textContent='❌ Senhas não coincidem';el.style.color='#dc2626';}
-}
-
-function updateRoleDesc(){
-  const role=document.getElementById('user-role')?.value;
-  const el=document.getElementById('user-role-desc');if(!el||!role)return;
-  const desc={
-    admin:'👑 Acesso total. Gerencia usuários, permissões, financeiro e configurações.',
-    advogado:'⚖️ Clientes, processos, financeiro e agenda. Sem gestão de usuários.',
-    estagiario:'🎓 Visualiza clientes e processos. Sem financeiro ou configurações.',
-    colaborador:'🗂️ Agenda e cadastro de clientes. Sem acesso jurídico ou financeiro.',
-    financeiro:'💰 Módulo financeiro e relatórios. Sem acesso a processos.',
-    atendente:'📞 Visualiza clientes e agenda. Acesso mais restrito.',
-    personalizado:'🔧 Permissões definidas individualmente pelo administrador.',
-  };
-  el.innerHTML=`<strong style="font-size:11px;color:var(--n)">${ROLES[role]?.l||role}</strong><br><span style="font-size:10px">${desc[role]||''}</span>`;
+  if(!id&&!pwd)return alert('Defina uma senha para o novo usuário.');
+  const o={nome,cargo:document.getElementById('user-cargo').value.trim(),email,pwd:pwd||(id?(users.find(u=>u.id===id)||{}).pwd:''),oab:document.getElementById('user-oab').value.trim(),tel:document.getElementById('user-tel').value.trim(),role:document.getElementById('user-role').value,ativo:document.getElementById('user-ativo').value==='1'};
+  if(id){users.splice(users.findIndex(u=>u.id===id),1,{...o,id});}else{users.push({...o,id:gid2()});}
+  save();closeMo('m-user');renderUsers();
+  if(currentUser.id===id){currentUser=users.find(u=>u.id===id);document.getElementById('uname').textContent='Dr. '+currentUser.nome.split(' ').slice(-1)[0];document.getElementById('uav').textContent=initials(currentUser.nome);}
 }
 function toggleUser(id){if(id===currentUser.id)return alert('Não é possível desativar sua própria conta.');const idx=users.findIndex(u=>u.id===id);users[idx].ativo=!users[idx].ativo;save();renderUsers();}
 
@@ -2794,176 +2108,38 @@ function toggleUser(id){if(id===currentUser.id)return alert('Não é possível d
 // GOOGLE CALENDAR
 // ═══════════════════════════════════════════════════════════════════
 function renderGCal(){
-  const pendentes=bk.filter(b=>['solicitado','confirmado'].includes(b.status)&&b.data>=td0);
-  const hasScript=!!(gcfg.script);
-  document.getElementById('admin-cnt').innerHTML=`
-
-  <!-- STATUS GERAL -->
-  <div class="al ${hasScript?'al-ok':'al-warn'}" style="margin-bottom:12px">
-    ${hasScript
-      ?'✅ Google Calendar totalmente integrado — agenda pública + criação automática de eventos ativa'
-      :'✅ Google Calendar conectado e público — configure o Apps Script para criar eventos automaticamente'}
-    <div style="font-size:10px;margin-top:4px;opacity:.8">
-      Calendário: <strong>adv.souzamarcus@gmail.com</strong> · API Key: <strong>✅ válida</strong> · Embed: <strong>✅ público</strong>
-    </div>
-  </div>
-
-  <!-- AGENDA INCORPORADA (iframe real, validado HTTP 200) -->
-  <div class="card gl" style="margin-bottom:12px">
-    <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:10px;flex-wrap:wrap;gap:6px">
-      <div class="stit">📅 Agenda — adv.souzamarcus@gmail.com</div>
-      <div style="display:flex;gap:6px;flex-wrap:wrap">
-        <a href="https://calendar.google.com/calendar/r" target="_blank" class="btn bghost bsm">🔗 Abrir</a>
-        <a href="https://calendar.google.com/calendar/ical/adv.souzamarcus%40gmail.com/public/basic.ics" target="_blank" class="btn bblue bsm">⬇️ .ICS Público</a>
-        <a href="https://calendar.google.com/calendar/ical/adv.souzamarcus%40gmail.com/private-236753512d79bbf560da21cc4142dcc8/basic.ics" class="btn bghost bsm">🔒 .ICS Privado</a>
-        <a href="https://calendar.google.com/calendar/u/1?cid=YWR2LnNvdXphbWFyY3VzQGdtYWlsLmNvbQ" target="_blank" class="btn bma bsm">➕ Assinar</a>
-      </div>
-    </div>
-    <iframe
-      src="https://calendar.google.com/calendar/embed?src=adv.souzamarcus%40gmail.com&ctz=America%2FSao_Paulo&mode=WEEK&showTitle=0&showNav=1&showDate=1&showPrint=0&showTabs=1&showCalendars=0&showTz=1"
-      style="border:1px solid var(--bd);border-radius:10px;width:100%;min-height:520px;display:block"
-      frameborder="0" scrolling="no" loading="lazy">
-    </iframe>
-  </div>
-
-  <!-- CONFIGURAÇÃO -->
-  <div class="card" style="margin-bottom:12px">
-    <div class="stit">⚙️ Configuração da Integração</div>
-    <div class="frow">
-      <div class="ff">
-        <div class="fl">Calendar ID <span class="badge bg" style="margin-left:4px">✅ público</span></div>
-        <input class="fi" id="gc-cid" value="${gcfg.calId}"
-          style="background:#f0fdf4;border-color:#bbf7d0;font-size:12px">
-        <div style="font-size:10px;color:#16a34a;margin-top:3px">
-          ✅ Calendário público confirmado — HTTP 200 · 10+ eventos
-        </div>
-      </div>
-      <div class="ff">
-        <div class="fl">API Key <span class="badge bg" style="margin-left:4px">✅ válida</span></div>
-        <input class="fi" id="gc-key" value="${gcfg.key}"
-          style="background:#f0fdf4;border-color:#bbf7d0;font-family:monospace;font-size:11px">
-        <div style="font-size:10px;color:#16a34a;margin-top:3px">
-          ✅ Testada — Calendar API v3 funcionando
-        </div>
-      </div>
-    </div>
-    <div class="fg">
-      <div class="fl">Apps Script URL <span style="color:var(--re)">*</span>
-        ${hasScript?'<span class="badge bg" style="margin-left:4px">✅ configurado</span>':'<span style="font-size:10px;color:#d97706">(necessário para criar eventos)</span>'}
-      </div>
-      <input class="fi" id="gc-scr" value="${gcfg.script}"
-        placeholder="https://script.google.com/macros/s/.../exec"
-        style="${hasScript?'background:#f0fdf4;border-color:#bbf7d0':''}">
-      <div style="font-size:10px;color:var(--mu);margin-top:3px">
-        Obtenha em: <a href="https://script.google.com" target="_blank" style="color:var(--bl)">script.google.com</a>
-        → Implantar → App da Web → Qualquer pessoa → Copiar URL
-      </div>
-    </div>
-    <div class="brow">
-      <button class="btn bgold" onclick="saveGC()">💾 Salvar</button>
-      <button class="btn bghost" onclick="testGC()">🔍 Testar Apps Script</button>
-      <button class="btn bblue bsm" onclick="testGCalAPI()">🔍 Testar API Key</button>
-    </div>
+  const isOn=gcfg.on&&gcfg.key;
+  let h=`<div class="al ${isOn?'al-ok':gcfg.key?'al-warn':'al-err'}">${isOn?'✅ Google Calendar conectado e ativo':gcfg.key?'⚠️ API Key cadastrada — verifique o Calendar ID':'🔴 Google Calendar não configurado'}</div>
+  <div class="card gl">
+    <div class="stit">Configuração da API</div>
+    <div class="fg"><div class="fl">Google Calendar API Key</div><input class="fi" id="gc-key" value="${gcfg.key}" placeholder="AIzaSy..." style="font-family:monospace;font-size:12px"></div>
+    <div class="fg"><div class="fl">Calendar ID</div><input class="fi" id="gc-cid" value="${gcfg.calId}" placeholder="seu@gmail.com"></div>
+    <div class="fg"><div class="fl">Apps Script URL (criação automática de eventos)</div><input class="fi" id="gc-scr" value="${gcfg.script}" placeholder="https://script.google.com/macros/s/..."></div>
+    <div class="brow"><button class="btn bgold" onclick="saveGC()">💾 Salvar</button><button class="btn bghost" onclick="testGC()">🔍 Testar Conexão</button></div>
     <div id="gc-res" style="margin-top:8px"></div>
   </div>
-
-  <!-- SINCRONIZAÇÃO -->
-  <div class="card" style="margin-bottom:12px">
-    <div class="stit">🔄 Sincronizar com Google Calendar (${pendentes.length} pendentes)</div>
-    ${!hasScript
-      ?'<div class="al al-warn" style="margin-bottom:10px">Configure o Apps Script URL acima para habilitar a sincronização automática.</div>'
-      :''}
-    <div style="display:flex;gap:8px;flex-wrap:wrap;margin-bottom:10px">
-      <button class="btn bnav" ${!hasScript?'disabled title="Configure o Apps Script primeiro"':''}
-        onclick="syncGCal()">📅 Sincronizar Todos (${pendentes.length})</button>
-      <button class="btn bblue bsm" onclick="expICS()">⬇️ Exportar .ICS</button>
-    </div>
-    <div id="sync-res"></div>
-    ${pendentes.length?`
-    <div class="divider"></div>
-    <div class="stit" style="margin-top:10px">Agendamentos pendentes</div>
-    ${pendentes.sort((a,b_)=>a.data.localeCompare(b_.data)).slice(0,10).map(b=>`
-      <div style="display:flex;align-items:center;gap:8px;padding:8px 0;border-bottom:1px solid var(--bd);flex-wrap:wrap">
-        <span style="font-size:18px">${BT[b.type]?.i||'📅'}</span>
-        <div style="flex:1;min-width:150px">
-          <div style="font-size:12px;font-weight:700">${esc(b.nome)}</div>
-          <div style="font-size:10px;color:var(--mu)">${fd(b.data)} · ${b.hora} · ${BT[b.type]?.n||b.type}</div>
-          ${b.gcEventId?'<div style="font-size:9px;color:#16a34a">✅ Sincronizado</div>':''}
-        </div>
-        ${bdg(b.status)}
-        <div style="display:flex;gap:4px">
-          <a href="${gcLink(b)}" target="_blank" class="btn bghost bsm" style="font-size:10px">📅 Manual</a>
-          ${hasScript?`<button class="btn bsa bsm" style="font-size:10px" onclick="syncOne('${b.id}')">⚡ Auto</button>`:''}
-        </div>
-      </div>`).join('')}
-    `:'<div class="al al-ok" style="margin-top:10px">✅ Nenhum pendente de sincronização.</div>'}
-  </div>
-
-  <!-- APPS SCRIPT -->
   <div class="card">
-    <div class="stit">📋 Apps Script — Código para Instalação</div>
-    <div class="al al-gold" style="font-size:11px;margin-bottom:10px;line-height:1.7">
-      <strong>Como instalar (5 minutos):</strong><br>
-      1. Acesse <a href="https://script.google.com" target="_blank" style="color:var(--gd);font-weight:700">script.google.com</a>
-         → clique em <strong>Novo projeto</strong><br>
-      2. Apague o conteúdo existente e cole o código abaixo<br>
-      3. Salve (Ctrl+S) → menu <strong>Implantar</strong> → <strong>Nova implantação</strong><br>
-      4. Tipo: <strong>App da Web</strong> · Executar como: <strong>Eu mesmo</strong>
-         · Acesso: <strong>Qualquer pessoa</strong><br>
-      5. Clique em <strong>Implantar</strong> → autorize → copie a URL gerada<br>
-      6. Cole a URL no campo <em>Apps Script URL</em> acima → Salvar
-    </div>
-    <button class="btn bghost bsm" onclick="cpScript()" style="margin-bottom:8px">📋 Copiar Código</button>
-    <div class="code" style="font-size:10px;line-height:1.6;max-height:380px;overflow-y:auto;white-space:pre-wrap">${esc(appsScript())}</div>
+    <div class="stit">Sincronizar Agendamentos</div>
+    <div class="brow"><button class="btn bnav" onclick="syncGCal()">📅 Sincronizar Todos</button><button class="btn bblue" onclick="expICS()">⬇️ Exportar .ICS</button></div>
+    <div id="sync-res" style="margin-top:9px"></div>
+    <div class="divider"></div>
+    <div class="stit">Adicionar Individualmente</div>
+    ${bk.filter(b=>b.status!=='cancelado'&&b.data>=td0).sort((a,b_)=>a.data.localeCompare(b_.data)).slice(0,8).map(b=>`<div style="display:flex;align-items:center;gap:7px;padding:7px 0;border-bottom:1px solid var(--bd)"><span style="font-size:15px">${BT[b.type].i}</span><div style="flex:1"><div style="font-size:11px;font-weight:700">${b.nome}</div><div style="font-size:10px;color:var(--mu)">${fd(b.data)} · ${b.hora}</div></div>${bdg(b.status)}<a href="${gcLink(b)}" target="_blank" class="btn bghost bsm" style="font-size:10px;padding:4px 8px">📅 Add</a></div>`).join('')}
+  </div>
+  <div class="card">
+    <div class="stit">Apps Script — Código para Instalar</div>
+    <div class="al al-gold" style="font-size:10px;margin-bottom:7px"><strong>Como instalar:</strong> script.google.com → Novo projeto → Cole o código → Implantar → App da Web → Qualquer pessoa → Copie a URL e cole acima.</div>
+    <button class="btn bghost bsm" onclick="cpScript()" style="margin-bottom:7px">📋 Copiar Código</button>
+    <div class="code">${esc(appsScript())}</div>
   </div>`;
+  document.getElementById('admin-cnt').innerHTML=h;
 }
-function saveGC(){
-  const prevScript=gcfg.script;
-  gcfg.key   = gi('gc-key') || gcfg.key;
-  gcfg.calId = gi('gc-cid') || gcfg.calId;
-  gcfg.script= gi('gc-scr');
-  gcfg.on    = !!(gcfg.script && gcfg.calId);
-  const enc  = encodeURIComponent(gcfg.calId);
-  gcfg.calEmbedUrl = `https://calendar.google.com/calendar/embed?src=${enc}&ctz=America%2FSao_Paulo`;
-  gcfg.calIcsUrl   = `https://calendar.google.com/calendar/ical/${enc}/public/basic.ics`;
-  saveGc();
-  const msg = gcfg.script && !prevScript
-    ? '✅ Apps Script configurado! Teste a conexão.'
-    : '✅ Configuração salva!';
-  alert(msg);
-  renderGCal();
-}
+function saveGC(){gcfg.key=gi('gc-key');gcfg.calId=gi('gc-cid');gcfg.script=gi('gc-scr');gcfg.on=!!(gcfg.key&&gcfg.calId);saveGc();alert('✅ Configuração salva!');renderGCal();}
 async function testGC(){
-  const script=gi('gc-scr');const res=document.getElementById('gc-res');
-  if(!script){res.innerHTML='<div class="al al-warn">Cole o URL do Apps Script antes de testar.</div>';return;}
-  res.innerHTML='<div class="al al-info">⏳ Testando Apps Script com evento de teste...</div>';
-  const now=new Date();
-  const start=new Date(now.getTime()+60000).toISOString().replace('Z','-03:00').substring(0,22)+'-03:00';
-  const end=new Date(now.getTime()+1800000).toISOString().replace('Z','-03:00').substring(0,22)+'-03:00';
-  const payload={
-    calendarId:gi('gc-cid')||'adv.souzamarcus@gmail.com',
-    title:'[TESTE] Marcus Souza I Advogado — Sistema',
-    start,end,
-    clientName:'Teste do Sistema',
-    phone:'(21) 96534-8183',
-    email:'adv.souzamarcus@gmail.com',
-    serviceType:'Teste de integração',
-    description:'Evento de teste criado automaticamente pelo sistema. Pode ser excluído.',
-    location:'Sistema — Teste',
-    notes:'Projeto: logical-bolt-499415-t9',
-  };
-  try{
-    const r=await fetch(script,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(payload)});
-    const d=await r.json();
-    if(d.success){
-      gcfg.on=true;gcfg.script=script;saveGc();
-      res.innerHTML=`<div class="al al-ok">✅ Apps Script funcionando!<br>Evento criado: <strong>${d.title||'Teste'}</strong><br>ID: <code style="font-size:10px">${d.eventId||'—'}</code><br><span style="font-size:11px;color:var(--mu)">Verifique no Google Calendar e exclua o evento de teste.</span></div>`;
-    }else{
-      res.innerHTML=`<div class="al al-err">❌ Apps Script retornou erro:<br>${d.error}</div>`;
-    }
-  }catch(e){
-    res.innerHTML=`<div class="al al-err">❌ Falha na conexão com o Apps Script:<br>${e.message}<br><span style="font-size:11px">Verifique se a URL está correta e se o acesso está como "Qualquer pessoa".</span></div>`;
-  }
+  const key=gi('gc-key'),calId=gi('gc-cid');const res=document.getElementById('gc-res');
+  if(!key||!calId){res.innerHTML=`<div class="al al-warn">Preencha API Key e Calendar ID antes de testar.</div>`;return;}
+  res.innerHTML=`<div class="al al-info">⏳ Testando...</div>`;
+  try{const url=`https://www.googleapis.com/calendar/v3/calendars/${encodeURIComponent(calId)}/events?key=${key}&timeMin=${new Date().toISOString()}&maxResults=5&singleEvents=true&orderBy=startTime`;const r=await fetch(url);const d=await r.json();if(d.error){res.innerHTML=`<div class="al al-err">❌ Erro: ${d.error.message}</div>`;}else{gcEvt=d.items||[];gcfg.on=true;saveGc();res.innerHTML=`<div class="al al-ok">✅ Conectado! ${gcEvt.length} evento(s) encontrado(s).</div>`;}}catch(e){res.innerHTML=`<div class="al al-err">❌ Falha: ${e.message}</div>`;}
 }
 async function syncGCal(){
   const btn=document.getElementById('sync-btn');if(btn)btn.classList.add('spin');
@@ -2971,186 +2147,13 @@ async function syncGCal(){
   const res=document.getElementById('sync-res');
   if(!gcfg.script){toS.forEach(b=>window.open(gcLink(b),'_blank'));if(btn)btn.classList.remove('spin');if(res)res.innerHTML=`<div class="al al-warn">Configure o Apps Script para sincronização automática.</div>`;return;}
   let ok=0,err=0;
-  for(const b of toS){
-    try{
-      const t=BT[b.type];
-      // Payload completo conforme contrato do Apps Script instalado
-      const payload={
-        calendarId: gcfg.calId||'adv.souzamarcus@gmail.com',
-        title: `[${t.n}] - ${b.nome}`,
-        start: `${b.data}T${b.hora}:00-03:00`,
-        end:   `${b.data}T${am(b.hora,t.d)}:00-03:00`,
-        clientName:  b.nome,
-        phone:       b.tel?`(${b.tel.substring(0,2)}) ${b.tel.substring(2,7)}-${b.tel.substring(7)}`:'Não informado',
-        email:       b.email||'Não informado',
-        serviceType: t.n,
-        description: b.resumo||'Sem descrição.',
-        location:    b.modal==='videoconferencia'?'Google Meet / Videoconferência':
-                     b.modal==='whatsapp'?'WhatsApp (21) 96534-8183':
-                     b.modal==='ligacao'?'Ligação telefônica':'Online',
-        notes: `Modalidade: ${b.modal}\nProtocolo: ${b.id}\nCidade: ${b.cidade||''}/${b.estado||'RJ'}\nÁrea jurídica: ${b.area||''}`,
-      };
-      const r=await fetch(gcfg.script,{
-        method:'POST',
-        headers:{'Content-Type':'application/json'},
-        body:JSON.stringify(payload)
-      });
-      const d=await r.json();
-      if(d.success){ok++;b.gcEventId=d.eventId;saveBk();}
-      else{err++;console.warn('Apps Script erro:',d.error);}
-    }catch(e){err++;console.warn('sync erro:',e.message);}
-  }
+  for(const b of toS){try{const t=BT[b.type];const payload={action:'createEvent',calendarId:gcfg.calId,title:`[${t.n}] - ${b.nome}`,start:`${b.data}T${b.hora}:00`,end:`${b.data}T${am(b.hora,t.d)}:00`,description:`Nome: ${b.nome}\nWhatsApp: ${b.tel}\nCPF: ${b.cpf}\nÁrea: ${b.area}\nResumo: ${b.resumo}\nModalidade: ${b.modal}\nProtocolo: ${b.id}`};const r=await fetch(gcfg.script,{method:'POST',body:JSON.stringify(payload)});const d=await r.json();if(d.success)ok++;else err++;}catch{err++;}}
   if(res)res.innerHTML=`<div class="al ${!err?'al-ok':'al-warn'}">${!err?'✅':'⚠️'} Sincronizado: ${ok} evento(s)${err?`, ${err} erro(s)`:''}</div>`;
   if(btn)btn.classList.remove('spin');
 }
-function gcLink(b){
-  const t=BT[b.type];
-  const s=b.data.replace(/-/g,'')+'T'+b.hora.replace(':','')+'00';
-  const e=b.data.replace(/-/g,'')+'T'+am(b.hora,t.d).replace(':','')+'00';
-  const tel=b.tel?`(${b.tel.substring(0,2)}) ${b.tel.substring(2,7)}-${b.tel.substring(7)}`:b.tel||'';
-  const loc=b.modal==='videoconferencia'?'Google Meet / Videoconferência':
-             b.modal==='whatsapp'?'WhatsApp (21) 96534-8183':
-             b.modal==='ligacao'?'Ligação telefônica':'Online';
-  const det=`Marcus Souza I Advogado — Agendamento
-Cliente: ${b.nome}
-WhatsApp: ${tel}
-E-mail: ${b.email||''}
-Tipo: ${t.n}
-Área: ${b.area||''}
-Resumo: ${b.resumo||''}
-Modalidade: ${loc}
-Protocolo: ${b.id}
-Cidade: ${b.cidade||''}/${b.estado||'RJ'}`;
-  return`https://calendar.google.com/calendar/render?action=TEMPLATE&text=${encodeURIComponent('['+t.n+'] - '+b.nome)}&dates=${s}/${e}&details=${encodeURIComponent(det)}&location=${encodeURIComponent(loc)}&add=${encodeURIComponent(gcfg.calId||'adv.souzamarcus@gmail.com')}`;
-}
-function cpScript(){navigator.clipboard?.writeText(appsScript()).then(()=>alert('✅ Código copiado! Cole no Google Apps Script.')).catch(()=>{const t=document.createElement('textarea');t.value=appsScript();document.body.appendChild(t);t.select();document.execCommand('copy');document.body.removeChild(t);alert('✅ Código copiado!');});}
-
-// Testa a API Key do Google Calendar (leitura pública)
-async function testGCalAPI(){
-  const key=gi('gc-key')||gcfg.key;
-  const calId=gi('gc-cid')||gcfg.calId;
-  const res=document.getElementById('gc-res');
-  if(!key){res.innerHTML='<div class="al al-warn">API Key não configurada.</div>';return;}
-  res.innerHTML='<div class="al al-info">⏳ Testando conexão com Google Calendar...</div>';
-  try{
-    const url=`https://www.googleapis.com/calendar/v3/calendars/${encodeURIComponent(calId)}/events?key=${key}&timeMin=${new Date().toISOString()}&maxResults=5&singleEvents=true&orderBy=startTime`;
-    const r=await fetch(url);
-    const d=await r.json();
-    if(d.error){
-      res.innerHTML=`<div class="al al-err">❌ ${d.error.message}<br><span style="font-size:10px">Code: ${d.error.code} — ${d.error.status}</span></div>`;
-    }else{
-      gcEvt=d.items||[];
-      gcfg.key=key;gcfg.calId=calId;saveGc();
-      const evList=gcEvt.slice(0,3).map(e=>{
-        const s=(e.start?.dateTime||e.start?.date||'').substring(0,16);
-        return`<div style="font-size:11px;padding:2px 0">📅 ${s} — ${e.summary||'(sem título)'}</div>`;
-      }).join('');
-      res.innerHTML=`<div class="al al-ok">
-        ✅ <strong>API Key válida!</strong> Calendário <strong>adv.souzamarcus@gmail.com</strong> acessível.<br>
-        ${gcEvt.length} evento(s) próximos encontrados.${evList?'<div style="margin-top:6px">'+evList+'</div>':''}
-      </div>`;
-    }
-  }catch(e){
-    res.innerHTML=`<div class="al al-err">❌ Falha: ${e.message}</div>`;
-  }
-}
-
-// Sincroniza um agendamento individual via Apps Script
-async function syncOne(bkId){
-  const b=bk.find(x=>x.id===bkId);if(!b||!gcfg.script)return;
-  const t=BT[b.type];
-  const payload={
-    calendarId:gcfg.calId||'adv.souzamarcus@gmail.com',
-    title:`[${t.n}] - ${b.nome}`,
-    start:`${b.data}T${b.hora}:00-03:00`,
-    end:`${b.data}T${am(b.hora,t.d)}:00-03:00`,
-    clientName:b.nome,
-    phone:b.tel?`(${b.tel.substring(0,2)}) ${b.tel.substring(2,7)}-${b.tel.substring(7)}`:b.tel||'',
-    email:b.email||'',
-    serviceType:t.n,
-    description:b.resumo||'',
-    location:b.modal==='videoconferencia'?'Google Meet / Videoconferência':b.modal==='whatsapp'?'WhatsApp (21) 96534-8183':'Ligação telefônica',
-    notes:`Modalidade: ${b.modal}\nProtocolo: ${b.id}\nCidade: ${b.cidade||''}/${b.estado||'RJ'}`,
-  };
-  try{
-    const r=await fetch(gcfg.script,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(payload)});
-    const d=await r.json();
-    if(d.success){b.gcEventId=d.eventId;saveBk();alert(`✅ Evento criado no Google Calendar!
-ID: ${d.eventId}`);}
-    else alert(`❌ Erro: ${d.error}`);
-  }catch(e){alert(`❌ Falha: ${e.message}`);}
-}
-function appsScript(){return `// MARCUS SOUZA I ADVOGADO — Google Apps Script
-// Calendário: adv.souzamarcus@gmail.com
-// Projeto GCP: logical-bolt-499415-t9
-// Conta de serviço: escritorio-app@logical-bolt-499415-t9.iam.gserviceaccount.com
-//
-// INSTALAÇÃO:
-// 1. script.google.com → Novo projeto → Cole este código
-// 2. Implantar → Nova implantação → App da Web
-// 3. Executar como: Eu mesmo | Acesso: Qualquer pessoa
-// 4. Copie a URL e cole no sistema (aba Google Cal → Apps Script URL)
-
-function doPost(e) {
-  try {
-    if (!e || !e.postData || !e.postData.contents) {
-      throw new Error('Nenhum dado enviado.');
-    }
-    const d = JSON.parse(e.postData.contents);
-
-    if (!d.title) throw new Error("Campo 'title' obrigatório.");
-    if (!d.start) throw new Error("Campo 'start' obrigatório.");
-    if (!d.end)   throw new Error("Campo 'end' obrigatório.");
-
-    const calendarId = d.calendarId || 'adv.souzamarcus@gmail.com';
-    const cal = CalendarApp.getCalendarById(calendarId);
-    if (!cal) throw new Error('Calendário não encontrado: ' + calendarId);
-
-    const startDate = new Date(d.start);
-    const endDate   = new Date(d.end);
-    if (isNaN(startDate)) throw new Error('Data inicial inválida: ' + d.start);
-    if (isNaN(endDate))   throw new Error('Data final inválida: ' + d.end);
-    if (endDate <= startDate) throw new Error('Data final deve ser posterior à inicial.');
-
-    const description = [
-      'MARCUS SOUZA I ADVOGADO',
-      'Cliente: '      + (d.clientName  || 'Não informado'),
-      'WhatsApp: '     + (d.phone       || 'Não informado'),
-      'E-mail: '       + (d.email       || 'Não informado'),
-      'Tipo: '         + (d.serviceType || 'Não informado'),
-      'Resumo: '       + (d.description || 'Sem descrição.'),
-      'Local: '        + (d.location    || 'Não informado'),
-      'Obs. internas: '+ (d.notes       || 'Nenhuma.'),
-    ].join('\n');
-
-    const event = cal.createEvent(d.title, startDate, endDate, {
-      description: description,
-      location: d.location || 'Atendimento online'
-    });
-
-    event.addPopupReminder(60);   // 1h antes
-    event.addPopupReminder(1440); // 1 dia antes
-
-    return ContentService
-      .createTextOutput(JSON.stringify({
-        success: true,
-        message: 'Evento criado com sucesso.',
-        eventId: event.getId(),
-        title:   d.title,
-        start:   d.start,
-        end:     d.end,
-      }))
-      .setMimeType(ContentService.MimeType.JSON);
-
-  } catch (err) {
-    return ContentService
-      .createTextOutput(JSON.stringify({
-        success: false,
-        error: err.toString()
-      }))
-      .setMimeType(ContentService.MimeType.JSON);
-  }
-}`;}
+function gcLink(b){const t=BT[b.type];const s=b.data.replace(/-/g,'')+'T'+b.hora.replace(':','')+'00';const e=b.data.replace(/-/g,'')+'T'+am(b.hora,t.d).replace(':','')+'00';return`https://calendar.google.com/calendar/render?action=TEMPLATE&text=${encodeURIComponent('['+t.n+'] - '+b.nome)}&dates=${s}/${e}&details=${encodeURIComponent('Nome: '+b.nome+'\nWhatsApp: '+b.tel+'\nCPF: '+b.cpf+'\nÁrea: '+b.area+'\nResumo: '+b.resumo+'\nProtocolo: '+b.id)}`;}
+function cpScript(){navigator.clipboard?.writeText(appsScript()).then(()=>alert('✅ Código copiado!'));}
+function appsScript(){return`// SOUZA ADVOCACIA — Google Apps Script\nfunction doPost(e) {\n  try {\n    const d = JSON.parse(e.postData.contents);\n    const cal = CalendarApp.getCalendarById(d.calendarId || 'primary');\n    const event = cal.createEvent(d.title, new Date(d.start), new Date(d.end), {\n      description: d.description || ''\n    });\n    event.addPopupReminder(60);\n    event.addPopupReminder(1440);\n    return ContentService.createTextOutput(\n      JSON.stringify({ success: true, eventId: event.getId() })\n    ).setMimeType(ContentService.MimeType.JSON);\n  } catch(err) {\n    return ContentService.createTextOutput(\n      JSON.stringify({ success: false, error: err.toString() })\n    ).setMimeType(ContentService.MimeType.JSON);\n  }\n}`;}
 
 // ═══════════════════════════════════════════════════════════════════
 // CONFIG
@@ -3180,36 +2183,7 @@ function renderConfig(){
   <div class="card"><div class="stit" style="color:var(--re)">⚠️ Zona de Perigo</div>
     <button class="btn bred bw" onclick="if(confirm('Limpar TODOS os agendamentos? Ação irreversível!'))clearAllBk()">🗑️ Limpar Todos os Agendamentos</button>
   </div>`;
-  
-  // Sincronização
-  h+=`<div class="card" style="margin-bottom:12px">
-    <div class="stit">📲 Sincronização entre Aparelhos</div>
-    <div class="al al-warn" style="font-size:11px;margin-bottom:10px">
-      ⚠️ <strong>Os dados ficam salvos localmente em cada aparelho.</strong>
-      Para usar em outro celular/computador, exporte aqui e importe lá.
-    </div>
-    <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:10px">
-      <div style="background:#f0fdf4;border:1px solid #bbf7d0;border-radius:8px;padding:12px">
-        <div style="font-size:12px;font-weight:700;color:#166534;margin-bottom:4px">📤 Exportar</div>
-        <div style="font-size:11px;color:var(--mu);margin-bottom:8px">Todos os dados em arquivo .json para enviar ao outro aparelho.</div>
-        <button class="btn bgreen bsm bw" onclick="exportarDados()">📤 Exportar dados (.json)</button>
-      </div>
-      <div style="background:#eff6ff;border:1px solid #bfdbfe;border-radius:8px;padding:12px">
-        <div style="font-size:12px;font-weight:700;color:#1d4ed8;margin-bottom:4px">📥 Importar</div>
-        <div style="font-size:11px;color:var(--mu);margin-bottom:8px">Carrega os dados exportados neste dispositivo.</div>
-        <button class="btn bblue bsm bw" onclick="importarDados()">📥 Importar dados (.json)</button>
-      </div>
-    </div>
-    <div style="border-top:1px solid var(--bd);padding-top:10px">
-      <div style="font-size:12px;font-weight:700;color:var(--n);margin-bottom:4px">🔑 Código de acesso rápido</div>
-      <div style="font-size:11px;color:var(--mu);margin-bottom:8px">Compartilha só os logins/senhas (sem dados de clientes). Mais rápido e seguro para novo colaborador.</div>
-      <div style="display:flex;gap:8px;flex-wrap:wrap">
-        <button class="btn bgold bsm" onclick="exportarAcessos()">📋 Gerar código</button>
-        <button class="btn bghost bsm" onclick="importarAcessos()">📲 Usar código</button>
-      </div>
-    </div>
-  </div>\`;
-document.getElementById('admin-cnt').innerHTML=h;
+  document.getElementById('admin-cnt').innerHTML=h;
 }
 function clearAllBk(){bk=[];saveBk();updNotif();renderConfig();}
 
@@ -3250,7 +2224,6 @@ function showDet(id){
     </div>
     <div class="brow">
       <a href="https://wa.me/55${b.tel}?text=${encodeURIComponent('Olá '+b.nome.split(' ')[0]+'! Confirmamos seu atendimento para '+fd(b.data)+' às '+b.hora+'. Escritório Marcus Souza I Advogado — (21) 96534-8183.')}" target="_blank" class="btn bwa" style="flex:1">📱 WhatsApp</a>
-      <a href="https://link.picpay.com/p/17814621996a2ef4b7697a2" target="_blank" class="btn" style="flex:1;background:linear-gradient(135deg,#11c76f,#21D07A);color:#fff;text-decoration:none;display:inline-flex;align-items:center;justify-content:center">💳 Link Pagamento</a>
       <a href="${gcLink(b)}" target="_blank" class="btn bnav" style="flex:1">📅 Google Cal</a>
       <button class="btn bred" onclick="delDet('${b.id}')" style="flex:1">🗑️</button>
     </div>`;
@@ -3388,26 +2361,6 @@ function submitBooking(){
   if(!app.lgpd){alert('É necessário aceitar a Política de Privacidade.');return;}
   const b={id:gidb(),type:app.type,status:'solicitado',nome:app.nome,cpf:'',tel:app.tel,email:app.email,cidade:app.cidade,estado:app.estado,area:app.area,resumo:app.resumo,modal:app.modal,data:app.data,hora:app.hora,extra:app.extra,files:[...app.files],createdAt:new Date().toISOString(),obs:''};
   bk.push(b);saveBk();updNotif();
-  // Criar evento no Google Calendar automaticamente (se Apps Script configurado)
-  if(gcfg.script&&gcfg.on){
-    const t_=BT[b.type];
-    const payload_={
-      calendarId:gcfg.calId||'adv.souzamarcus@gmail.com',
-      title:`[${t_.n}] - ${b.nome}`,
-      start:`${b.data}T${b.hora}:00-03:00`,
-      end:`${b.data}T${am(b.hora,t_.d)}:00-03:00`,
-      clientName:b.nome,
-      phone:b.tel?`(${b.tel.substring(0,2)}) ${b.tel.substring(2,7)}-${b.tel.substring(7)}`:b.tel||'',
-      email:b.email||'',
-      serviceType:t_.n,
-      description:b.resumo||'',
-      location:b.modal==='videoconferencia'?'Google Meet / Videoconferência':b.modal==='whatsapp'?'WhatsApp (21) 96534-8183':'Ligação telefônica',
-      notes:`Modalidade: ${b.modal}\nProtocolo: ${b.id}\nCidade: ${b.cidade||''}/${b.estado||'RJ'}\nÁrea: ${b.area||''}`,
-    };
-    fetch(gcfg.script,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(payload_)})
-      .then(r=>r.json()).then(d=>{if(d.success){b.gcEventId=d.eventId;saveBk();}})
-      .catch(()=>{}); // silencioso — não bloqueia o agendamento
-  }
   const t=BT[b.type];const mmap={videoconferencia:'📹 Videoconferência',ligacao:'📞 Ligação',whatsapp:'💬 WhatsApp'};
   document.getElementById('suc-msg').textContent=`Olá, ${b.nome.split(' ')[0]}! Seu agendamento foi realizado. Em breve a equipe confirmará pelo WhatsApp.`;
   document.getElementById('suc-det').innerHTML=`<div class="ri2"><div class="rl">Tipo</div><div class="rv">${t.i} ${t.n}</div></div><div class="ri2"><div class="rl">Data</div><div class="rv">📅 ${fd(b.data)}</div></div><div class="ri2"><div class="rl">Horário</div><div class="rv">⏰ ${b.hora}</div></div><div class="ri2"><div class="rl">Modalidade</div><div class="rv">${mmap[b.modal]||b.modal}</div></div><div class="ri2"><div class="rl">Protocolo</div><div class="rv" style="font-family:monospace;font-size:11px">${b.id}</div></div>`;
@@ -3433,67 +2386,318 @@ function gcalUrl(title,date,endDate,desc,location){const s=date.replace(/-/g,'')
 function buildAdvSelect(id,selected){const sel=document.getElementById(id);if(!sel)return;sel.innerHTML=users.filter(u=>u.ativo&&(u.role==='admin'||u.role==='advogado')).map(u=>`<option value="${u.nome}" ${u.nome===selected?'selected':''}>${u.nome}</option>`).join('');}
 function buildCliSelect(id,selected){const sel=document.getElementById(id);if(!sel)return;sel.innerHTML='<option value="">— Selecionar —</option>'+cli.map(c=>`<option value="${c.id}" ${c.id===+selected?'selected':''}>${c.nome}</option>`).join('');}
 
-// ═══════════════════════════════════════════════════════════════════
-// DADOS DE PAGAMENTO
-// ═══════════════════════════════════════════════════════════════════
-const PAYMENT={picpay:'https://link.picpay.com/p/17814621996a2ef4b7697a2',pix:'adv.souzamarcus@gmail.com',banco:'PicPay (380)',ag:'0001',cc:'93530512-2',fav:'Marcus Souza'};
-function copyPayLink(){navigator.clipboard?.writeText(PAYMENT.picpay).then(()=>alert('✅ Link copiado!'));}
-function copyPixKey(){navigator.clipboard?.writeText(PAYMENT.pix).then(()=>alert('✅ Chave PIX copiada!'));}
-function copyBankData(){navigator.clipboard?.writeText('Banco '+PAYMENT.banco+' | Ag: '+PAYMENT.ag+' | CC: '+PAYMENT.cc+' | '+PAYMENT.fav).then(()=>alert('✅ Dados bancários copiados!'));}
 
-// ═══════════════════════════════════════════════════════════════════
-// SINCRONIZAÇÃO ENTRE APARELHOS
-// Os dados ficam no localStorage de cada aparelho.
-// Para usar em outro dispositivo: exportar aqui → importar lá.
-// ═══════════════════════════════════════════════════════════════════
-function exportarDados(){
-  const dados={v:2,exportedAt:new Date().toISOString(),exportedBy:currentUser?.nome,
-    users:users.map(u=>({...u})),cli,proc,tar,fin};
-  const a=document.createElement('a');
-  a.href='data:application/json;charset=utf-8,'+encodeURIComponent(JSON.stringify(dados,null,2));
-  a.download='sistema-'+td0+'.json';a.click();
-  alert('✅ Dados exportados!\n\nEnvie o arquivo .json para o outro aparelho e use a opção Importar Dados.');
+// CONTROLE DE ACESSOS
+const MOD_LBL={cli:{l:'Clientes',i:'&#128101;'},proc:{l:'Processos',i:'&#9878;'},age:{l:'Agenda',i:'&#128197;'},fin:{l:'Financeiro',i:'&#128176;'},tar:{l:'Tarefas',i:'&#9989;'},rel:{l:'Relatorios',i:'&#128202;'},cfg:{l:'Config',i:'&#9881;'},usr:{l:'Usuarios',i:'&#128100;'}};
+const ACT_LBL={v:'Visualizar',c:'Criar',e:'Editar',d:'Excluir'};
+function renderAcessos(){
+  if(currentUser?.role!=='admin'){denyAccess('Controle de Acessos');return;}
+  loadLog();
+  const sbg=u=>u.ativo?'<span class="badge bg">Ativo</span>':'<span class="badge br">Bloqueado</span>';
+  const lastA=u=>{const l=accessLog.filter(x=>x.usuario===u.nome&&!x.negado);return l.length?l[0].data+' '+l[0].hora:'Nunca';};
+  const denied=u=>accessLog.filter(x=>x.usuario===u.nome&&x.negado).length;
+  let h='<div class="card hi" style="margin-bottom:12px"><div class="stit">&#128274; Controle de Acessos e Permissoes</div><div style="font-size:12px;color:var(--mu)">Somente o administrador tem acesso a esta area.</div></div>';
+  h+='<div class="card" style="margin-bottom:12px"><div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:10px"><div class="stit">&#128101; Usuarios</div><button class="btn bp bsm" onclick="openUserModal()">+ Novo</button></div><div class="tw"><table><thead><tr><th></th><th>Usuario</th><th>Perfil</th><th>Status</th><th>Ultimo Acesso</th><th>Negados</th><th>Acoes</th></tr></thead><tbody>';
+  h+=users.map(u=>'<tr style="opacity:'+( u.ativo?1:.6)+'"><td><div class="av" style="width:30px;height:30px;font-size:11px;background:'+ac(u.id)+';color:#fff">'+initials(u.nome)+'</div></td><td><div style="font-weight:700;font-size:12px">'+esc(u.nome)+'</div><div style="font-size:10px;color:#2563eb">'+esc(u.email)+'</div></td><td><span class="urole '+(ROLES[u.role]?.cls||'r-colaborador')+'">'+( ROLES[u.role]?.l||u.role)+'</span></td><td>'+sbg(u)+'</td><td style="font-size:10px;color:var(--mu)">'+lastA(u)+'</td><td style="text-align:center">'+(denied(u)>0?'<span style="color:#dc2626;font-weight:700">'+denied(u)+'</span>':'0')+'</td><td><div style="display:flex;gap:3px"><button class="btn bsa xs" onclick="openPermModal('+u.id+')" title="Permissoes">&#128273;</button><button class="btn bgh xs" onclick="editUser('+u.id+')">&#9999;&#65039;</button>'+(u.id!==currentUser.id?'<button class="btn '+(u.ativo?'bd_':'bg_')+' xs" onclick="toggleAcesso('+u.id+')">'+(u.ativo?'&#128274;':'&#128275;')+'</button>':'')+'</div></td></tr>').join('');
+  h+='</tbody></table></div></div>';
+  h+='<div class="card"><div class="stit">&#128203; Log de Acessos</div><div style="display:flex;gap:8px;margin-bottom:8px"><select id="log-fu" onchange="renderLogT()" style="font-size:11px"><option value="">Todos</option>'+users.map(u=>'<option value="'+esc(u.nome)+'">'+esc(u.nome)+'</option>').join('')+'</select><select id="log-ft" onchange="renderLogT()" style="font-size:11px"><option value="">Todos</option><option value="negado">Negados</option><option value="ok">Permitidos</option></select><button class="btn bgh bsm" onclick="accessLog=[];localStorage.removeItem(&quot;sa_log&quot;);renderAcessos()">&#128465;&#65039; Limpar</button></div><div id="log-cont"></div></div>';
+  document.getElementById('admin-cnt').innerHTML=h;
+  renderLogT();
 }
-function importarDados(){
-  const input=document.createElement('input');
-  input.type='file';input.accept='.json';
-  input.onchange=async e=>{
-    const file=e.target.files[0];if(!file)return;
-    try{
-      const dados=JSON.parse(await file.text());
-      if(!dados.v||!dados.users?.length){alert('❌ Arquivo inválido.');return;}
-      const quando=dados.exportedAt?new Date(dados.exportedAt).toLocaleString('pt-BR'):'desconhecido';
-      if(!confirm(`Importar dados de ${dados.exportedBy||'outro aparelho'} (${quando})?\n\nIsso irá substituir os dados locais.`))return;
-      users=dados.users;
-      if(dados.cli)cli=dados.cli;
-      if(dados.proc)proc=dados.proc;
-      if(dados.tar)tar=dados.tar;
-      if(dados.fin)fin=dados.fin;
-      ['users','cli','proc','tar','fin'].forEach(k=>localStorage.setItem('sa_'+k,JSON.stringify(
-        k==='users'?users:k==='cli'?cli:k==='proc'?proc:k==='tar'?tar:fin)));
-      alert('✅ Dados importados! Faça o login com seu e-mail e senha.');
-      location.reload();
-    }catch(err){alert('❌ Erro ao importar: '+err.message);}
-  };input.click();
+function renderLogT(){
+  const fu=(document.getElementById('log-fu')||{}).value||'';
+  const ft=(document.getElementById('log-ft')||{}).value||'';
+  let logs=accessLog;
+  if(fu)logs=logs.filter(l=>l.usuario===fu);
+  if(ft==='negado')logs=logs.filter(l=>l.negado);
+  if(ft==='ok')logs=logs.filter(l=>!l.negado);
+  const c=document.getElementById('log-cont');if(!c)return;
+  if(!logs.length){c.innerHTML='<div style="text-align:center;padding:16px;font-size:12px;color:var(--mu)">Nenhum registro.</div>';return;}
+  c.innerHTML='<div style="max-height:280px;overflow-y:auto"><div class="log-row" style="font-weight:700;font-size:10px;text-transform:uppercase;color:var(--mu);background:#f8fafc"><div>Data/Hora</div><div>Usuario</div><div>Modulo</div><div>Status</div></div>'+logs.slice(0,80).map(l=>'<div class="log-row"><div style="font-size:10px">'+l.data+'<br>'+l.hora+'</div><div style="font-size:11px;font-weight:600">'+esc(l.usuario)+'</div><div style="font-size:11px">'+esc(l.mod)+'</div><div>'+(l.negado?'<span style="color:#dc2626;font-size:10px">&#10006; NEGADO</span>':'<span style="color:#16a34a;font-size:10px">&#10003;</span>')+'</div></div>').join('')+'</div>';
 }
-function exportarAcessos(){
-  const dados={v:2,t:'acessos',exportedAt:new Date().toISOString(),users:users.map(u=>({...u}))};
-  const b64=btoa(unescape(encodeURIComponent(JSON.stringify(dados))));
-  navigator.clipboard?.writeText(b64)
-    .then(()=>alert('✅ Código copiado!\n\nNo outro aparelho, toque em "Primeiro acesso neste aparelho?" e cole o código.'))
-    .catch(()=>prompt('Copie este código e cole no outro aparelho:',b64));
+function openPermModal(userId){
+  const u=users.find(x=>x.id===userId);if(!u)return;
+  const base=ROLES[u.role]||ROLES.estagiario;
+  const merged=u.customPerms?deepMerge(base,u.customPerms):base;
+  let rows='';
+  Object.entries(MOD_LBL).forEach(([mod,info])=>{
+    const l=info.l,i=info.i;
+    rows+='<div class="perm-mod"><div class="perm-mod-title">'+i+' '+l+'</div>';
+    Object.entries(ACT_LBL).forEach(([act,albl])=>{
+      const val=merged[mod]&&merged[mod][act]?1:0;
+      rows+='<div class="perm-row"><span>'+albl+'</span><label class="ptog"><input type="checkbox" id="pc-'+mod+'-'+act+'" '+(val?'checked':'')+'><span class="pslider"></span></label></div>';
+    });
+    rows+='</div>';
+  });
+  const m=document.createElement('div');
+  m.className='mo-desk on';m.id='m-perm-modal';
+  const rn=ROLES[u.role]?.l||u.role;
+  const rc=ROLES[u.role]?.cls||'r-colaborador';
+  m.innerHTML='<div class="mbox" style="max-width:820px;max-height:85vh;overflow-y:auto">'
+    +'<h3>Permissoes &mdash; '+esc(u.nome)+'</h3>'
+    +'<div style="display:flex;align-items:center;gap:10px;margin-bottom:14px;flex-wrap:wrap">'
+    +'<span class="urole '+rc+'">'+rn+'</span>'
+    +'<span style="font-size:11px;color:var(--mu)">Permissoes personalizadas sobrepoem o perfil padrao</span>'
+    +'<button class="btn bgh bsm" onclick="resetPerm('+userId+')">Reset</button>'
+    +'</div><div class="perm-grid">'+rows+'</div>'
+    +'<div class="mfoot" style="margin-top:14px">'
+    +'<button class="btn bp" onclick="savePerm('+userId+')">Salvar</button> '
+    +'<button class="btn bgh" onclick="document.getElementById(&quot;m-perm-modal&quot;).remove()">Cancelar</button>'
+    +'</div></div>';
+  document.body.appendChild(m);
+  m.addEventListener('click',e=>{if(e.target===m)m.remove();});
 }
-function importarAcessos(){
-  const codigo=prompt('Cole o código de acessos aqui:','');
-  if(!codigo)return;
+function savePerm(uid){const u=users.find(x=>x.id===uid);if(!u)return;const cp={};Object.keys(MOD_LBL).forEach(mod=>{cp[mod]={};Object.keys(ACT_LBL).forEach(act=>{const el=document.getElementById('pc-'+mod+'-'+act);if(el)cp[mod][act]=el.checked?1:0;});});u.customPerms=cp;save();document.getElementById('m-perm-modal')?.remove();logAccess('usuarios','permissoes salvas: '+u.nome);alert('Permissoes de '+u.nome+' salvas!');renderAcessos();}
+function resetPerm(uid){const u=users.find(x=>x.id===uid);if(!u)return;if(!confirm('Resetar permissoes de '+u.nome+' ao perfil padrao?'))return;delete u.customPerms;save();document.getElementById('m-perm-modal')?.remove();renderAcessos();}
+function toggleAcesso(uid){const u=users.find(x=>x.id===uid);if(!u)return;if(!confirm((u.ativo?'Bloquear':'Desbloquear')+' '+u.nome+'?'))return;u.ativo=!u.ativo;save();logAccess('usuarios',(u.ativo?'desbloqueado':'bloqueado')+': '+u.nome);renderAcessos();}
+
+// ASSISTENTE VIRTUAL COM IA
+let iaCfg={apiKey:'',model:'claude-sonnet-4-6',persona:'voce e um assistente virtual juridico do escritorio Marcus Souza I Advogado. Responda sempre em portugues. Seja cordial, objetivo e nunca faca aconselhamento juridico ou preveja resultados. Para consultas juridicas, agende uma reuniao com o Dr. Marcus Souza.',respDelay:1200,voz:false,agendamento:true,docs:true,faq:true};
+let iaHist=[];
+let iaTyping=false;
+
+function renderIA(){
+  const cfg=iaCfg;
+  document.getElementById('admin-cnt').innerHTML=`
+  <div style="display:grid;grid-template-columns:1fr 320px;gap:12px;height:calc(100vh - 120px)">
+
+    <!-- Chat principal -->
+    <div class="card" style="display:flex;flex-direction:column;padding:0;overflow:hidden">
+      <div style="padding:14px 16px;border-bottom:1px solid var(--bd);display:flex;align-items:center;gap:10px">
+        <div style="width:36px;height:36px;background:linear-gradient(135deg,var(--g),#2563eb);border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:18px">&#129302;</div>
+        <div>
+          <div style="font-weight:700;font-size:13px">Assistente Virtual IA</div>
+          <div style="font-size:10px;color:var(--mu)">Marcus Souza I Advogado &mdash; ${cfg.apiKey?'&#10003; Conectado':'&#9888; Configure a API Key'}</div>
+        </div>
+        <div style="margin-left:auto;display:flex;gap:6px">
+          <button class="btn bgh bsm" onclick="iaClearChat()">&#128465;&#65039; Limpar</button>
+          <button class="btn bsa bsm" onclick="iaExportChat()">&#128229; Exportar</button>
+        </div>
+      </div>
+      <div class="ia-messages" id="ia-msgs">
+        <div class="ia-bubble ia">
+          Ola! Sou o assistente virtual do escritorio <strong>Marcus Souza I Advogado</strong>. &#128522;<br><br>
+          Posso ajudar com:<br>
+          &bull; Informacoes sobre o escritorio<br>
+          &bull; Agendamento de consultas<br>
+          &bull; Duvidas gerais juridicas (sem aconselhamento)<br>
+          &bull; Acompanhamento de processos<br>
+          &bull; Formas de pagamento<br><br>
+          Como posso ajudar?
+        </div>
+      </div>
+      <div style="padding:10px 14px;border-top:1px solid var(--bd)">
+        <div style="display:flex;gap:6px;margin-bottom:8px;flex-wrap:wrap">
+          <button class="btn bgh xs" onclick="iaSuggest('Quero agendar uma consulta')">&#128197; Agendar</button>
+          <button class="btn bgh xs" onclick="iaSuggest('Qual e o endereco do escritorio?')">&#128205; Endereco</button>
+          <button class="btn bgh xs" onclick="iaSuggest('Quais sao as formas de pagamento?')">&#128176; Pagamento</button>
+          <button class="btn bgh xs" onclick="iaSuggest('Como acompanho meu processo?')">&#9878; Processo</button>
+          ${cfg.docs?'<button class="btn bgh xs" onclick="iaUploadDoc()">&#128196; Enviar doc</button>':''}
+          ${cfg.voz?'<button class="btn bgh xs" id="ia-mic-btn" onclick="iaToggleMic()">&#127908; Audio</button>':''}
+        </div>
+        <div style="display:flex;gap:8px">
+          <input id="ia-input" class="fi" placeholder="Digite sua mensagem..." style="flex:1"
+            onkeydown="if(event.key==='Enter'&&!event.shiftKey){event.preventDefault();iaSend();}">
+          <button class="btn bgold" onclick="iaSend()" style="padding:10px 16px">&#10148;</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- Painel de configuracao -->
+    <div style="display:flex;flex-direction:column;gap:10px;overflow-y:auto">
+
+      <div class="card">
+        <div class="stit">&#9881;&#65039; Configuracao da IA</div>
+        <div class="fg"><div class="fl">API Key (Anthropic Claude)</div>
+          <div style="position:relative">
+            <input type="password" id="ia-key" class="fi" value="${esc(cfg.apiKey)}" placeholder="sk-ant-..." style="padding-right:42px">
+            <button type="button" onclick="togglePwd('ia-key',this)" style="position:absolute;right:10px;top:50%;transform:translateY(-50%);background:none;border:none;cursor:pointer;font-size:14px;color:var(--mu)">&#128065;&#65039;</button>
+          </div>
+        </div>
+        <div class="fg"><div class="fl">Modelo</div>
+          <select id="ia-model" class="fsel">
+            <option value="claude-sonnet-4-6" ${cfg.model==='claude-sonnet-4-6'?'selected':''}>Claude Sonnet 4.6 (Recomendado)</option>
+            <option value="claude-haiku-4-5-20251001" ${cfg.model==='claude-haiku-4-5-20251001'?'selected':''}>Claude Haiku 4.5 (Rapido)</option>
+          </select>
+        </div>
+        <div class="fg"><div class="fl">Delay de resposta (ms)</div>
+          <input id="ia-delay" type="number" class="fi" value="${cfg.respDelay}" min="0" max="5000" step="100">
+        </div>
+        <button class="btn bp bsm bw" onclick="iaSaveCfg()" style="margin-top:6px">&#128190; Salvar</button>
+        <button class="btn bgh bsm bw" onclick="iaTestAPI()" style="margin-top:4px">&#128270; Testar API</button>
+        <div id="ia-test-res" style="font-size:11px;margin-top:6px"></div>
+      </div>
+
+      <div class="card">
+        <div class="stit">&#129302; Personalidade do Assistente</div>
+        <div class="fg"><div class="fl">Instrucao do sistema (persona)</div>
+          <textarea id="ia-persona" style="width:100%;min-height:120px;font-size:11px;padding:8px;border:1px solid var(--bd);border-radius:8px;resize:vertical;font-family:inherit">${esc(cfg.persona)}</textarea>
+        </div>
+        <div class="al al-warn" style="font-size:10px">Nunca habilite aconselhamento juridico, previsao de resultados ou analise de documentos na persona do assistente.</div>
+      </div>
+
+      <div class="card">
+        <div class="stit">&#128736;&#65039; Funcionalidades</div>
+        ${[['agendamento','&#128197; Agendamento automatico','Permite ao cliente agendar diretamente no chat'],['docs','&#128196; Recebimento de documentos','Aceita envio de documentos pelo cliente'],['voz','&#127908; Resposta por audio','Usa Web Speech API para voz (browser)'],['faq','&#10067; FAQ automatico','Responde perguntas frequentes sem chamar a API']].map(([k,l,d])=>`<div style="display:flex;justify-content:space-between;align-items:center;padding:8px 0;border-bottom:1px solid var(--bd)"><div><div style="font-size:12px;font-weight:600">${l}</div><div style="font-size:10px;color:var(--mu)">${d}</div></div><label class="ptog"><input type="checkbox" id="ia-${k}" ${cfg[k]?'checked':''}><span class="pslider"></span></label></div>`).join('')}
+      </div>
+
+      <div class="card">
+        <div class="stit">&#128200; Historico</div>
+        <div style="font-size:12px;color:var(--mu);margin-bottom:8px">${iaHist.length} mensagens nesta sessao</div>
+        <div style="font-size:11px;font-weight:700;margin-bottom:6px">Leads capturados nesta sessao:</div>
+        <div id="ia-leads" style="font-size:11px;color:var(--mu)">Nenhum lead ainda.</div>
+      </div>
+
+    </div>
+  </div>`;
+  iaRenderLeads();
+}
+
+// Configuracao da IA
+function iaSaveCfg(){
+  iaCfg.apiKey=document.getElementById('ia-key')?.value||'';
+  iaCfg.model=document.getElementById('ia-model')?.value||'claude-sonnet-4-6';
+  iaCfg.respDelay=parseInt(document.getElementById('ia-delay')?.value||'1200',10);
+  iaCfg.persona=document.getElementById('ia-persona')?.value||iaCfg.persona;
+  ['agendamento','docs','voz','faq'].forEach(k=>{iaCfg[k]=!!document.getElementById('ia-'+k)?.checked;});
+  try{localStorage.setItem('ia_cfg',JSON.stringify(iaCfg));}catch(e){}
+  alert('Configuracao salva!');
+  renderIA();
+}
+
+function iaLoadCfg(){try{const d=localStorage.getItem('ia_cfg');if(d)iaCfg={...iaCfg,...JSON.parse(d)};}catch(e){}}
+
+// Testar API
+async function iaTestAPI(){
+  const key=document.getElementById('ia-key')?.value||iaCfg.apiKey;
+  const res=document.getElementById('ia-test-res');
+  if(!key){if(res)res.innerHTML='<span style="color:#dc2626">Insira a API Key.</span>';return;}
+  if(res)res.innerHTML='<span style="color:var(--mu)">&#9203; Testando...</span>';
   try{
-    const dados=JSON.parse(decodeURIComponent(escape(atob(codigo.trim()))));
-    if(!dados.users||dados.t!=='acessos'){alert('❌ Código inválido.');return;}
-    users=dados.users;
-    localStorage.setItem('sa_users',JSON.stringify(users));
-    alert('✅ Acessos importados! Faça o login com seu e-mail e senha.');
-    location.reload();
-  }catch(e){alert('❌ Código inválido ou corrompido.');}
+    const r=await fetch('https://api.anthropic.com/v1/messages',{
+      method:'POST',
+      headers:{'Content-Type':'application/json','x-api-key':key,'anthropic-version':'2023-06-01'},
+      body:JSON.stringify({model:'claude-haiku-4-5-20251001',max_tokens:10,messages:[{role:'user',content:'Oi'}]})
+    });
+    const d=await r.json();
+    if(d.content&&d.content[0]){if(res)res.innerHTML='<span style="color:#16a34a">&#10003; API funcionando! Modelo: '+d.model+'</span>';}
+    else{if(res)res.innerHTML='<span style="color:#dc2626">Erro: '+(d.error?.message||'resposta inesperada')+'</span>';}
+  }catch(e){if(res)res.innerHTML='<span style="color:#dc2626">Erro: '+e.message+'</span>';}
+}
+
+// FAQ embutido (sem chamar API)
+const IA_FAQ=[
+  {q:['endereco','localizacao','onde fica','onde voces ficam'],r:'&#128205; Nosso escritorio fica no Rio de Janeiro/RJ. Entre em contato pelo WhatsApp (21) 96534-8183 para obter o endereco completo.'},
+  {q:['whatsapp','telefone','contato','ligar','chamar'],r:'&#128222; Nosso WhatsApp: <strong>(21) 96534-8183</strong>. Atendemos de segunda a sexta, das 8h as 18h.'},
+  {q:['pagamento','pagar','honorario','custo','preco','valor','quanto custa'],r:'&#128176; Aceitamos PIX (chave: adv.souzamarcus@gmail.com), cartao de credito, debito e transferencia bancaria. O valor dos honorarios e definido apos a consulta inicial.'},
+  {q:['pix','chave pix'],r:'&#9889; Chave PIX: <strong>adv.souzamarcus@gmail.com</strong>'},
+  {q:['area','areas','atende','especialidade','trabalhista','consumidor','previdenciario','familia'],r:'&#9878; Atuamos em: Direito do Consumidor, Trabalhista, Previdenciario, Familiar, Civil, Saude, INSS e outros. Agende uma consulta para avaliarmos seu caso!'},
+  {q:['processo','andamento','como esta','meu processo'],r:'&#9878; Para consultar o andamento do seu processo, acesse o portal do tribunal pelo numero CNJ ou entre em contato pelo WhatsApp. Nosso sistema tambem permite consulta direta pelo Datajud.'},
+  {q:['horario','funciona','atende','atendimento'],r:'&#8986; Atendemos de <strong>segunda a sexta, das 8h as 18h</strong>. Fora do horario, deixe sua mensagem e retornamos em breve!'},
+];
+
+function iaFAQ(msg){
+  const low=msg.toLowerCase();
+  for(const f of IA_FAQ){if(f.q.some(q=>low.includes(q)))return f.r;}
+  return null;
+}
+
+// Leads capturados
+let iaLeads=[];
+function iaRenderLeads(){
+  const el=document.getElementById('ia-leads');if(!el)return;
+  if(!iaLeads.length){el.innerHTML='Nenhum lead ainda.';return;}
+  el.innerHTML=iaLeads.map(l=>'<div style="background:#f8fafc;border:1px solid var(--bd);border-radius:6px;padding:8px;margin-bottom:6px"><div style="font-weight:700">'+esc(l.nome)+'</div><div>'+esc(l.tel||'')+'</div><div style="font-size:10px;color:var(--mu)">'+esc(l.area||'')+'</div></div>').join('');
+}
+function iaExtractLead(msg){
+  const tel=msg.match(/\(?(\d{2})\)?[\s-]?(\d{4,5})[\s-]?(\d{4})/);
+  if(tel&&!iaLeads.find(l=>l.tel===tel[0])){
+    iaLeads.push({nome:'Lead #'+(iaLeads.length+1),tel:tel[0],area:'Chat IA',data:new Date().toLocaleString('pt-BR')});
+    iaRenderLeads();
+  }
+}
+
+// Enviar mensagem
+async function iaSend(){
+  const inp=document.getElementById('ia-input');
+  const msgs=document.getElementById('ia-msgs');
+  if(!inp||!msgs)return;
+  const txt=inp.value.trim();if(!txt)return;
+  inp.value='';
+  // Mensagem do usuário
+  msgs.innerHTML+='<div class="ia-bubble usr">'+esc(txt)+'</div>';
+  msgs.scrollTop=msgs.scrollHeight;
+  iaExtractLead(txt);
+  // Verificar FAQ
+  if(iaCfg.faq){const faq=iaFAQ(txt);if(faq){await new Promise(r=>setTimeout(r,iaCfg.respDelay));msgs.innerHTML+='<div class="ia-bubble ia">'+faq+'</div>';msgs.scrollTop=msgs.scrollHeight;return;}}
+  // Verificar agendamento
+  if(iaCfg.agendamento&&/agendar|consulta|marcar|horario|reuniao/.test(txt.toLowerCase())){
+    await new Promise(r=>setTimeout(r,iaCfg.respDelay));
+    const agBtn=document.createElement('div');
+    agBtn.className='ia-bubble ia';
+    const agBtnTxt=document.createElement('span');
+    agBtnTxt.innerHTML='&#128197; Que otimo! Vou encaminhar voce para o agendamento online.<br><br>';
+    const agBtnAg=document.createElement('button');
+    agBtnAg.className='btn bgold bsm';
+    agBtnAg.style.marginTop='4px';
+    agBtnAg.textContent='&#128197; Agendar agora';
+    agBtnAg.onclick=()=>go('s-type');
+    agBtn.appendChild(agBtnTxt);agBtn.appendChild(agBtnAg);
+    msgs.appendChild(agBtn);
+    msgs.scrollTop=msgs.scrollHeight;return;
+  }
+  // Verificar API Key
+  if(!iaCfg.apiKey){
+    msgs.innerHTML+='<div class="ia-bubble ia">&#128561; A IA nao esta configurada ainda. O administrador precisa inserir a API Key na aba de configuracao. Enquanto isso, entre em contato pelo WhatsApp: <strong>(21) 96534-8183</strong></div>';
+    msgs.scrollTop=msgs.scrollHeight;return;
+  }
+  // Typing indicator
+  msgs.innerHTML+='<div class="ia-typing" id="ia-typ"><div class="ia-dot"></div><div class="ia-dot"></div><div class="ia-dot"></div></div>';
+  msgs.scrollTop=msgs.scrollHeight;
+  // Historico para contexto
+  const hist=[];
+  msgs.querySelectorAll('.ia-bubble').forEach(b=>{if(b.classList.contains('usr'))hist.push({role:'user',content:b.textContent});else if(!b.id&&!b.classList.contains('ia-typing'))hist.push({role:'assistant',content:b.textContent});});
+  hist.push({role:'user',content:txt});
+  // Chamar API Claude
+  try{
+    await new Promise(r=>setTimeout(r,iaCfg.respDelay));
+    const r=await fetch('https://api.anthropic.com/v1/messages',{
+      method:'POST',
+      headers:{'Content-Type':'application/json','x-api-key':iaCfg.apiKey,'anthropic-version':'2023-06-01'},
+      body:JSON.stringify({
+        model:iaCfg.model,
+        max_tokens:600,
+        system:iaCfg.persona+' | Info: Tel (21) 96534-8183 | adv.souzamarcus@gmail.com | OAB/RJ 250.430 | Seg-Sex 8h-18h',        messages:hist.slice(-8)
+      })
+    });
+    const d=await r.json();
+    document.getElementById('ia-typ')?.remove();
+    const resp=d.content?.[0]?.text||'Nao entendi. Pode reformular?';
+    msgs.innerHTML+='<div class="ia-bubble ia">'+esc(resp).replace(/\n/g,'<br>')+'</div>';
+    // TTS se habilitado
+    if(iaCfg.voz&&'speechSynthesis' in window){const u=new SpeechSynthesisUtterance(resp);u.lang='pt-BR';speechSynthesis.speak(u);}
+  }catch(e){
+    document.getElementById('ia-typ')?.remove();
+    msgs.innerHTML+='<div class="ia-bubble ia" style="color:#dc2626">&#9888; Erro ao chamar a IA: '+esc(e.message)+'. Verifique a API Key nas configuracoes.</div>';
+  }
+  msgs.scrollTop=msgs.scrollHeight;
+}
+
+function iaSuggest(txt){const inp=document.getElementById('ia-input');if(inp){inp.value=txt;iaSend();}}
+function iaClearChat(){iaHist=[];const msgs=document.getElementById('ia-msgs');if(msgs)msgs.innerHTML='<div class="ia-bubble ia">Chat reiniciado. Como posso ajudar?</div>';}
+function iaExportChat(){const msgs=document.getElementById('ia-msgs');if(!msgs)return;const txt=Array.from(msgs.querySelectorAll('.ia-bubble')).map(b=>(b.classList.contains('usr')?'CLIENTE: ':'IA: ')+b.textContent).join('\n\n');const a=document.createElement('a');a.href='data:text/plain;charset=utf-8,'+encodeURIComponent(txt);a.download='chat-ia-'+td0+'.txt';a.click();}
+function iaUploadDoc(){const inp=document.createElement('input');inp.type='file';inp.accept='.pdf,.doc,.docx,.jpg,.png';inp.onchange=e=>{const f=e.target.files[0];if(!f)return;const msgs=document.getElementById('ia-msgs');if(msgs){msgs.innerHTML+='<div class="ia-bubble usr">&#128196; Documento enviado: '+esc(f.name)+'</div><div class="ia-bubble ia">&#10003; Documento recebido! <strong>'+esc(f.name)+'</strong> sera analisado pelo Dr. Marcus Souza. Entraremos em contato em ate 24h. Deseja agendar uma consulta para discutir o documento?</div>';msgs.scrollTop=msgs.scrollHeight;}};inp.click();}
+let iaMicActive=false;
+function iaToggleMic(){
+  if(!('webkitSpeechRecognition' in window||'SpeechRecognition' in window)){alert('Seu browser nao suporta reconhecimento de voz.');return;}
+  const SR=window.SpeechRecognition||window.webkitSpeechRecognition;
+  const btn=document.getElementById('ia-mic-btn');
+  if(iaMicActive){iaMicActive=false;if(btn)btn.textContent='&#127908; Audio';return;}
+  iaMicActive=true;if(btn)btn.innerHTML='&#128308; Gravando...';
+  const rec=new SR();rec.lang='pt-BR';rec.continuous=false;rec.interimResults=false;
+  rec.onresult=e=>{const txt=e.results[0][0].transcript;const inp=document.getElementById('ia-input');if(inp){inp.value=txt;iaSend();}};
+  rec.onend=()=>{iaMicActive=false;if(btn)btn.textContent='&#127908; Audio';};
+  rec.start();
 }
 
 // ═══════════════════════════════════════════════════════════════════
@@ -3505,13 +2709,13 @@ function exportExcel(){
   XLSX.utils.book_append_sheet(wb,XLSX.utils.json_to_sheet(proc.map(p=>({'Nº Processo':p.num,Cliente:cn(p.cliId),Área:p.tipo,'Tribunal/Vara':p.vara,Status:p.status,Início:fmtD(p.ini),'Próx.Mov':fmtD(p.prox),Advogado:p.adv,'Observações':p.obs}))),'Processos');
   XLSX.utils.book_append_sheet(wb,XLSX.utils.json_to_sheet(tar.map(t=>({Data:fmtD(t.data),Descrição:t.desc,Cliente:cn(t.cliId),Prioridade:t.prio,Status:t.status,Responsável:t.resp,Concluída:t.ok?'Sim':'Não'}))),'Tarefas');
   XLSX.utils.book_append_sheet(wb,XLSX.utils.json_to_sheet(fin.map(f=>({Cliente:cn(f.cliId),Descrição:f.desc,Data:fmtD(f.data),Contratado:f.ct,Recebido:f.rc,Pendente:(f.ct||0)-(f.rc||0),Pagamento:f.pg,Status:f.st}))),'Financeiro');
-  XLSX.utils.book_append_sheet(wb,XLSX.utils.json_to_sheet(bk.map(b=>({Protocolo:b.id,Tipo:BT[b.type]?.n,Status:SS[b.status]?.l,Nome:b.nome,Telefone:b.tel,'E-mail':b.email,Cidade:b.cidade,Estado:b.estado,Área:b.area,Data:b.data,Hora:b.hora,Modalidade:b.modal,Resumo:b.resumo}))),'Agendamentos');
+  XLSX.utils.book_append_sheet(wb,XLSX.utils.json_to_sheet(bk.map(b=>({Protocolo:b.id,Tipo:BT[b.type]?.n,Status:SS[b.status]?.l,Nome:b.nome,CPF:b.cpf,Telefone:b.tel,'E-mail':b.email,Cidade:b.cidade,Estado:b.estado,Área:b.area,Data:b.data,Hora:b.hora,Modalidade:b.modal,Resumo:b.resumo}))),'Agendamentos');
   XLSX.utils.book_append_sheet(wb,XLSX.utils.json_to_sheet(users.map(u=>({Nome:u.nome,Cargo:u.cargo,'E-mail':u.email,OAB:u.oab,Telefone:u.tel,Função:ROLES[u.role]?.l,Status:u.ativo?'Ativo':'Inativo'}))),'Usuários');
   XLSX.writeFile(wb,'SouzaAdvocacia_'+new Date().toLocaleDateString('pt-BR').replace(/\//g,'-')+'.xlsx');
 }
 function expCSV(){
-  const h=['ID','Tipo','Status','Nome','','Telefone','Email','Cidade','UF','Área','Data','Hora','Modalidade','Resumo','Obs'];
-  const rows=bk.map(b=>[b.id,BT[b.type]?.n,SS[b.status]?.l,b.nome,b.tel,b.email,b.cidade,b.estado,b.area,b.data,b.hora,b.modal,b.resumo?.replace(/,/g,';'),b.obs?.replace(/,/g,';')]);
+  const h=['ID','Tipo','Status','Nome','CPF','Telefone','Email','Cidade','UF','Área','Data','Hora','Modalidade','Resumo','Obs'];
+  const rows=bk.map(b=>[b.id,BT[b.type]?.n,SS[b.status]?.l,b.nome,b.cpf,b.tel,b.email,b.cidade,b.estado,b.area,b.data,b.hora,b.modal,b.resumo?.replace(/,/g,';'),b.obs?.replace(/,/g,';')]);
   const csv=[h,...rows].map(r=>r.map(v=>`"${(v||'').toString().replace(/"/g,'""')}"`).join(',')).join('\n');
   const a=document.createElement('a');a.href='data:text/csv;charset=utf-8,\uFEFF'+encodeURIComponent(csv);a.download=`agendamentos_${td0}.csv`;a.click();
 }
@@ -3519,7 +2723,7 @@ function expICS(){
   let ics='BEGIN:VCALENDAR\nVERSION:2.0\nPRODID:-//Marcus Souza I Advogado//PT\n';
   bk.filter(b=>b.data&&b.hora&&b.status!=='cancelado').forEach(b=>{
     const t=BT[b.type],s=b.data.replace(/-/g,'')+'T'+b.hora.replace(':','')+'00',e=b.data.replace(/-/g,'')+'T'+am(b.hora,t.d).replace(':','')+'00';
-    ics+=`BEGIN:VEVENT\nUID:${b.id}@souzaadv.com\nDTSTART:${s}\nDTEND:${e}\nSUMMARY:[${t.n}] - ${b.nome}\nDESCRIPTION:Nome: ${b.nome}\\nWhatsApp: ${b.tel}\\nÁrea: ${b.area}\\nStatus: ${SS[b.status]?.l}\\nProtocolo: ${b.id}\nEND:VEVENT\n`;
+    ics+=`BEGIN:VEVENT\nUID:${b.id}@souzaadv.com\nDTSTART:${s}\nDTEND:${e}\nSUMMARY:[${t.n}] - ${b.nome}\nDESCRIPTION:Nome: ${b.nome}\\nWhatsApp: ${b.tel}\\nCPF: ${b.cpf}\\nÁrea: ${b.area}\\nStatus: ${SS[b.status]?.l}\\nProtocolo: ${b.id}\nEND:VEVENT\n`;
   });
   ics+='END:VCALENDAR';
   const a=document.createElement('a');a.href='data:text/calendar;charset=utf-8,'+encodeURIComponent(ics);a.download=`agenda_${td0}.ics`;a.click();
@@ -3531,7 +2735,7 @@ function expICS(){
 document.addEventListener('DOMContentLoaded',()=>{
   const ls=document.getElementById('ls');
   if(ls){ls.classList.remove('on');ls.style.display='none';}
-  try{load();loadLog();}catch(e){console.warn('load:',e);users=D_USERS;}
+  try{load();loadLog();iaLoadCfg();}catch(e){console.warn('load:',e);users=D_USERS;}
   if(!users||!users.length)users=D_USERS;
   const sid=parseInt(localStorage.getItem('sa_sess')||'0',10);
   if(sid>0){const u=users.find(x=>x.id===sid&&x.ativo);if(u){currentUser=u;showApp();return;}localStorage.removeItem('sa_sess');}
