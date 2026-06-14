@@ -358,8 +358,8 @@ tr:hover td{background:#f8fafc!important}
 /* ═══════════════════════════════════════════════
    LOGIN SCREEN
 ═══════════════════════════════════════════════ */
-#ls{position:fixed;inset:0;background:linear-gradient(135deg,#0f2444,var(--n) 50%,#2563eb);display:none;align-items:center;justify-content:center;z-index:999;padding:16px}
-#ls.on{display:flex}
+#ls{position:fixed;inset:0;background:linear-gradient(135deg,#0f2444,var(--n) 50%,#2563eb);display:none;align-items:center;justify-content:center;z-index:9999;padding:16px}
+#ls.on{display:flex;align-items:center;justify-content:center}
 .lb{background:#fff;border-radius:16px;padding:32px 28px;width:100%;max-width:360px;text-align:center;box-shadow:0 25px 60px rgba(0,0,0,.35)}
 .lb .ico{font-size:42px;margin-bottom:8px}.lb h2{font-size:18px;font-weight:700;color:var(--n);margin-bottom:3px}
 .lb .sub{font-size:12px;color:var(--mu);margin-bottom:22px}
@@ -787,19 +787,27 @@ function go(id){
   const s=document.getElementById(id);if(s){s.classList.add('on');s.scrollTop=0;}
 }
 function goAdmin(){
+  // Fechar tudo
   document.querySelectorAll('.sc').forEach(s=>s.classList.remove('on'));
   document.getElementById('admin-app').style.display='none';
+  // Abrir login — forçar via style E classList para garantir visibilidade
   const ls=document.getElementById('ls');
   ls.classList.add('on');
-  // limpar campos a cada abertura
+  ls.style.display='flex';
+  ls.style.alignItems='center';
+  ls.style.justifyContent='center';
+  // Limpar campos
   const le=document.getElementById('lemail'),lp=document.getElementById('lpwd');
-  if(le)le.value='';if(lp)lp.value='';
-  const err=document.getElementById('lerr');if(err)err.style.display='none';
-  if(le)le.focus();
+  if(le){le.value='';setTimeout(()=>le.focus(),100);}
+  if(lp)lp.value='';
+  const err=document.getElementById('lerr');
+  if(err){err.style.display='none';err.style.color='#dc2626';}
 }
 function showApp(){
   document.querySelectorAll('.sc').forEach(s=>s.classList.remove('on'));
-  const lsel=document.getElementById('ls');lsel.classList.remove('on');lsel.style.display='none';
+  const ls=document.getElementById('ls');
+  ls.classList.remove('on');
+  ls.style.display='none';
   document.getElementById('admin-app').style.display='block';
   const nm=currentUser.nome;
   document.getElementById('uname').textContent=nm.split(' ')[1]?'Dr. '+nm.split(' ').slice(-1)[0]:nm;
@@ -2495,13 +2503,17 @@ function expICS(){
 // INIT
 // ═══════════════════════════════════════════════════════════════════
 document.addEventListener('DOMContentLoaded',()=>{
+  // Garantir que o login começa fechado
+  const ls=document.getElementById('ls');
+  if(ls){ls.classList.remove('on');ls.style.display='none';}
+  // Carregar dados
   try{ load(); }catch(e){ console.warn('load() erro:',e); users=D_USERS; }
   if(!users||!users.length) users=D_USERS;
+  // Restaurar sessão
   const sid=parseInt(localStorage.getItem('sa_sess')||'0',10);
   if(sid>0){
     const u=users.find(x=>x.id===sid&&x.ativo);
     if(u){currentUser=u;showApp();return;}
-    // sessão inválida — limpar e ir para home
     localStorage.removeItem('sa_sess');
   }
   go('s-home');
