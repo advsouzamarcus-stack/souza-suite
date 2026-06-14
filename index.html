@@ -405,15 +405,9 @@ tr:hover td{background:#f8fafc!important}
   <div style="padding:8px 14px;font-size:10px;color:var(--mu);letter-spacing:.5px">Selecione como podemos ajudar você</div>
   <div class="tgrid">
     <div class="tc" onclick="selType('primeiro')"><div class="tc-ic">👤</div><div class="tc-nm">Primeiro Atendimento</div><div class="tc-d">30 min</div></div>
-    <div class="tc" onclick="selType('andamento')"><div class="tc-ic">⚖️</div><div class="tc-nm">Andamento de Processo</div><div class="tc-d">20 min</div></div>
-    <div class="tc" onclick="selType('documentos')"><div class="tc-ic">📄</div><div class="tc-nm">Entrega de Documentos</div><div class="tc-d">15 min</div></div>
     <div class="tc" onclick="selType('duvidas')"><div class="tc-ic">❓</div><div class="tc-nm">Dúvidas Jurídicas</div><div class="tc-d">20 min</div></div>
     <div class="tc" onclick="selType('retorno')"><div class="tc-ic">🔄</div><div class="tc-nm">Retorno de Atendimento</div><div class="tc-d">20 min</div></div>
-    <div class="tc" onclick="selType('previdenciario')"><div class="tc-ic">🏦</div><div class="tc-nm">Consulta Previdenciária</div><div class="tc-d">40 min</div></div>
-    <div class="tc" onclick="selType('trabalhista')"><div class="tc-ic">💼</div><div class="tc-nm">Consulta Trabalhista</div><div class="tc-d">40 min</div></div>
-    <div class="tc" onclick="selType('consumidor')"><div class="tc-ic">🛡️</div><div class="tc-nm">Direito do Consumidor</div><div class="tc-d">30 min</div></div>
-    <div class="tc" onclick="selType('autista')"><div class="tc-ic">💙</div><div class="tc-nm">BPC/LOAS · Autismo</div><div class="tc-d">40 min</div></div>
-    <div class="tc" onclick="selType('outros')"><div class="tc-ic">📋</div><div class="tc-nm">Outros Assuntos</div><div class="tc-d">30 min</div></div>
+    <div class="tc" onclick="selType('andamento')"><div class="tc-ic">⚖️</div><div class="tc-nm">Andamento de Processo</div><div class="tc-d">20 min</div></div>
   </div>
   <div class="al al-warn" style="margin:0 14px 14px;font-size:11px">O sistema <strong>não oferece atendimento criminal</strong>.</div>
 </div>
@@ -524,7 +518,7 @@ tr:hover td{background:#f8fafc!important}
 <div class="mo" id="mo-lgpd">
   <div class="mob"><div class="moh"></div><div class="moi">
     <div class="mot">🔒 Política de Privacidade</div>
-    <p style="font-size:12px;line-height:1.7;margin-bottom:14px">O Souza Advocacia trata seus dados com base na LGPD (Lei nº 13.709/2018).<br><br><strong>Dados coletados:</strong> nome, CPF, telefone, e-mail e documentos.<br><strong>Finalidade:</strong> Agendamento, análise jurídica e prestação de serviços.<br><strong>Compartilhamento:</strong> Não compartilhamos dados com terceiros, salvo obrigação legal.<br><strong>Seus direitos:</strong> Acesso, correção e exclusão. Contato: souzaadvogadosa@gmail.com</p>
+    <p style="font-size:12px;line-height:1.7;margin-bottom:14px">O Souza Advocacia trata seus dados com base na LGPD (Lei nº 13.709/2018).<br><br><strong>Dados coletados:</strong> nome, telefone, e-mail e documentos.<br><strong>Finalidade:</strong> Agendamento, análise jurídica e prestação de serviços.<br><strong>Compartilhamento:</strong> Não compartilhamos dados com terceiros, salvo obrigação legal.<br><strong>Seus direitos:</strong> Acesso, correção e exclusão. Contato: souzaadvogadosa@gmail.com</p>
     <button class="btn bgold bw" onclick="closeMo('mo-lgpd')">Entendido</button>
   </div></div>
 </div>
@@ -630,11 +624,10 @@ tr:hover td{background:#f8fafc!important}
 // BOOKING CONSTANTS (from INDEX.HTML)
 // ═══════════════════════════════════════════════════════════════════
 const BT={
-  primeiro:{n:'Primeiro Atendimento',i:'👤',d:30},andamento:{n:'Andamento de Processo',i:'⚖️',d:20},
-  documentos:{n:'Entrega de Documentos',i:'📄',d:15},duvidas:{n:'Dúvidas Jurídicas',i:'❓',d:20},
-  retorno:{n:'Retorno de Atendimento',i:'🔄',d:20},previdenciario:{n:'Consulta Previdenciária',i:'🏦',d:40},
-  trabalhista:{n:'Consulta Trabalhista',i:'💼',d:40},consumidor:{n:'Direito do Consumidor',i:'🛡️',d:30},
-  autista:{n:'BPC/LOAS · Autismo',i:'💙',d:40},outros:{n:'Outros Assuntos',i:'📋',d:30}
+  primeiro:{n:'Primeiro Atendimento',i:'👤',d:30},
+  duvidas:{n:'Dúvidas Jurídicas',i:'❓',d:20},
+  retorno:{n:'Retorno de Atendimento',i:'🔄',d:20},
+  andamento:{n:'Andamento de Processo',i:'⚖️',d:20},
 };
 const SS={
   solicitado:{l:'Solicitado',c:'b-req',kb:'#eff6ff',kt:'#1d4ed8'},
@@ -649,7 +642,7 @@ const SS={
 };
 const AREAS=['Direito Previdenciário','BPC/LOAS','Direito dos Autistas','Direito Trabalhista','Direito Civil','Direito de Família','Direito do Consumidor','Direito de Trânsito','Direito Tributário','Direito do Idoso','ECA','Contratos','Imobiliário','Tributário','Empresarial','Outros'];
 const HRS=['10:00','10:30','11:00','11:30','12:00','12:30','13:00','13:30','14:00','14:30','15:00','15:30','16:00','16:30','17:00','17:30'];
-const TC={primeiro:'#2563eb',andamento:'#7c3aed',documentos:'#16a34a',duvidas:'#d97706',retorno:'#6b7280',previdenciario:'#0891b2',trabalhista:'#dc2626',consumidor:'#c026d3',autista:'#2563eb',outros:'#64748b'};
+const TC={primeiro:'#2563eb',duvidas:'#d97706',retorno:'#6b7280',andamento:'#7c3aed'};
 
 // ═══════════════════════════════════════════════════════════════════
 // STATE — helpers primeiro (sem dependências externas)
@@ -758,12 +751,12 @@ function load(){
 }
 function seedBk(){
   bk=[
-    {id:'AG001',type:'primeiro',status:'confirmado',nome:'Maria Fernanda Oliveira',cpf:'123.456.789-00',tel:'21988887777',email:'mf@gmail.com',cidade:'Rio de Janeiro',estado:'RJ',area:'Direito do Consumidor',resumo:'Plano de saúde negou cobertura de cirurgia urgente.',modal:'videoconferencia',data:td0,hora:'10:00',createdAt:new Date().toISOString(),obs:''},
-    {id:'AG002',type:'trabalhista',status:'aguardando_docs',nome:'Carlos Eduardo Santos',cpf:'987.654.321-00',tel:'21977776666',email:'ces@gmail.com',cidade:'Niterói',estado:'RJ',area:'Direito Trabalhista',resumo:'Verbas rescisórias não pagas pela empresa.',modal:'whatsapp',data:td0,hora:'11:00',createdAt:new Date().toISOString(),obs:'Solicitar CTPS'},
-    {id:'AG003',type:'previdenciario',status:'solicitado',nome:'Ana Paula Costa',cpf:'456.789.123-00',tel:'21966665555',email:'ana@gmail.com',cidade:'Duque de Caxias',estado:'RJ',area:'Direito Previdenciário',resumo:'Negativa de auxílio-doença. Possui laudo médico.',modal:'ligacao',data:dt(1),hora:'14:00',createdAt:new Date().toISOString(),obs:''},
-    {id:'AG004',type:'autista',status:'solicitado',nome:'Roberto Lima',cpf:'321.654.987-00',tel:'21955554444',email:'rob@gmail.com',cidade:'São Gonçalo',estado:'RJ',area:'BPC/LOAS',resumo:'Filho com TEA nível 2. INSS negou.',modal:'videoconferencia',data:dt(1),hora:'15:00',createdAt:new Date().toISOString(),obs:''},
-    {id:'AG005',type:'consumidor',status:'confirmado',nome:'Joana Pereira Lima',cpf:'654.987.321-00',tel:'21944443333',email:'joana@gmail.com',cidade:'Belford Roxo',estado:'RJ',area:'Direito do Consumidor',resumo:'Banco cobrou parcelas após quitação.',modal:'whatsapp',data:dt(2),hora:'10:30',createdAt:new Date().toISOString(),obs:''},
-    {id:'AG006',type:'trabalhista',status:'contratado',nome:'Lucia Menezes',cpf:'111.222.333-44',tel:'21922221111',email:'lucia@gmail.com',cidade:'Rio de Janeiro',estado:'RJ',area:'Direito Trabalhista',resumo:'Assédio moral.',modal:'videoconferencia',data:dt(-3),hora:'10:00',createdAt:new Date().toISOString(),obs:'Contrato assinado'},
+    {id:'AG001',type:'primeiro',status:'confirmado',nome:'Maria Fernanda Oliveira',cpf:'',tel:'21988887777',email:'mf@gmail.com',cidade:'Rio de Janeiro',estado:'RJ',area:'Primeiro Atendimento',resumo:'Plano de saúde negou cobertura de cirurgia urgente.',modal:'videoconferencia',data:td0,hora:'10:00',createdAt:new Date().toISOString(),obs:''},
+    {id:'AG002',type:'duvidas',status:'aguardando_docs',nome:'Carlos Eduardo Santos',cpf:'',tel:'21977776666',email:'ces@gmail.com',cidade:'Niterói',estado:'RJ',area:'Dúvidas Jurídicas',resumo:'Dúvida sobre rescisão de contrato de trabalho.',modal:'whatsapp',data:td0,hora:'11:00',createdAt:new Date().toISOString(),obs:''},
+    {id:'AG003',type:'retorno',status:'solicitado',nome:'Ana Paula Costa',cpf:'',tel:'21966665555',email:'ana@gmail.com',cidade:'Duque de Caxias',estado:'RJ',area:'Retorno de Atendimento',resumo:'Retorno sobre andamento do processo previdenciário.',modal:'ligacao',data:dt(1),hora:'14:00',createdAt:new Date().toISOString(),obs:''},
+    {id:'AG004',type:'andamento',status:'solicitado',nome:'Roberto Lima',cpf:'',tel:'21955554444',email:'rob@gmail.com',cidade:'São Gonçalo',estado:'RJ',area:'Andamento de Processo',resumo:'Verificar situação do processo no INSS.',modal:'videoconferencia',data:dt(1),hora:'15:00',createdAt:new Date().toISOString(),obs:''},
+    {id:'AG005',type:'primeiro',status:'confirmado',nome:'Joana Pereira Lima',cpf:'',tel:'21944443333',email:'joana@gmail.com',cidade:'Belford Roxo',estado:'RJ',area:'Primeiro Atendimento',resumo:'Banco realizou cobranças indevidas após quitação.',modal:'whatsapp',data:dt(2),hora:'10:30',createdAt:new Date().toISOString(),obs:''},
+    {id:'AG006',type:'duvidas',status:'contratado',nome:'Lucia Menezes',cpf:'',tel:'21922221111',email:'lucia@gmail.com',cidade:'Rio de Janeiro',estado:'RJ',area:'Dúvidas Jurídicas',resumo:'Dúvidas sobre direitos trabalhistas após demissão.',modal:'videoconferencia',data:dt(-3),hora:'10:00',createdAt:new Date().toISOString(),obs:'Contrato assinado'},
   ];
   saveBk();
 }
@@ -2173,7 +2166,7 @@ async function syncGCal(){
   if(res)res.innerHTML=`<div class="al ${!err?'al-ok':'al-warn'}">${!err?'✅':'⚠️'} Sincronizado: ${ok} evento(s)${err?`, ${err} erro(s)`:''}</div>`;
   if(btn)btn.classList.remove('spin');
 }
-function gcLink(b){const t=BT[b.type];const s=b.data.replace(/-/g,'')+'T'+b.hora.replace(':','')+'00';const e=b.data.replace(/-/g,'')+'T'+am(b.hora,t.d).replace(':','')+'00';return`https://calendar.google.com/calendar/render?action=TEMPLATE&text=${encodeURIComponent('['+t.n+'] - '+b.nome)}&dates=${s}/${e}&details=${encodeURIComponent('Nome: '+b.nome+'\nWhatsApp: '+b.tel+'\nCPF: '+b.cpf+'\nÁrea: '+b.area+'\nResumo: '+b.resumo+'\nProtocolo: '+b.id)}`;}
+function gcLink(b){const t=BT[b.type];const s=b.data.replace(/-/g,'')+'T'+b.hora.replace(':','')+'00';const e=b.data.replace(/-/g,'')+'T'+am(b.hora,t.d).replace(':','')+'00';return`https://calendar.google.com/calendar/render?action=TEMPLATE&text=${encodeURIComponent('['+t.n+'] - '+b.nome)}&dates=${s}/${e}&details=${encodeURIComponent('Nome: '+b.nome+'\nWhatsApp: '+b.tel++'\nÁrea: '+b.area+'\nResumo: '+b.resumo+'\nProtocolo: '+b.id)}`;}
 function cpScript(){navigator.clipboard?.writeText(appsScript()).then(()=>alert('✅ Código copiado!'));}
 function appsScript(){return`// SOUZA ADVOCACIA — Google Apps Script\nfunction doPost(e) {\n  try {\n    const d = JSON.parse(e.postData.contents);\n    const cal = CalendarApp.getCalendarById(d.calendarId || 'primary');\n    const event = cal.createEvent(d.title, new Date(d.start), new Date(d.end), {\n      description: d.description || ''\n    });\n    event.addPopupReminder(60);\n    event.addPopupReminder(1440);\n    return ContentService.createTextOutput(\n      JSON.stringify({ success: true, eventId: event.getId() })\n    ).setMimeType(ContentService.MimeType.JSON);\n  } catch(err) {\n    return ContentService.createTextOutput(\n      JSON.stringify({ success: false, error: err.toString() })\n    ).setMimeType(ContentService.MimeType.JSON);\n  }\n}`;}
 
@@ -2230,7 +2223,7 @@ function showDet(id){
     <div class="card" style="margin-bottom:10px">
       <div class="drow"><div class="dl">Data</div><div class="dv">📅 ${fdl(b.data)}</div></div>
       <div class="drow"><div class="dl">Horário</div><div class="dv">⏰ ${b.hora} – ${am(b.hora,t.d)}</div></div>
-      <div class="drow"><div class="dl">CPF</div><div class="dv">${b.cpf}</div></div>
+
       <div class="drow"><div class="dl">WhatsApp</div><div class="dv"><a href="https://wa.me/55${b.tel}" target="_blank" style="color:var(--gr);font-weight:700">📱 ${b.tel}</a></div></div>
       <div class="drow"><div class="dl">E-mail</div><div class="dv">${b.email||'—'}</div></div>
       <div class="drow"><div class="dl">Cidade</div><div class="dv">${b.cidade}/${b.estado}</div></div>
@@ -2280,7 +2273,7 @@ function rStep0(){
   return`<div class="card gl" style="margin-bottom:13px;display:flex;align-items:center;gap:10px"><span style="font-size:26px">${t.i}</span><div><div style="font-weight:700;color:var(--n)">${t.n}</div><div style="font-size:11px;color:var(--mu)">${t.d} minutos</div></div></div>
   <div class="stit">Dados Pessoais</div>
   <div class="fg"><div class="fl">Nome Completo <span style="color:var(--g)">*</span></div><input class="fi" id="f-nome" value="${app.nome}" placeholder="Nome completo"></div>
-  <div class="frow"><div class="fg" style="flex:1"><div class="fl">CPF *</div><input class="fi" id="f-cpf" type="tel" inputmode="numeric" value="${app.cpf}" placeholder="000.000.000-00" oninput="mCPF(this)"></div><div class="fg" style="flex:1"><div class="fl">Nasc.</div><input class="fi" id="f-nasc" type="date" value="${app.extra.nasc||''}"></div></div>
+
   <div class="fg"><div class="fl">WhatsApp *</div><input class="fi" id="f-tel" type="tel" inputmode="numeric" value="${app.tel}" placeholder="(21) 99999-9999" oninput="mTel(this)"></div>
   <div class="fg"><div class="fl">E-mail</div><input class="fi" id="f-email" type="email" value="${app.email}" placeholder="email@exemplo.com"></div>
   <div class="frow"><div class="fg" style="flex:2"><div class="fl">Cidade *</div><input class="fi" id="f-cidade" value="${app.cidade}" placeholder="Rio de Janeiro"></div><div class="fg" style="flex:1"><div class="fl">UF</div><select class="fsel" id="f-uf"><option value="">--</option>${['AC','AL','AP','AM','BA','CE','DF','ES','GO','MA','MT','MS','MG','PA','PB','PR','PE','PI','RJ','RN','RS','RO','RR','SC','SP','SE','TO'].map(u=>`<option ${app.estado===u?'selected':''}>${u}</option>`).join('')}</select></div></div>
@@ -2360,9 +2353,9 @@ function pickDate(d){selDate=d;selTime=null;renderStep(2);}
 function pickTime(t){selTime=t;renderStep(2);}
 function gi(id){const e=document.getElementById(id);return e?e.value:'';}
 function s0next(){
-  const nome=gi('f-nome').trim(),cpf=gi('f-cpf').trim(),tel=gi('f-tel').trim(),cidade=gi('f-cidade').trim();
-  if(!nome||!cpf||!tel||!cidade){alert('Preencha: Nome, CPF, WhatsApp e Cidade.');return;}
-  Object.assign(app,{nome,cpf,tel:tel.replace(/\D/g,''),email:gi('f-email').trim(),cidade,estado:gi('f-uf'),extra:{...app.extra,nasc:gi('f-nasc')}});
+  const nome=gi('f-nome').trim(),tel=gi('f-tel').trim(),cidade=gi('f-cidade').trim();
+  if(!nome||!tel||!cidade){alert('Preencha: Nome, WhatsApp e Cidade.');return;}
+  Object.assign(app,{nome,cpf:'',tel:tel.replace(/\D/g,''),email:gi('f-email').trim(),cidade,estado:gi('f-uf'),extra:{...app.extra}});
   renderStep(1);
 }
 function s1next(){
@@ -2381,7 +2374,7 @@ function s1next(){
 function s2next(){if(!selDate||!selTime){alert('Selecione data e horário.');return;}app.data=selDate;app.hora=selTime;renderStep(3);}
 function submitBooking(){
   if(!app.lgpd){alert('É necessário aceitar a Política de Privacidade.');return;}
-  const b={id:gidb(),type:app.type,status:'solicitado',nome:app.nome,cpf:app.cpf,tel:app.tel,email:app.email,cidade:app.cidade,estado:app.estado,area:app.area,resumo:app.resumo,modal:app.modal,data:app.data,hora:app.hora,extra:app.extra,files:[...app.files],createdAt:new Date().toISOString(),obs:''};
+  const b={id:gidb(),type:app.type,status:'solicitado',nome:app.nome,cpf:'',tel:app.tel,email:app.email,cidade:app.cidade,estado:app.estado,area:app.area,resumo:app.resumo,modal:app.modal,data:app.data,hora:app.hora,extra:app.extra,files:[...app.files],createdAt:new Date().toISOString(),obs:''};
   bk.push(b);saveBk();updNotif();
   const t=BT[b.type];const mmap={videoconferencia:'📹 Videoconferência',ligacao:'📞 Ligação',whatsapp:'💬 WhatsApp'};
   document.getElementById('suc-msg').textContent=`Olá, ${b.nome.split(' ')[0]}! Seu agendamento foi realizado. Em breve a equipe confirmará pelo WhatsApp.`;
@@ -2417,13 +2410,13 @@ function exportExcel(){
   XLSX.utils.book_append_sheet(wb,XLSX.utils.json_to_sheet(proc.map(p=>({'Nº Processo':p.num,Cliente:cn(p.cliId),Área:p.tipo,'Tribunal/Vara':p.vara,Status:p.status,Início:fmtD(p.ini),'Próx.Mov':fmtD(p.prox),Advogado:p.adv,'Observações':p.obs}))),'Processos');
   XLSX.utils.book_append_sheet(wb,XLSX.utils.json_to_sheet(tar.map(t=>({Data:fmtD(t.data),Descrição:t.desc,Cliente:cn(t.cliId),Prioridade:t.prio,Status:t.status,Responsável:t.resp,Concluída:t.ok?'Sim':'Não'}))),'Tarefas');
   XLSX.utils.book_append_sheet(wb,XLSX.utils.json_to_sheet(fin.map(f=>({Cliente:cn(f.cliId),Descrição:f.desc,Data:fmtD(f.data),Contratado:f.ct,Recebido:f.rc,Pendente:(f.ct||0)-(f.rc||0),Pagamento:f.pg,Status:f.st}))),'Financeiro');
-  XLSX.utils.book_append_sheet(wb,XLSX.utils.json_to_sheet(bk.map(b=>({Protocolo:b.id,Tipo:BT[b.type]?.n,Status:SS[b.status]?.l,Nome:b.nome,CPF:b.cpf,Telefone:b.tel,'E-mail':b.email,Cidade:b.cidade,Estado:b.estado,Área:b.area,Data:b.data,Hora:b.hora,Modalidade:b.modal,Resumo:b.resumo}))),'Agendamentos');
+  XLSX.utils.book_append_sheet(wb,XLSX.utils.json_to_sheet(bk.map(b=>({Protocolo:b.id,Tipo:BT[b.type]?.n,Status:SS[b.status]?.l,Nome:b.nome,Telefone:b.tel,'E-mail':b.email,Cidade:b.cidade,Estado:b.estado,Área:b.area,Data:b.data,Hora:b.hora,Modalidade:b.modal,Resumo:b.resumo}))),'Agendamentos');
   XLSX.utils.book_append_sheet(wb,XLSX.utils.json_to_sheet(users.map(u=>({Nome:u.nome,Cargo:u.cargo,'E-mail':u.email,OAB:u.oab,Telefone:u.tel,Função:ROLES[u.role]?.l,Status:u.ativo?'Ativo':'Inativo'}))),'Usuários');
   XLSX.writeFile(wb,'SouzaAdvocacia_'+new Date().toLocaleDateString('pt-BR').replace(/\//g,'-')+'.xlsx');
 }
 function expCSV(){
-  const h=['ID','Tipo','Status','Nome','CPF','Telefone','Email','Cidade','UF','Área','Data','Hora','Modalidade','Resumo','Obs'];
-  const rows=bk.map(b=>[b.id,BT[b.type]?.n,SS[b.status]?.l,b.nome,b.cpf,b.tel,b.email,b.cidade,b.estado,b.area,b.data,b.hora,b.modal,b.resumo?.replace(/,/g,';'),b.obs?.replace(/,/g,';')]);
+  const h=['ID','Tipo','Status','Nome','Telefone','Email','Cidade','UF','Área','Data','Hora','Modalidade','Resumo','Obs'];
+  const rows=bk.map(b=>[b.id,BT[b.type]?.n,SS[b.status]?.l,b.nome,b.tel,b.email,b.cidade,b.estado,b.area,b.data,b.hora,b.modal,b.resumo?.replace(/,/g,';'),b.obs?.replace(/,/g,';')]);
   const csv=[h,...rows].map(r=>r.map(v=>`"${(v||'').toString().replace(/"/g,'""')}"`).join(',')).join('\n');
   const a=document.createElement('a');a.href='data:text/csv;charset=utf-8,\uFEFF'+encodeURIComponent(csv);a.download=`agendamentos_${td0}.csv`;a.click();
 }
@@ -2431,7 +2424,7 @@ function expICS(){
   let ics='BEGIN:VCALENDAR\nVERSION:2.0\nPRODID:-//Souza Advocacia//PT\n';
   bk.filter(b=>b.data&&b.hora&&b.status!=='cancelado').forEach(b=>{
     const t=BT[b.type],s=b.data.replace(/-/g,'')+'T'+b.hora.replace(':','')+'00',e=b.data.replace(/-/g,'')+'T'+am(b.hora,t.d).replace(':','')+'00';
-    ics+=`BEGIN:VEVENT\nUID:${b.id}@souzaadv.com\nDTSTART:${s}\nDTEND:${e}\nSUMMARY:[${t.n}] - ${b.nome}\nDESCRIPTION:Nome: ${b.nome}\\nWhatsApp: ${b.tel}\\nCPF: ${b.cpf}\\nÁrea: ${b.area}\\nStatus: ${SS[b.status]?.l}\\nProtocolo: ${b.id}\nEND:VEVENT\n`;
+    ics+=`BEGIN:VEVENT\nUID:${b.id}@souzaadv.com\nDTSTART:${s}\nDTEND:${e}\nSUMMARY:[${t.n}] - ${b.nome}\nDESCRIPTION:Nome: ${b.nome}\\nWhatsApp: ${b.tel}\\nÁrea: ${b.area}\\nStatus: ${SS[b.status]?.l}\\nProtocolo: ${b.id}\nEND:VEVENT\n`;
   });
   ics+='END:VCALENDAR';
   const a=document.createElement('a');a.href='data:text/calendar;charset=utf-8,'+encodeURIComponent(ics);a.download=`agenda_${td0}.ics`;a.click();
