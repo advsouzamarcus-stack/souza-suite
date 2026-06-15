@@ -1,0 +1,20 @@
+{
+  "name": "souza-suite-cloud",
+  "version": "1.1.0",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "build": "node scripts/smoke-test.mjs",
+    "dev": "netlify dev",
+    "test": "node --check netlify/functions/api.mjs && node --check netlify/functions/datajud-sync.mjs && node scripts/smoke-test.mjs"
+  },
+  "dependencies": {
+    "@netlify/functions": "latest",
+    "@supabase/supabase-js": "latest",
+    "bcryptjs": "latest",
+    "jsonwebtoken": "latest"
+  },
+  "devDependencies": {
+    "netlify-cli": "latest"
+  }
+}

@@ -1,0 +1,63 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>Souza Advocacia — Suite Cloud</title>
+  <link rel="stylesheet" href="/style.css" />
+</head>
+<body>
+  <main id="login" class="login">
+    <section class="box">
+      <div class="brand">Souza Advocacia</div>
+      <h1>Suite Jurídica Cloud</h1>
+      <p>Gestão jurídica com banco em nuvem, DataJud e automações oficiais.</p>
+      <input id="email" autocomplete="email" placeholder="E-mail" />
+      <input id="password" type="password" autocomplete="current-password" placeholder="Senha" />
+      <button id="loginBtn">Entrar</button>
+      <small id="loginMsg"></small>
+    </section>
+  </main>
+
+  <main id="app" class="app hidden">
+    <aside>
+      <h2>Souza Suite</h2>
+      <button data-view="dashboard">Dashboard</button>
+      <button data-view="clients">Clientes</button>
+      <button data-view="cases">Processos</button>
+      <button data-view="tasks">Tarefas</button>
+      <button data-view="appointments">Agenda</button>
+      <button data-view="financial_records">Financeiro</button>
+      <button data-view="leads">Leads</button>
+      <button data-view="conversations">Conversas</button>
+      <button data-action="logout">Sair</button>
+    </aside>
+    <section class="content">
+      <header>
+        <div>
+          <h1 id="title">Dashboard</h1>
+          <p id="subtitle">Sistema pronto para operação multiusuário.</p>
+        </div>
+        <div class="toolbar">
+          <button id="syncBtn" class="secondary">Sincronizar DataJud</button>
+          <button id="newBtn">Novo</button>
+        </div>
+      </header>
+      <div id="grid"></div>
+    </section>
+  </main>
+
+  <dialog id="modal">
+    <form method="dialog" id="form">
+      <h3 id="modalTitle">Novo</h3>
+      <div id="fields"></div>
+      <menu>
+        <button value="cancel" class="secondary">Cancelar</button>
+        <button type="button" id="saveBtn">Salvar</button>
+      </menu>
+    </form>
+  </dialog>
+
+  <script src="/app.js"></script>
+</body>
+</html>
