@@ -811,6 +811,8 @@ function save(){
   if(el)el.textContent='💾 Salvando...';
   saveT=setTimeout(()=>{
     const _sd={users,cli,proc,tar,fin};['users','cli','proc','tar','fin'].forEach(k=>localStorage.setItem('sa_'+k,JSON.stringify(_sd[k])));
+    // Push assíncrono para servidor (sem bloquear)
+    if(SA_JWT) setTimeout(pushToServer, 2000);
     if(el)el.textContent='✅ Salvo às '+new Date().toLocaleTimeString('pt-BR',{hour:'2-digit',minute:'2-digit'});
   },700);
 }
@@ -877,6 +879,7 @@ function showApp(){
   if(aceBtn)aceBtn.style.display=currentUser?.role==='admin'?'':'none';
   startClock();updNotif();
   setTimeout(djStartMonitor,2000);
+  setTimeout(syncFromServer,1500); // Sync central ao abrir
   aTab('dash',document.querySelector('.atab'));
 }
 function openMo(id){document.getElementById(id).classList.add('on');}
@@ -908,7 +911,88 @@ function doLogin(){
   lerr.style.display='none';
   currentUser=u;localStorage.setItem('sa_sess',String(u.id));showApp();
 }
-function doLogout(){closeMo('m-umenu');djStopMonitor();localStorage.removeItem('sa_sess');location.reload();}
+function doLogout(){
+  closeMo('m-umenu');
+  djStopMonitor();
+  // Limpar JWT
+  localStorage.removeItem('sa_sess');
+  localStorage.removeItem('sa_jwt');
+  localStorage.removeItem('sa_jwt_refresh');
+  location.reload();
+}
+
+// ── Autenticação via Netlify Functions ────────────────────────────
+let SA_JWT = localStorage.getItem('sa_jwt') || '';
+let SA_JWT_REFRESH = localStorage.getItem('sa_jwt_refresh') || '';
+
+async function loginBackend(email, pwd) {
+  try {
+    const r = await fetch('/api/auth?action=login', {
+      method: 'POST',
+      headers: {'Content-Type':'application/json'},
+      body: JSON.stringify({email, pwd})
+    });
+    const d = await r.json();
+    if (!d.ok) return null;
+    SA_JWT = d.access_token;
+    SA_JWT_REFRESH = d.refresh_token;
+    localStorage.setItem('sa_jwt', SA_JWT);
+    localStorage.setItem('sa_jwt_refresh', SA_JWT_REFRESH);
+    return d.user;
+  } catch(e) {
+    console.warn('[auth] Backend indisponível — usando localStorage local:', e.message);
+    return null;
+  }
+}
+
+async function refreshJWT() {
+  if (!SA_JWT_REFRESH) return false;
+  try {
+    const r = await fetch('/api/auth?action=refresh', {
+      method: 'POST',
+      headers: {'Content-Type':'application/json'},
+      body: JSON.stringify({refresh_token: SA_JWT_REFRESH})
+    });
+    const d = await r.json();
+    if (d.ok) { SA_JWT = d.access_token; localStorage.setItem('sa_jwt', SA_JWT); return true; }
+  } catch(_) {}
+  return false;
+}
+
+// Sync Supabase — puxar dados centralizados
+async function syncFromServer() {
+  if (!SA_JWT) return;
+  try {
+    const r = await fetch('/api/sync', {
+      headers: {'Authorization': 'Bearer ' + SA_JWT}
+    });
+    if (r.status === 401) { await refreshJWT(); return; }
+    const d = await r.json();
+    if (!d.ok || !d.data) return;
+    // Mesclar dados do servidor com local (servidor tem precedência)
+    if (d.data.clientes?.length)     { cli  = d.data.clientes;     localStorage.setItem('sa_cli',  JSON.stringify(cli));  }
+    if (d.data.processos?.length)    { proc = d.data.processos;    localStorage.setItem('sa_proc', JSON.stringify(proc)); }
+    if (d.data.agendamentos?.length) { bk   = d.data.agendamentos; localStorage.setItem('ms_bookings', JSON.stringify(bk)); }
+    if (d.data.tarefas?.length)      { tar  = d.data.tarefas;      localStorage.setItem('sa_tar',  JSON.stringify(tar));  }
+    if (d.data.financeiro?.length)   { fin  = d.data.financeiro;   localStorage.setItem('sa_fin',  JSON.stringify(fin));  }
+    if (d.data.usuarios?.length)     { users = d.data.usuarios;    localStorage.setItem('sa_users', JSON.stringify(users)); }
+    console.log('[sync] Dados sincronizados do servidor:', new Date().toLocaleTimeString('pt-BR'));
+  } catch(e) {
+    console.warn('[sync] Indisponível — usando localStorage:', e.message);
+  }
+}
+
+// Push dados locais para o servidor
+async function pushToServer() {
+  if (!SA_JWT) return;
+  try {
+    await fetch('/api/sync/push', {
+      method: 'POST',
+      headers: {'Content-Type':'application/json','Authorization':'Bearer '+SA_JWT},
+      body: JSON.stringify({data:{clientes:cli,processos:proc,agendamentos:bk,tarefas:tar,financeiro:fin}})
+    });
+  } catch(_) {}
+}
 function togglePwd(fid,btn){const f=document.getElementById(fid);if(!f)return;const s=f.type==='password';f.type=s?'text':'password';btn.textContent=s?'🙈':'👁️';}
 function showUserMenu(){
   document.getElementById('umenu-info').innerHTML=`
@@ -2765,20 +2849,17 @@ async function iaCallAPI(messages, provider, maxTokens){
     respModel=d.model||model;
 
   }else if(provider==='gemini'){
-    url='https://generativelanguage.googleapis.com/v1beta/models/'+model+':generateContent?key='+key;
-    headers={'Content-Type':'application/json'};
-    // Converter histórico para formato Gemini (parts)
-    const contents=messages.map(m=>({role:m.role==='assistant'?'model':'user',parts:[{text:m.content}]}));
-    // Adicionar sistema como primeiro turno user se não houver
-    if(contents.length>0&&contents[0].role!=='user'){
-      contents.unshift({role:'user',parts:[{text:sys}]});
-    }
-    body={systemInstruction:{parts:[{text:sys}]},contents,generationConfig:{maxOutputTokens:maxTokens||600}};
-    const r=await fetch(url,{method:'POST',headers,body:JSON.stringify(body)});
+    // Rotear via Netlify Function para evitar CORS e usar fallback de modelos
+    const r=await fetch('/api/gemini',{
+      method:'POST',
+      headers:{'Content-Type':'application/json','X-Gemini-Model':model},
+      body:JSON.stringify({apiKey:key,messages,system:sys,maxTokens:maxTokens||600})
+    });
     const d=await r.json();
-    if(d.error) throw new Error(d.error.message||'Erro Gemini');
-    respText=d.candidates?.[0]?.content?.parts?.[0]?.text||'';
-    respModel=model;
+    if(!d.ok) throw new Error(d.error||'Erro Gemini');
+    if(d.fallback) console.warn('[Gemini] Modelo',model,'indisponível. Usando:',d.model);
+    respText=d.text||'';
+    respModel=d.model||model;
 
   }else if(provider==='deepseek'){
     // DeepSeek usa API compatível com OpenAI
