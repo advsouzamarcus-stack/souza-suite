@@ -58,7 +58,7 @@ export default async (req) => {
       const [clients, cases, appointments, tasks, financial, users] = await Promise.all([
         supa('clients?order=created_at.desc&limit=500'),
         supa('cases?order=created_at.desc&limit=500'),
-        supa('appointments?order=scheduled_at.asc&limit=500'),
+        supa('appointments?order=starts_at.asc&limit=500'),
         supa('tasks?order=created_at.desc&limit=500'),
         supa('financial_records?order=created_at.desc&limit=500'),
         supa('users?select=id,name,email,role,active&order=id.asc'),
