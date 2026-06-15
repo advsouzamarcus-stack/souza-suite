@@ -1,10 +1,26 @@
 [build]
-  publish = "public"
+  publish = "."
   functions = "netlify/functions"
-  command = "npm run build"
 
 [functions]
   node_bundler = "esbuild"
 
-[functions."datajud-sync"]
-  schedule = "0 * * * *"
+[[headers]]
+  for = "/*"
+  [headers.values]
+    X-Frame-Options = "SAMEORIGIN"
+    X-Content-Type-Options = "nosniff"
+    Cache-Control = "public, max-age=3600"
+
+[[headers]]
+  for = "/api/*"
+  [headers.values]
+    Access-Control-Allow-Origin = "*"
+    Access-Control-Allow-Methods = "GET, POST, PATCH, DELETE, OPTIONS"
+    Access-Control-Allow-Headers = "Content-Type, Authorization, X-Gemini-Model"
+    Cache-Control = "no-store"
+
+[[redirects]]
+  from = "/*"
+  to = "/index.html"
+  status = 200
