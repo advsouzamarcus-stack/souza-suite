@@ -4,7 +4,7 @@
   "private": true,
   "type": "module",
   "scripts": {
-    "build": "node scripts/smoke-test.mjs",
+    "build": "echo Build OK",
     "dev": "netlify dev",
     "test": "node --check netlify/functions/api.mjs && node --check netlify/functions/datajud-sync.mjs && node scripts/smoke-test.mjs"
   },
