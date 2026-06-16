@@ -1,4 +1,4 @@
-// sync.mjs v4 — Sincronização bidirecional CORRETA
+// sync.mjs v5.3 — rebuild 1781581891 — Sincronização bidirecional CORRETA
 
 // ── UUID v5 determinístico (SHA-1 baseado) ───────────────────────
 // Garante que ID local (número ou string) sempre mapeia para o mesmo UUID
