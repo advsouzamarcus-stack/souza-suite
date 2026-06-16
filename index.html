@@ -680,6 +680,7 @@ const BT={
 };
 const SS={
   solicitado:{l:'Solicitado',c:'b-req',kb:'#eff6ff',kt:'#1d4ed8'},
+  agendado:{l:'Solicitado',c:'b-req',kb:'#eff6ff',kt:'#1d4ed8'}, // alias Supabase→frontend
   confirmado:{l:'Confirmado',c:'b-cfm',kb:'#f0fdf4',kt:'#15803d'},
   aguardando_docs:{l:'Aguard. Docs',c:'b-doc',kb:'#fffbeb',kt:'#b45309'},
   realizado:{l:'Realizado',c:'b-dn',kb:'#0B1A3B',kt:'#C8A96A'},
@@ -1007,7 +1008,18 @@ async function syncFromServer() {
     let changed = false;
     if (Array.isArray(d.data.clientes)     && d.data.clientes.length)     { cli   = d.data.clientes;     localStorage.setItem('sa_cli',      JSON.stringify(cli));   changed=true; }
     if (Array.isArray(d.data.processos)    && d.data.processos.length)    { proc  = d.data.processos;    localStorage.setItem('sa_proc',     JSON.stringify(proc));  changed=true; }
-    if (Array.isArray(d.data.agendamentos) && d.data.agendamentos.length) { bk    = d.data.agendamentos; localStorage.setItem('ms_bookings', JSON.stringify(bk));    changed=true; }
+    if (Array.isArray(d.data.agendamentos) && d.data.agendamentos.length) {
+      // Normalizar status do Supabase (EN) para o vocabulário do frontend (PT)
+      const stMap = {agendado:'solicitado', confirmado:'confirmado', realizado:'realizado', cancelado:'cancelado', remarcado:'remarcado'};
+      bk = d.data.agendamentos.map(b => ({
+        ...b,
+        status: stMap[b.status] || b.status || 'solicitado',
+        // Restaurar área/nome do campo type que foi mapeado para title
+        area: b.area || b.type || '',
+        type: b.type || 'consulta',
+      }));
+      localStorage.setItem('ms_bookings', JSON.stringify(bk)); changed=true;
+    }
     if (Array.isArray(d.data.tarefas)      && d.data.tarefas.length)      { tar   = d.data.tarefas;      localStorage.setItem('sa_tar',      JSON.stringify(tar));   changed=true; }
     if (Array.isArray(d.data.financeiro)   && d.data.financeiro.length)   { fin   = d.data.financeiro;   localStorage.setItem('sa_fin',      JSON.stringify(fin));   changed=true; }
     if (Array.isArray(d.data.usuarios)     && d.data.usuarios.length)     { users = d.data.usuarios;     localStorage.setItem('sa_users',    JSON.stringify(users)); }
