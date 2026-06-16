@@ -821,7 +821,19 @@ function save(){
     if(el)el.textContent='✅ Salvo às '+new Date().toLocaleTimeString('pt-BR',{hour:'2-digit',minute:'2-digit'});
   },700);
 }
-function saveBk(){localStorage.setItem('ms_bookings',JSON.stringify(bk));}
+function saveBk(){
+  localStorage.setItem('ms_bookings',JSON.stringify(bk));
+  // Sincronizar agendamentos com o servidor imediatamente
+  if(SA_JWT){
+    const badge=document.getElementById('sbadge');
+    if(badge) badge.textContent='☁️ Sincronizando...';
+    pushToServer().then(()=>{
+      if(badge) badge.textContent='✅ Salvo às '+new Date().toLocaleTimeString('pt-BR',{hour:'2-digit',minute:'2-digit'});
+    }).catch(()=>{
+      if(badge) badge.textContent='📱 Salvo localmente';
+    });
+  }
+}
 function saveGc(){localStorage.setItem('ms_gcal',JSON.stringify(gcfg));}
 function load(){
   const _ld={users:D_USERS,cli:D_CLI,proc:D_PROC,tar:D_TAR,fin:D_FIN};
@@ -975,56 +987,119 @@ async function syncFromServer() {
   // Tentar renovar JWT se necessário
   if (!SA_JWT && SA_JWT_REFRESH) await refreshJWT();
   if (!SA_JWT) return;
+  const badge = document.getElementById('sbadge');
+  if (badge) badge.textContent = '🔄 Sincronizando...';
   try {
     const r = await fetch('/api/sync', {
       headers: {'Authorization': 'Bearer ' + SA_JWT}
     });
     if (r.status === 401) {
       const renewed = await refreshJWT();
-      if (renewed) setTimeout(syncFromServer, 500);
+      if (renewed) { syncFromServer(); return; }
+      if (badge) badge.textContent = '⚠️ Sessão expirada';
       return;
     }
+    if (!r.ok) { if (badge) badge.textContent = '⚠️ Erro de sync'; return; }
     const d = await r.json();
-    if (!d.ok || !d.data) { console.warn('[sync] resposta inválida:', d); return; }
-    // Mesclar dados do servidor (servidor tem precedência sobre localStorage)
+    if (!d.ok || !d.data) { if (badge) badge.textContent = '⚠️ Sync falhou'; return; }
+
+    // Mesclar dados do servidor — servidor sempre tem precedência
     let changed = false;
-    if (Array.isArray(d.data.clientes))     { cli  = d.data.clientes;     localStorage.setItem('sa_cli',  JSON.stringify(cli));  changed=true; }
-    if (Array.isArray(d.data.processos))    { proc = d.data.processos;    localStorage.setItem('sa_proc', JSON.stringify(proc)); changed=true; }
-    if (Array.isArray(d.data.agendamentos)) { bk   = d.data.agendamentos; localStorage.setItem('ms_bookings', JSON.stringify(bk)); changed=true; }
-    if (Array.isArray(d.data.tarefas))      { tar  = d.data.tarefas;      localStorage.setItem('sa_tar',  JSON.stringify(tar));  changed=true; }
-    if (Array.isArray(d.data.financeiro))   { fin  = d.data.financeiro;   localStorage.setItem('sa_fin',  JSON.stringify(fin));  changed=true; }
-    if (Array.isArray(d.data.usuarios))     { users = d.data.usuarios;    localStorage.setItem('sa_users', JSON.stringify(users)); }
-    if (changed) {
-      console.log('[sync] ✅ Dados sincronizados do servidor —', new Date().toLocaleTimeString('pt-BR'));
-    // Atualizar badge de status no header
-    const badge = document.getElementById('sbadge');
-    if(badge) {
-      badge.textContent = '☁️ Sync ' + new Date().toLocaleTimeString('pt-BR',{hour:'2-digit',minute:'2-digit'});
-      setTimeout(()=>{ if(badge) badge.textContent = '✅ Salvo'; }, 3000);
+    if (Array.isArray(d.data.clientes)     && d.data.clientes.length)     { cli   = d.data.clientes;     localStorage.setItem('sa_cli',      JSON.stringify(cli));   changed=true; }
+    if (Array.isArray(d.data.processos)    && d.data.processos.length)    { proc  = d.data.processos;    localStorage.setItem('sa_proc',     JSON.stringify(proc));  changed=true; }
+    if (Array.isArray(d.data.agendamentos) && d.data.agendamentos.length) { bk    = d.data.agendamentos; localStorage.setItem('ms_bookings', JSON.stringify(bk));    changed=true; }
+    if (Array.isArray(d.data.tarefas)      && d.data.tarefas.length)      { tar   = d.data.tarefas;      localStorage.setItem('sa_tar',      JSON.stringify(tar));   changed=true; }
+    if (Array.isArray(d.data.financeiro)   && d.data.financeiro.length)   { fin   = d.data.financeiro;   localStorage.setItem('sa_fin',      JSON.stringify(fin));   changed=true; }
+    if (Array.isArray(d.data.usuarios)     && d.data.usuarios.length)     { users = d.data.usuarios;     localStorage.setItem('sa_users',    JSON.stringify(users)); }
+
+    const ts = new Date().toLocaleTimeString('pt-BR',{hour:'2-digit',minute:'2-digit'});
+    if (badge) {
+      badge.textContent = changed ? ('☁️ ' + ts) : ('✅ ' + ts);
+      setTimeout(()=>{ if(badge && badge.textContent.includes(ts)) badge.textContent = '✅ Online'; }, 4000);
     }
-      // Atualizar a tela se estiver no dashboard
-      if (typeof renderDash === 'function' && window._aTabCur === 'dash') renderDash();
+
+    if (changed) {
+      updNotif();
+      console.log('[sync] ✅ Dados recebidos do servidor —', ts,
+        '| cli:', d.data.clientes?.length, 'proc:', d.data.processos?.length,
+        'bk:', d.data.agendamentos?.length, 'tar:', d.data.tarefas?.length);
+      // Re-renderizar a aba atual automaticamente com dados novos
+      try {
+        const rf = {
+          'dash':renderDash, 'clientes':renderCli, 'processos':renderProc,
+          'kanban':renderKanban, 'agendamentos':renderAgendamentos,
+          'agenda-hoje':renderAgenda, 'tarefas':renderTar,
+          'financeiro':renderFin, 'metricas':renderMetricas,
+          'semana':renderSem, 'mes':renderCal, 'cal-agend':renderAgCal,
+          'comunicacoes':renderCom, 'usuarios':renderUsers, 'ia':renderIA
+        };
+        if (aTabCur && rf[aTabCur]) rf[aTabCur]();
+      } catch(_) { /* re-render silencioso */ }
     }
   } catch(e) {
-    console.warn('[sync] indisponível — usando localStorage:', e.message);
+    if (badge) badge.textContent = '📱 Offline';
+    console.warn('[sync] indisponível — usando dados locais:', e.message);
   }
 }
 
 // Push dados locais para o servidor
 async function pushToServer() {
-  if (!SA_JWT) return;
+  // Se não tem JWT, tentar relogin silencioso com credenciais salvas
+  if (!SA_JWT) {
+    const email = localStorage.getItem('sa_email');
+    const pwd   = localStorage.getItem('sa_pwd_tmp');
+    if (email && pwd) {
+      await loginBackend(email, pwd).catch(()=>{});
+    }
+    if (!SA_JWT) {
+      // Tentar refresh se houver refresh token
+      if (SA_JWT_REFRESH) await refreshJWT().catch(()=>{});
+    }
+    if (!SA_JWT) return false; // Sem conexão — dado salvo só localmente
+  }
+  const badge = document.getElementById('sbadge');
+  if (badge) badge.textContent = '☁️ Enviando...';
   try {
+    const payload = {
+      data: {
+        clientes:     cli  || [],
+        processos:    proc || [],
+        agendamentos: bk   || [],
+        tarefas:      tar  || [],
+        financeiro:   fin  || [],
+      }
+    };
     const r = await fetch('/api/sync', {
-      method: 'POST',
-      headers: {'Content-Type':'application/json','Authorization':'Bearer '+SA_JWT},
-      body: JSON.stringify({data:{clientes:cli,processos:proc,agendamentos:bk,tarefas:tar,financeiro:fin}})
+      method:  'POST',
+      headers: { 'Content-Type': 'application/json', 'Authorization': 'Bearer ' + SA_JWT },
+      body:    JSON.stringify(payload),
     });
-    if(r.ok) {
-      const d = await r.json();
-      if(d.ok) console.log('[sync push] OK —', JSON.stringify(d.synced));
+    if (r.status === 401) {
+      // Token expirou — renovar e tentar novamente
+      const renewed = await refreshJWT();
+      if (renewed) return pushToServer();
+      return false;
+    }
+    if (!r.ok) {
+      if (badge) badge.textContent = '⚠️ Erro ao salvar';
+      return false;
+    }
+    const d = await r.json();
+    if (d.ok) {
+      const ts = new Date().toLocaleTimeString('pt-BR',{hour:'2-digit',minute:'2-digit'});
+      if (badge) badge.textContent = '✅ Salvo às ' + ts;
+      localStorage.setItem('sa_last_push', new Date().toISOString());
+      console.log('[sync push] ✅', d.synced);
+      return true;
+    } else {
+      if (badge) badge.textContent = '⚠️ Sync parcial';
+      if (d.errors?.length) console.warn('[sync push] erros:', d.errors);
+      return false;
     }
   } catch(e) {
-    console.warn('[sync push] erro (dados salvos localmente):', e.message);
+    if (badge) badge.textContent = '📱 Offline';
+    console.warn('[sync push] offline — dado salvo localmente:', e.message);
+    return false;
   }
 }
 function togglePwd(fid,btn){const f=document.getElementById(fid);if(!f)return;const s=f.type==='password';f.type=s?'text':'password';btn.textContent=s?'🙈':'👁️';}
@@ -1154,7 +1229,13 @@ function saveCli(){
   id?cli.splice(cli.findIndex(c=>c.id===id),1,{...o,id}):cli.push({...o,id:gid2()});
   save();closeMo('m-cli');renderCli();
 }
-function delCli(id){if(confirm('Excluir este cliente?')){cli=cli.filter(c=>c.id!==id);save();renderCli();}}
+function delCli(id){
+  if(confirm('Excluir este cliente?')){
+    cli=cli.filter(c=>c.id!==id);
+    save(); renderCli();
+    pushToServer().catch(()=>{});
+  }
+}
 
 // ═══════════════════════════════════════════════════════════════════
 // PROCESSOS
@@ -1207,7 +1288,13 @@ function saveProc(){
   id?proc.splice(proc.findIndex(p=>p.id===id),1,{...o,id}):proc.push({...o,id:gid2()});
   save();closeMo('m-proc');renderProc();
 }
-function delProc(id){if(confirm('Excluir este processo?')){proc=proc.filter(p=>p.id!==id);save();renderProc();}}
+function delProc(id){
+  if(confirm('Excluir este processo?')){
+    proc=proc.filter(p=>p.id!==id);
+    save(); renderProc();
+    pushToServer().catch(()=>{});
+  }
+}
 function addProcToCalendar(id){const r=proc.find(p=>p.id===id);if(!r||!r.prox)return;window.open(gcalUrl('⚖️ Movimentação: '+r.num.substring(0,20),r.prox,r.prox,'Processo: '+r.num+'\nCliente: '+cn(r.cliId)+'\nAdvogado: '+r.adv,r.vara),'_blank');}
 function searchProcNum(num,vara){
   const t=vara.toLowerCase();let url;
@@ -1275,7 +1362,13 @@ function saveTar(openCal){
   if(openCal&&o.data)window.open(gcalUrl(o.desc,o.data,o.data,'Responsável: '+o.resp+(o.procId?'\nProcesso: '+proc.find(p=>p.id===o.procId)?.num:''),o.local),'_blank');
 }
 function calFromTar(){saveTar(true);}
-function delTar(id){if(confirm('Excluir esta tarefa?')){tar=tar.filter(t=>t.id!==id);save();renderTar();}}
+function delTar(id){
+  if(confirm('Excluir esta tarefa?')){
+    tar=tar.filter(t=>t.id!==id);
+    save(); renderTar();
+    pushToServer().catch(()=>{});
+  }
+}
 function addToCalendar(id){const t=tar.find(x=>x.id===id);if(!t)return;window.open(gcalUrl(t.desc,t.data,t.data,'Responsável: '+t.resp+(t.procId?'\nProcesso: '+proc.find(p=>p.id===t.procId)?.num:''),t.local),'_blank');}
 
 // ═══════════════════════════════════════════════════════════════════
@@ -1341,7 +1434,13 @@ function saveFin(){
   id?fin.splice(fin.findIndex(f=>f.id===id),1,{...o,id}):fin.push({...o,id:gid2()});
   save();closeMo('m-fin');renderFin();
 }
-function delFin(id){if(confirm('Excluir este lançamento?')){fin=fin.filter(f=>f.id!==id);save();renderFin();}}
+function delFin(id){
+  if(confirm('Excluir este lançamento?')){
+    fin=fin.filter(f=>f.id!==id);
+    save(); renderFin();
+    pushToServer().catch(()=>{});
+  }
+}
 
 // ═══════════════════════════════════════════════════════════════════
 // COMUNICAÇÕES
@@ -1519,64 +1618,68 @@ function fmtDJ(s){if(!s)return'--';if(/^\d{14}$/.test(String(s))){const v=String
 function djAssuntos(raw){if(!raw||!raw.length)return[];const f=[];raw.forEach(a=>{if(Array.isArray(a))a.forEach(x=>{if(x&&x.nome)f.push(x);});else if(a&&a.nome)f.push(a);});return f;}
 function detectTribCNJ(num){const d=num.replace(/\D/g,'');if(d.length!==20)return null;const seg=d[13],tt=d.substring(14,16);const m={'8':{'01':'tjac','02':'tjal','03':'tjam','04':'tjap','05':'tjba','06':'tjce','07':'tjdft','08':'tjes','09':'tjgo','10':'tjma','11':'tjmt','12':'tjms','13':'tjmg','14':'tjpa','15':'tjpb','16':'tjpr','17':'tjpe','18':'tjpi','19':'tjrj','20':'tjrn','21':'tjrs','22':'tjro','23':'tjrr','24':'tjsc','25':'tjse','26':'tjsp','27':'tjto'},'9':{'01':'trt1','02':'trt2','03':'trt3','04':'trt4','05':'trt5','06':'trt6','07':'trt7','08':'trt8','09':'trt9','10':'trt10','11':'trt11','12':'trt12','13':'trt13','14':'trt14','15':'trt15','16':'trt16','17':'trt17','18':'trt18','19':'trt19','20':'trt20','21':'trt21','22':'trt22','23':'trt23','24':'trt24','00':'tst'},'4':{'01':'trf1','02':'trf2','03':'trf3','04':'trf4','05':'trf5','06':'trf6'},'3':{'00':'stj'},'2':{'00':'tse'},'6':{'00':'stm'}};return(m[seg]&&m[seg][tt])||null;}
 function djErrMsg(status,msg){if(status===401||status===403)return'APIKey invalida. Atualize em datajud-wiki.cnj.jus.br';if(status===429)return'Limite de requisicoes. Aguarde.';if(status===502||status===503||status===504)return'Datajud indisponivel. Tente em alguns minutos.';if(msg&&(msg.includes('fetch')||msg.includes('network')))return'Sem conexao com a internet.';return msg||'Erro HTTP '+status;}
-// djFetch — roteado via /api/datajud (Netlify Function segura)
-// A API Key fica no servidor, sem exposição no browser nem problemas de CORS
+// djFetch — proxy seguro via backend Netlify
+// Tenta /api/datajud (função dedicada) e faz fallback para /api/auth?action=datajud
 async function djFetch(alias, body) {
-  // Extrair tribunal do alias (ex: 'api_publica_tjrj' → 'tjrj')
   const tribKey = alias.replace('api_publica_', '');
-
-  // Extrair query e size do body
   const { size = 10, query, search_after } = body;
-
   const payload = { tribunal: tribKey, query, size };
   if (search_after) payload.searchAfter = search_after;
 
-  try {
-    const ctrl = new AbortController();
-    const tid  = setTimeout(() => ctrl.abort(), 25000);
-    const r = await fetch('/api/datajud', {
-      method:  'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body:    JSON.stringify(payload),
-      signal:  ctrl.signal,
-    });
-    clearTimeout(tid);
-    const d = await r.json();
-    if (!d.ok) throw { status: r.status, message: d.error || 'Erro Datajud' };
-    // Reformatar para o formato esperado pelo código existente
-    return {
-      took: d.took,
-      hits: {
-        total: { value: d.total, relation: 'eq' },
-        hits:  d.hits.map(s => ({ _source: s, sort: d.searchAfter })),
-      },
-    };
-  } catch(e) {
-    if (e.name === 'AbortError') throw new Error('Timeout: servidor demorou mais de 25s');
-    throw new Error(e.message || 'Erro ao chamar /api/datajud');
+  // Tentar os dois endpoints (o que estiver disponível responderá)
+  const endpoints = ['/api/datajud', '/api/auth?action=datajud'];
+  let lastError;
+
+  for (const endpoint of endpoints) {
+    try {
+      const ctrl = new AbortController();
+      const tid  = setTimeout(() => ctrl.abort(), 25000);
+      const r = await fetch(endpoint, {
+        method:  'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body:    JSON.stringify(payload),
+        signal:  ctrl.signal,
+      });
+      clearTimeout(tid);
+      if (r.status === 404) continue; // tentar próximo endpoint
+      const d = await r.json();
+      if (!d.ok) throw new Error(d.error || 'Erro Datajud');
+      return {
+        took: d.took,
+        hits: {
+          total: { value: d.total, relation: 'eq' },
+          hits:  d.hits.map(s => ({ _source: s, sort: d.searchAfter })),
+        },
+      };
+    } catch(e) {
+      if (e.name === 'AbortError') { lastError = new Error('Timeout: servidor demorou >25s'); break; }
+      lastError = e;
+      continue;
+    }
   }
+  throw lastError || new Error('Datajud indisponível');
 }
 
-// djSearch — versão nova usada pelo renderBusca (retorna hits e searchAfter)
+// djSearch — versão nova usada pelo renderBusca (com fallback automático)
 async function djSearch(alias, body) {
   const tribKey = alias.replace('api_publica_','');
   const { size=10, query, search_after } = body;
   const payload = { tribunal:tribKey, query, size };
   if(search_after) payload.searchAfter = search_after;
-  const r = await fetch('/api/datajud', {
-    method:'POST',
-    headers:{'Content-Type':'application/json'},
-    body:JSON.stringify(payload)
-  });
-  const d = await r.json();
-  if(!d.ok) throw new Error(d.error||'Erro Datajud');
-  return {
-    took: d.took,
-    hits: {
-      total: { value:d.total },
-      hits:  d.hits.map(s=>({ _source:s, sort:d.searchAfter }))
-    }
-  };
+
+  const endpoints = ['/api/datajud', '/api/auth?action=datajud'];
+  for(const ep of endpoints) {
+    const r = await fetch(ep, {
+      method:'POST',
+      headers:{'Content-Type':'application/json'},
+      body:JSON.stringify(payload)
+    });
+    if(r.status === 404) continue;
+    const d = await r.json();
+    if(!d.ok) throw new Error(d.error||'Erro Datajud');
+    return { took:d.took, hits:{ total:{value:d.total}, hits:d.hits.map(s=>({_source:s,sort:d.searchAfter})) } };
+  }
+  throw new Error('Datajud indisponível');
 }
 async function djConsultar(numProc){
   const nd=numRaw(numProc);
@@ -2429,10 +2532,10 @@ function showDet(id){
     </div>
     <div class="card" style="margin-bottom:10px">
       <div class="stit">Alterar Status</div>
-      <select id="det-st" style="width:100%;padding:10px;border:1px solid var(--bd);border-radius:9px;font-size:13px;outline:none;margin-bottom:9px">${allSt}</select>
+      <select id="det-st" onchange="autoSaveDet('${b.id}')" style="width:100%;padding:10px;border:1px solid var(--bd);border-radius:9px;font-size:13px;outline:none;margin-bottom:9px;background:var(--bg);color:var(--tx)">${allSt}</select>
       <div class="stit">Observações Internas</div>
       <textarea id="det-obs" style="width:100%;padding:10px;border:1px solid var(--bd);border-radius:9px;font-size:12px;min-height:65px;resize:vertical;outline:none">${b.obs||''}</textarea>
-      <button class="btn bgold bw" style="margin-top:9px" onclick="saveDet('${b.id}')">💾 Salvar Alterações</button>
+      <button class="btn bgold bw" style="margin-top:9px" onclick="saveDet('${b.id}');this.textContent='✅ Salvo!';setTimeout(()=>this.textContent='💾 Salvar Alterações',2000)">💾 Salvar Alterações</button>
     </div>
     <div class="brow">
       <a href="https://wa.me/55${b.tel}?text=${encodeURIComponent('Olá '+b.nome.split(' ')[0]+'! Confirmamos seu atendimento para '+fd(b.data)+' às '+b.hora+'. Escritório Marcus Souza I Advogado — (21) 96534-8183.')}" target="_blank" class="btn bwa" style="flex:1">📱 WhatsApp</a>
@@ -2441,8 +2544,46 @@ function showDet(id){
     </div>`;
   openMo('mo-detail');
 }
-function saveDet(id){const i=bk.findIndex(b=>b.id===id);if(i<0)return;bk[i].status=document.getElementById('det-st').value;bk[i].obs=document.getElementById('det-obs').value;saveBk();updNotif();closeMo('mo-detail');const at=document.querySelector('.atab.on');if(at)at.click();}
-function delDet(id){if(!confirm('Excluir este agendamento?'))return;bk=bk.filter(b=>b.id!==id);saveBk();updNotif();closeMo('mo-detail');const at=document.querySelector('.atab.on');if(at)at.click();}
+function saveDet(id){
+  const i=bk.findIndex(b=>b.id===id);
+  if(i<0)return;
+  bk[i].status  = document.getElementById('det-st').value;
+  bk[i].obs     = document.getElementById('det-obs').value;
+  // Capturar campos adicionais se existirem no modal
+  const fNome = document.getElementById('det-nome');
+  const fTel  = document.getElementById('det-tel');
+  const fHora = document.getElementById('det-hora');
+  const fData = document.getElementById('det-data');
+  if(fNome) bk[i].nome  = fNome.value;
+  if(fTel)  bk[i].tel   = fTel.value;
+  if(fHora) bk[i].hora  = fHora.value;
+  if(fData) bk[i].data  = fData.value;
+  bk[i].updatedAt = new Date().toISOString();
+  saveBk(); updNotif();
+  closeMo('mo-detail');
+  const at=document.querySelector('.atab.on'); if(at)at.click();
+}
+// autoSaveDet — salva status imediatamente ao alterar no select (sem fechar modal)
+function autoSaveDet(id){
+  const i=bk.findIndex(b=>b.id===id);
+  if(i<0)return;
+  const newStatus = document.getElementById('det-st').value;
+  if(bk[i].status === newStatus) return; // sem mudança
+  bk[i].status    = newStatus;
+  bk[i].updatedAt = new Date().toISOString();
+  saveBk(); updNotif();
+  // Feedback visual sem fechar o modal
+  const btn = document.querySelector('#mo-detail .btn.bgold');
+  if(btn){ const orig=btn.textContent; btn.textContent='✅ Salvo!'; setTimeout(()=>btn.textContent=orig,1500); }
+}
+
+function delDet(id){
+  if(!confirm('Excluir este agendamento?'))return;
+  bk=bk.filter(b=>b.id!==id);
+  saveBk(); updNotif();
+  closeMo('mo-detail');
+  const at=document.querySelector('.atab.on'); if(at)at.click();
+}
 function showPending(){const p=bk.filter(b=>b.status==='solicitado');if(!p.length){alert('✅ Nenhum agendamento pendente!');return;}document.getElementById('mo-det-i').innerHTML=`<div class="mot">⏳ Aguardando Confirmação (${p.length})</div>${p.map(b=>arw(b)).join('')}`;openMo('mo-detail');}
 
 // ═══════════════════════════════════════════════════════════════════
