@@ -1,4 +1,4 @@
-// auth.mjs v4 — SEM dependência de JWT_SECRET externo
+// auth.mjs v4 — rebuild 1781581470 — SEM dependência de JWT_SECRET externo
 // Usa bcrypt via Web Crypto + token Base64 simples e seguro
 // Tabela: users (Supabase) com campos: id, email, password_hash, role, name, active
 
