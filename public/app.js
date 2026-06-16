@@ -10,7 +10,7 @@ const configs={
  leads:[['name','Nome'],['phone','Telefone'],['email','E-mail'],['source','Origem'],['stage','Etapa'],['summary','Resumo','textarea']],
  conversations:[['channel','Canal','text',true],['external_thread_id','ID externo'],['status','Status'],['ai_enabled','IA ativa','checkbox']]
 };
-async function api(path,opt={}){const headers={'Content-Type':'application/json',...(opt.headers||{})};if(state.token)headers.Authorization='Bearer '+state.token;const r=await fetch('/api/'+path,{...opt,headers});const text=await r.text();let data={};try{data=text?JSON.parse(text):{};}catch{data={raw:text};}if(!r.ok)throw new Error(data.error||'Erro na API');return data;}
+async function api(path,opt={}){const headers={'Content-Type':'application/json',...(opt.headers||{})};if(state.token)headers.Authorization='Bearer '+state.token;const r=await fetch('/.netlify/functions/api/'+path,{...opt,headers});const text=await r.text();let data={};try{data=text?JSON.parse(text):{};}catch{data={raw:text};}if(!r.ok)throw new Error(data.error||'Erro na API');return data;}
 function setSession(d){state.token=d.token;state.user=d.user;localStorage.setItem('token',d.token);localStorage.setItem('user',JSON.stringify(d.user));}
 async function login(){try{loginMsg.textContent='';const d=await api('auth/login',{method:'POST',body:JSON.stringify({email:email.value.trim(),password:password.value})});setSession(d);boot();}catch(e){loginMsg.textContent=e.message;}}
 function logout(){localStorage.clear();location.reload();}
