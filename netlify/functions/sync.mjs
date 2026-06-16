@@ -1,4 +1,34 @@
 // sync.mjs v4 — Sincronização bidirecional CORRETA
+
+// ── UUID v5 determinístico (SHA-1 baseado) ───────────────────────
+// Garante que ID local (número ou string) sempre mapeia para o mesmo UUID
+const NS = '6ba7b8109dad11d180b400c04fd430c8'; // DNS namespace
+async function toUUID(localId, table) {
+  const key = `souzaadv.${table}.${localId}`;
+  const buf = await crypto.subtle.digest('SHA-1', new TextEncoder().encode(NS + key));
+  const b   = new Uint8Array(buf);
+  b[6] = (b[6] & 0x0f) | 0x50; // version 5
+  b[8] = (b[8] & 0x3f) | 0x80; // variant
+  const h = Array.from(b).map(x => x.toString(16).padStart(2,'0')).join('');
+  return `${h.slice(0,8)}-${h.slice(8,12)}-${h.slice(12,16)}-${h.slice(16,20)}-${h.slice(20,32)}`;
+}
+
+// Cache de UUIDs (evitar recalcular)
+const _uCache = new Map();
+async function uid(localId, table) {
+  const key = `${table}:${localId}`;
+  if(_uCache.has(key)) return _uCache.get(key);
+  // Se já é UUID (36 chars com traços), usar direto
+  if(/^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i.test(String(localId))) {
+    _uCache.set(key, String(localId));
+    return String(localId);
+  }
+  const u = await toUUID(String(localId), table);
+  _uCache.set(key, u);
+  return u;
+}
+
+
 // Mapeia campos PT (frontend) ↔ EN (Supabase)
 // Tabelas Supabase: clients, cases, appointments, tasks, financial_records
 
@@ -53,10 +83,10 @@ async function supa(path, method='GET', body=null) {
 
 // CLIENTE: {id, nome, cpf, tel, email, end, tipo, obs}
 // → clients: {id, name, cpf_cnpj, phone, email, address, notes, source}
-function cliToSupa(c) {
+async function cliToSupa(c) {
   if(!c.id || !c.nome) return null;
   return {
-    id:          String(c.id),
+    id:          await uid(c.id, 'clients'),
     name:        c.nome || '',
     cpf_cnpj:    c.cpf  || '',
     phone:       c.tel  || '',
@@ -85,11 +115,11 @@ function supaToCliente(r) {
 
 // PROCESSO: {id, num, cliId, tipo, vara, status, ini, prox, adv, obs, djMov, djMovDt}
 // → cases: {id, client_id, process_number, court, tribunal, class_name, subject, phase, status}
-function procToSupa(p) {
+async function procToSupa(p) {
   if(!p.id || !p.num) return null;
   return {
-    id:              String(p.id),
-    client_id:       p.cliId ? String(p.cliId) : null,
+    id:              await uid(p.id, 'cases'),
+    client_id:       p.cliId ? await uid(p.cliId, 'clients') : null,
     process_number:  p.num   || '',
     court:           p.vara  || '',
     tribunal:        p.trib  || '',
@@ -125,11 +155,11 @@ function supaToProc(r) {
 
 // AGENDAMENTO: {id, type, status, nome, tel, email, cidade, estado, area, resumo, modal, data, hora, createdAt}
 // → appointments: {id, client_id, title, description, starts_at, ends_at, status, channel}
-function bkToSupa(b) {
+async function bkToSupa(b) {
   if(!b.id) return null;
   const dateStr = b.data && b.hora ? `${b.data}T${b.hora}:00` : (b.data || new Date().toISOString().slice(0,10));
   return {
-    id:          String(b.id),
+    id:          await uid(b.id, 'appointments'),
     title:       b.area || b.type || 'Atendimento',
     description: [b.nome, b.tel, b.resumo].filter(Boolean).join(' | '),
     starts_at:   dateStr,
@@ -158,12 +188,12 @@ function supaToAgenda(r) {
 
 // TAREFA: {id, data, desc, cliId, procId, prio, status, resp, local, ok}
 // → tasks: {id, client_id, case_id, title, description, due_at, status, priority, assigned_to}
-function tarToSupa(t) {
+async function tarToSupa(t) {
   if(!t.id || !t.desc) return null;
   return {
-    id:          String(t.id),
-    client_id:   t.cliId  ? String(t.cliId)  : null,
-    case_id:     t.procId ? String(t.procId) : null,
+    id:          await uid(t.id, 'tasks'),
+    client_id:   t.cliId  ? await uid(t.cliId,  'clients') : null,
+    case_id:     t.procId ? await uid(t.procId,  'cases')   : null,
     title:       t.desc   || '',
     description: t.local  || '',
     due_at:      t.data   || new Date().toISOString().slice(0,10),
@@ -191,11 +221,11 @@ function supaToTarefa(r) {
 
 // FINANCEIRO: {id, cliId, desc, ct, rc, pg, st, data}
 // → financial_records: {id, client_id, description, amount, kind, status, due_at, paid_at}
-function finToSupa(f) {
+async function finToSupa(f) {
   if(!f.id || !f.desc) return null;
   return {
-    id:          String(f.id),
-    client_id:   f.cliId ? String(f.cliId) : null,
+    id:          await uid(f.id, 'financial_records'),
+    client_id:   f.cliId ? await uid(f.cliId, 'clients') : null,
     description: f.desc || '',
     amount:      parseFloat(f.ct || f.valor || 0),
     kind:        f.pg   || 'PIX',
@@ -286,7 +316,7 @@ export default async (req) => {
       const rows = data[key];
       if(!rows?.length) { results[key]=0; continue; }
 
-      const mapped = rows.map(fn).filter(Boolean);
+      const mapped = (await Promise.all(rows.map(fn))).filter(Boolean);
       if(!mapped.length) { results[key]=0; continue; }
 
       let count=0;
