@@ -1,4 +1,4 @@
-// datajud.mjs — Proxy seguro para a API Pública do Datajud/CNJ
+// datajud.mjs — 1781616505 — Proxy seguro para a API Pública do Datajud/CNJ
 // A API Key fica no servidor (não exposta no frontend)
 // Elimina problemas de CORS e exposição da chave
 
