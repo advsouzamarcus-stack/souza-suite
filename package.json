@@ -4,7 +4,7 @@
   "private": true,
   "type": "module",
   "scripts": {
-    "build": "echo Build OK",
+    "build": "node scripts/sanitize-secrets.mjs && echo Compilação OK",
     "dev": "netlify dev",
     "test": "node --check netlify/functions/api.mjs && node --check netlify/functions/datajud-sync.mjs && node scripts/smoke-test.mjs"
   },
