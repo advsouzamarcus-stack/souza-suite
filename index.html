@@ -514,6 +514,11 @@ tr:hover td{background:#f8fafc!important}
       <span id="a-clock" style="font-size:10px;color:rgba(255,255,255,.35)"></span>
       <span id="sbadge" style="font-size:11px;color:rgba(255,255,255,.5)">✅ Salvo</span>
       <button class="sync-b" id="sync-btn" onclick="syncGCal()">📅 Sync</button>
+      <button onclick="syncFromServer().then(()=>alert('✅ Dados sincronizados!')).catch(e=>alert('❌ '+e.message))" 
+        title="Sincronizar dados entre dispositivos agora"
+        style="background:rgba(255,255,255,.1);border:1px solid rgba(255,255,255,.2);color:#fff;padding:4px 8px;border-radius:6px;cursor:pointer;font-size:11px">
+        🔄 Sync
+      </button>
       <button class="nb" onclick="showPending()">🔔<span class="ndot" id="ndot"></span></button>
       <button class="btn bca bsm" onclick="exportExcel()">📥 Excel</button>
       <button class="uchip" id="uchip" onclick="showUserMenu()">
@@ -811,8 +816,8 @@ function save(){
   if(el)el.textContent='💾 Salvando...';
   saveT=setTimeout(()=>{
     const _sd={users,cli,proc,tar,fin};['users','cli','proc','tar','fin'].forEach(k=>localStorage.setItem('sa_'+k,JSON.stringify(_sd[k])));
-    // Push assíncrono para servidor (sem bloquear)
-    if(SA_JWT) setTimeout(pushToServer, 2000);
+    // Push para servidor (sem bloquear a UI)
+    if(SA_JWT) pushToServer().catch(()=>{});
     if(el)el.textContent='✅ Salvo às '+new Date().toLocaleTimeString('pt-BR',{hour:'2-digit',minute:'2-digit'});
   },700);
 }
@@ -878,8 +883,14 @@ function showApp(){
   const aceBtn=document.getElementById('tab-acessos-btn');
   if(aceBtn)aceBtn.style.display=currentUser?.role==='admin'?'':'none';
   startClock();updNotif();
-  setTimeout(djStartMonitor,2000);
-  setTimeout(syncFromServer,1500); // Sync central ao abrir
+  setTimeout(djStartMonitor, 2000);
+  setTimeout(syncFromServer, 1500); // Sync ao abrir
+  // Sync periódico a cada 5 minutos para manter dados atualizados
+  setInterval(() => {
+    if(SA_JWT || SA_JWT_REFRESH) syncFromServer().catch(()=>{});
+  }, 5 * 60 * 1000);
+  // Sync periódico a cada 5 minutos para múltiplos dispositivos
+  setInterval(syncFromServer, 5 * 60 * 1000);
   aTab('dash',document.querySelector('.atab'));
 }
 function openMo(id){document.getElementById(id).classList.add('on');}
@@ -961,24 +972,41 @@ async function refreshJWT() {
 
 // Sync Supabase — puxar dados centralizados
 async function syncFromServer() {
+  // Tentar renovar JWT se necessário
+  if (!SA_JWT && SA_JWT_REFRESH) await refreshJWT();
   if (!SA_JWT) return;
   try {
     const r = await fetch('/api/sync', {
       headers: {'Authorization': 'Bearer ' + SA_JWT}
     });
-    if (r.status === 401) { await refreshJWT(); return; }
+    if (r.status === 401) {
+      const renewed = await refreshJWT();
+      if (renewed) setTimeout(syncFromServer, 500);
+      return;
+    }
     const d = await r.json();
-    if (!d.ok || !d.data) return;
-    // Mesclar dados do servidor com local (servidor tem precedência)
-    if (d.data.clientes?.length)     { cli  = d.data.clientes;     localStorage.setItem('sa_cli',  JSON.stringify(cli));  }
-    if (d.data.processos?.length)    { proc = d.data.processos;    localStorage.setItem('sa_proc', JSON.stringify(proc)); }
-    if (d.data.agendamentos?.length) { bk   = d.data.agendamentos; localStorage.setItem('ms_bookings', JSON.stringify(bk)); }
-    if (d.data.tarefas?.length)      { tar  = d.data.tarefas;      localStorage.setItem('sa_tar',  JSON.stringify(tar));  }
-    if (d.data.financeiro?.length)   { fin  = d.data.financeiro;   localStorage.setItem('sa_fin',  JSON.stringify(fin));  }
-    if (d.data.usuarios?.length)     { users = d.data.usuarios;    localStorage.setItem('sa_users', JSON.stringify(users)); }
-    console.log('[sync] Dados sincronizados do servidor:', new Date().toLocaleTimeString('pt-BR'));
+    if (!d.ok || !d.data) { console.warn('[sync] resposta inválida:', d); return; }
+    // Mesclar dados do servidor (servidor tem precedência sobre localStorage)
+    let changed = false;
+    if (Array.isArray(d.data.clientes))     { cli  = d.data.clientes;     localStorage.setItem('sa_cli',  JSON.stringify(cli));  changed=true; }
+    if (Array.isArray(d.data.processos))    { proc = d.data.processos;    localStorage.setItem('sa_proc', JSON.stringify(proc)); changed=true; }
+    if (Array.isArray(d.data.agendamentos)) { bk   = d.data.agendamentos; localStorage.setItem('ms_bookings', JSON.stringify(bk)); changed=true; }
+    if (Array.isArray(d.data.tarefas))      { tar  = d.data.tarefas;      localStorage.setItem('sa_tar',  JSON.stringify(tar));  changed=true; }
+    if (Array.isArray(d.data.financeiro))   { fin  = d.data.financeiro;   localStorage.setItem('sa_fin',  JSON.stringify(fin));  changed=true; }
+    if (Array.isArray(d.data.usuarios))     { users = d.data.usuarios;    localStorage.setItem('sa_users', JSON.stringify(users)); }
+    if (changed) {
+      console.log('[sync] ✅ Dados sincronizados do servidor —', new Date().toLocaleTimeString('pt-BR'));
+    // Atualizar badge de status no header
+    const badge = document.getElementById('sbadge');
+    if(badge) {
+      badge.textContent = '☁️ Sync ' + new Date().toLocaleTimeString('pt-BR',{hour:'2-digit',minute:'2-digit'});
+      setTimeout(()=>{ if(badge) badge.textContent = '✅ Salvo'; }, 3000);
+    }
+      // Atualizar a tela se estiver no dashboard
+      if (typeof renderDash === 'function' && window._aTabCur === 'dash') renderDash();
+    }
   } catch(e) {
-    console.warn('[sync] Indisponível — usando localStorage:', e.message);
+    console.warn('[sync] indisponível — usando localStorage:', e.message);
   }
 }
 
@@ -986,12 +1014,18 @@ async function syncFromServer() {
 async function pushToServer() {
   if (!SA_JWT) return;
   try {
-    await fetch('/api/sync/push', {
+    const r = await fetch('/api/sync', {
       method: 'POST',
       headers: {'Content-Type':'application/json','Authorization':'Bearer '+SA_JWT},
       body: JSON.stringify({data:{clientes:cli,processos:proc,agendamentos:bk,tarefas:tar,financeiro:fin}})
     });
-  } catch(_) {}
+    if(r.ok) {
+      const d = await r.json();
+      if(d.ok) console.log('[sync push] OK —', JSON.stringify(d.synced));
+    }
+  } catch(e) {
+    console.warn('[sync push] erro (dados salvos localmente):', e.message);
+  }
 }
 function togglePwd(fid,btn){const f=document.getElementById(fid);if(!f)return;const s=f.type==='password';f.type=s?'text':'password';btn.textContent=s?'🙈':'👁️';}
 function showUserMenu(){
@@ -2243,6 +2277,23 @@ function renderConfig(){
     <div class="drow"><div class="dl">Telefone</div><div class="dv">(21) 96534-8183 · (21) 96534-8183</div></div>
     <div class="drow"><div class="dl">E-mail</div><div class="dv">adv.souzamarcus@gmail.com</div></div>
     <div class="drow"><div class="dl">Horário</div><div class="dv">Seg–Sex · 10h–18h · Somente agendamento</div></div>
+  </div>
+  <div class="card"><div class="stit">☁️ Sincronização entre Aparelhos</div>
+    <div class="al ${SA_JWT?'al-ok':'al-warn'}" style="font-size:12px;margin-bottom:10px">
+      ${SA_JWT?'☁️ Conectado ao servidor — dados sincronizam automaticamente':'⚠️ Offline — dados salvos apenas neste aparelho'}
+    </div>
+    <div class="drow"><div class="dl">Status</div><div class="dv">${SA_JWT?'🟢 Online (JWT ativo)':'🔴 Offline (sem JWT)'}</div></div>
+    <div class="drow"><div class="dl">Último sync</div><div class="dv">${localStorage.getItem('sa_last_push')?new Date(localStorage.getItem('sa_last_push')).toLocaleString('pt-BR'):'Nunca'}</div></div>
+    <div class="drow"><div class="dl">Servidor</div><div class="dv">Supabase (briobxgqygjcyrbasqan)</div></div>
+    <div class="brow" style="margin-top:10px;flex-wrap:wrap;gap:6px">
+      <button class="btn bnav bsm" onclick="syncFromServer().then(()=>renderConfig())">⬇️ Baixar do servidor</button>
+      <button class="btn bp bsm" onclick="pushToServer().then(()=>renderConfig())">⬆️ Enviar ao servidor</button>
+      <button class="btn bgold bsm" onclick="exportarDados()">📤 Exportar .json</button>
+      <button class="btn bgh bsm" onclick="importarDados()">📥 Importar .json</button>
+    </div>
+    <div style="margin-top:8px;font-size:11px;color:var(--mu)">
+      💡 <strong>Novo aparelho?</strong> Clique em "Baixar do servidor" após fazer login para receber todos os dados cadastrados em outros dispositivos.
+    </div>
   </div>
   <div class="card"><div class="stit">Dados do Sistema</div>
     <div class="drow"><div class="dl">Clientes</div><div class="dv">${cli.length} registros</div></div>
