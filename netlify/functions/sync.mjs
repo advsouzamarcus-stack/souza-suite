@@ -161,10 +161,10 @@ async function bkToSupa(b) {
   return {
     id:          await uid(b.id, 'appointments'),
     title:       b.area || b.type || 'Atendimento',
-    description: [b.nome, b.tel, b.resumo].filter(Boolean).join(' | '),
+    description: [b.nome, b.tel, b.resumo, b.status||'solicitado'].filter(Boolean).join(' | '),
     starts_at:   dateStr,
     ends_at:     dateStr,
-    status:      ({'solicitado':'agendado','confirmado':'confirmado','realizado':'realizado','cancelado':'cancelado','remarcado':'remarcado','Confirmado':'confirmado','Cancelado':'cancelado'}[b.status]||'agendado'),
+    status:      ({'solicitado':'agendado','confirmado':'confirmado','realizado':'realizado','cancelado':'cancelado','remarcado':'remarcado','aguardando_docs':'agendado','contratado':'realizado','Confirmado':'confirmado','Cancelado':'cancelado','Contratado':'realizado','Realizado':'realizado','Solicitado':'agendado'}[b.status]||'agendado'),
     channel:     b.modal  || 'presencial',
     created_at:  b.createdAt || b.criadoEm || new Date().toISOString(),
     updated_at:  new Date().toISOString(),
@@ -175,10 +175,10 @@ function supaToAgenda(r) {
   return {
     id:        r.id,
     type:      r.title    || '',
-    status:    r.status   || 'solicitado',
-    nome:      parts[0]   || '',
-    tel:       parts[1]   || '',
-    resumo:    parts[2]   || '',
+    status:    parts[3] || r.status || 'solicitado', // 4º campo da description tem o status PT original
+    nome:      parts[0] || '',
+    tel:       parts[1] || '',
+    resumo:    parts[2] || '',
     modal:     r.channel  || 'presencial',
     data:      (r.starts_at||'').slice(0,10),
     hora:      (r.starts_at||'').slice(11,16),
