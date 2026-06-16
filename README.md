@@ -13,6 +13,8 @@ OAB/RJ 250.430 · OAB/RJ 160.689 — Rio de Janeiro/RJ
 |---|---|---|
 | Dr. Marcus Vinicius Souza | marcus@souzaadv.com | Admin@2025 |
 | Dr. Luiz Fabiano R. de Souza | luiz@souzaadv.com | Luiz@2025 |
+| Edvania Souza | edvania@souzaadv.com | 07122015 |
+| Gleison Barbosa | Gleison@souzaadv.com | G123456 |
 
 ## Funcionalidades
 
