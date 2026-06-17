@@ -1,0 +1,1 @@
+Pasta criada por engano. Deve ser removida.
