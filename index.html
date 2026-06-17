@@ -754,7 +754,7 @@ const initials=n=>n.split(' ').filter(Boolean).slice(0,2).map(w=>w[0].toUpperCas
 
 // DEFAULT DATA — após td0 e dt() para poder usá-los
 const D_USERS=[
-  {id:1,nome:'Dr. Marcus Souza',cargo:'Advogado Sócio',email:'marcus@souzaadv.com',pwd:'Admin@2025',oab:'OAB/RJ 250.430',tel:'(21) 96534-8183',role:'admin',ativo:true},
+  {id:1,nome:'Dr. Marcus Souza',cargo:'Advogado Sócio',email:'marcus@souzaadv.com',pwd:'',oab:'OAB/RJ 250.430',tel:'(21) 96534-8183',role:'admin',ativo:true},
 ];
 const D_CLI=[
   {id:1,nome:'João Silva Santos',cpf:'123.456.789-00',tel:'21999991111',email:'joao@gmail.com',end:'Rua das Flores, 100 – Rio de Janeiro/RJ',tipo:'Ativo',obs:'Preferência por WhatsApp'},
@@ -914,26 +914,40 @@ document.addEventListener('keydown',e=>{if(e.key==='Escape')document.querySelect
 // ═══════════════════════════════════════════════════════════════════
 // AUTH
 // ═══════════════════════════════════════════════════════════════════
-function doLogin(){
+async function doLogin(){
   const email=(document.getElementById('lemail').value||'').trim().toLowerCase();
   const pwd=(document.getElementById('lpwd').value||'');
   const lerr=document.getElementById('lerr');
+  const btn=document.querySelector('#ls .btn.bgold');
   if(!email||!pwd){lerr.innerHTML='Preencha e-mail e senha.';lerr.style.display='block';return;}
-  if(!users||!users.length)users=D_USERS;
-  if(!users.some(u=>u.email==='marcus@souzaadv.com'&&u.ativo)){users=D_USERS;localStorage.removeItem('sa_users');}
-  const byEmail=users.find(x=>x.email.toLowerCase()===email);
-  const u=byEmail&&byEmail.pwd===pwd&&byEmail.ativo?byEmail:null;
-  if(!u){
-    if(!byEmail) lerr.innerHTML='&#10060; E-mail não cadastrado.';
-    else if(!byEmail.ativo) lerr.innerHTML='&#128274; Usuário bloqueado.';
-    else lerr.innerHTML='&#10060; Senha incorreta.';
+  lerr.style.display='none';
+  const textoOriginal=btn?btn.textContent:'';
+  if(btn){btn.disabled=true;btn.textContent='Verificando...';}
+  const result=await loginBackend(email,pwd);
+  if(btn){btn.disabled=false;btn.textContent=textoOriginal;}
+
+  if(result.ok){
+    // Enriquecer com metadados locais (oab/tel/cargo) só para exibição —
+    // a autenticação em si já foi validada pelo backend, isto não afeta segurança.
+    const local=(users||[]).find(x=>x.email&&x.email.toLowerCase()===email);
+    currentUser={nome:result.user.name,cargo:local?.cargo||'',email:result.user.email,oab:local?.oab||'',tel:local?.tel||'',role:result.user.role,ativo:result.user.active,id:result.user.id};
+    localStorage.setItem('sa_sess',String(currentUser.id));
+    showApp();
+    return;
+  }
+
+  if(!result.network){
+    // Backend respondeu e recusou explicitamente — nunca cair para checagem local.
+    lerr.innerHTML='&#10060; '+(result.error||'Credenciais inválidas.');
     lerr.style.display='block';
     document.getElementById('lpwd').value='';
     document.getElementById('lpwd').focus();
     return;
   }
-  lerr.style.display='none';
-  currentUser=u;localStorage.setItem('sa_sess',String(u.id));showApp();
+
+  // Backend inalcançável (sem internet) — não há fallback de senha local.
+  lerr.innerHTML='&#128246; Não foi possível conectar ao servidor. Verifique sua internet e tente novamente.';
+  lerr.style.display='block';
 }
 function doLogout(){
   closeMo('m-umenu');
@@ -956,16 +970,16 @@ async function loginBackend(email, pwd) {
       headers: {'Content-Type':'application/json'},
       body: JSON.stringify({email, pwd})
     });
-    const d = await r.json();
-    if (!d.ok) return null;
+    const d = await r.json().catch(()=>({}));
+    if (!d.ok) return { ok:false, network:false, error: d.error || 'Credenciais inválidas.' };
     SA_JWT = d.access_token;
     SA_JWT_REFRESH = d.refresh_token;
     localStorage.setItem('sa_jwt', SA_JWT);
     localStorage.setItem('sa_jwt_refresh', SA_JWT_REFRESH);
-    return d.user;
+    return { ok:true, user: d.user };
   } catch(e) {
-    console.warn('[auth] Backend indisponível — usando localStorage local:', e.message);
-    return null;
+    console.warn('[auth] Backend indisponível:', e.message);
+    return { ok:false, network:true, error:'Sem conexão com o servidor.' };
   }
 }
 
@@ -2726,6 +2740,10 @@ function submitBooking(){
   if(!app.lgpd){alert('É necessário aceitar a Política de Privacidade.');return;}
   const b={id:gidb(),type:app.type,status:'solicitado',nome:app.nome,cpf:'',tel:app.tel,email:app.email,cidade:app.cidade,estado:app.estado,area:app.area,resumo:app.resumo,modal:app.modal,data:app.data,hora:app.hora,extra:app.extra,files:[...app.files],createdAt:new Date().toISOString(),obs:''};
   bk.push(b);saveBk();updNotif();
+  // Envia também para o endpoint público (sem login) — garante que o agendamento
+  // chegue ao escritório mesmo que o visitante nunca tenha feito login neste navegador.
+  fetch('/api/booking',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(b)})
+    .catch(e=>console.warn('[booking público] envio ao servidor falhou, mantido apenas localmente:',e.message));
   const t=BT[b.type];const mmap={videoconferencia:'📹 Videoconferência',ligacao:'📞 Ligação',whatsapp:'💬 WhatsApp'};
   document.getElementById('suc-msg').textContent=`Olá, ${b.nome.split(' ')[0]}! Seu agendamento foi realizado. Em breve a equipe confirmará pelo WhatsApp.`;
   document.getElementById('suc-det').innerHTML=`<div class="ri2"><div class="rl">Tipo</div><div class="rv">${t.i} ${t.n}</div></div><div class="ri2"><div class="rl">Data</div><div class="rv">📅 ${fd(b.data)}</div></div><div class="ri2"><div class="rl">Horário</div><div class="rv">⏰ ${b.hora}</div></div><div class="ri2"><div class="rl">Modalidade</div><div class="rv">${mmap[b.modal]||b.modal}</div></div><div class="ri2"><div class="rl">Protocolo</div><div class="rv" style="font-family:monospace;font-size:11px">${b.id}</div></div>`;
