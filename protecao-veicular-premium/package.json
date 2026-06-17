@@ -1,0 +1,13 @@
+{
+  "name": "protecao-veicular-premium",
+  "version": "1.0.0",
+  "private": true,
+  "description": "Assistente virtual de atendimento para Protecao Veicular Premium - Consultor Julio Beraka",
+  "scripts": {
+    "dev": "netlify dev",
+    "start": "netlify dev"
+  },
+  "devDependencies": {
+    "netlify-cli": "latest"
+  }
+}
