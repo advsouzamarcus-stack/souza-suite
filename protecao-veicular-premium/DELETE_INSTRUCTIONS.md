@@ -1,0 +1,1 @@
+Este modulo deve ser removido depois da criacao do repositorio separado protecao-veicular-premium.
