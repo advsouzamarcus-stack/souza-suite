@@ -1,1 +1,0 @@
-Apagar esta pasta do repositorio souza-suite.
