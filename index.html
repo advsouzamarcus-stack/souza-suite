@@ -1020,9 +1020,9 @@ async function syncFromServer() {
 
     // Mesclar dados do servidor — servidor sempre tem precedência
     let changed = false;
-    if (Array.isArray(d.data.clientes)     && d.data.clientes.length)     { cli   = d.data.clientes;     localStorage.setItem('sa_cli',      JSON.stringify(cli));   changed=true; }
-    if (Array.isArray(d.data.processos)    && d.data.processos.length)    { proc  = d.data.processos;    localStorage.setItem('sa_proc',     JSON.stringify(proc));  changed=true; }
-    if (Array.isArray(d.data.agendamentos) && d.data.agendamentos.length) {
+    if (Array.isArray(d.data.clientes))     { cli   = d.data.clientes;     localStorage.setItem('sa_cli',      JSON.stringify(cli));   changed=true; }
+    if (Array.isArray(d.data.processos))    { proc  = d.data.processos;    localStorage.setItem('sa_proc',     JSON.stringify(proc));  changed=true; }
+    if (Array.isArray(d.data.agendamentos)) {
       // Normalizar status do Supabase (EN) para o vocabulário do frontend (PT)
       const stMap = {agendado:'solicitado', confirmado:'confirmado', realizado:'realizado', cancelado:'cancelado', remarcado:'remarcado'};
       bk = d.data.agendamentos.map(b => ({
@@ -1034,9 +1034,9 @@ async function syncFromServer() {
       }));
       localStorage.setItem('ms_bookings', JSON.stringify(bk)); changed=true;
     }
-    if (Array.isArray(d.data.tarefas)      && d.data.tarefas.length)      { tar   = d.data.tarefas;      localStorage.setItem('sa_tar',      JSON.stringify(tar));   changed=true; }
-    if (Array.isArray(d.data.financeiro)   && d.data.financeiro.length)   { fin   = d.data.financeiro;   localStorage.setItem('sa_fin',      JSON.stringify(fin));   changed=true; }
-    if (Array.isArray(d.data.usuarios)     && d.data.usuarios.length)     { users = d.data.usuarios;     localStorage.setItem('sa_users',    JSON.stringify(users)); }
+    if (Array.isArray(d.data.tarefas))      { tar   = d.data.tarefas;      localStorage.setItem('sa_tar',      JSON.stringify(tar));   changed=true; }
+    if (Array.isArray(d.data.financeiro))   { fin   = d.data.financeiro;   localStorage.setItem('sa_fin',      JSON.stringify(fin));   changed=true; }
+    if (Array.isArray(d.data.usuarios)      && d.data.usuarios.length)     { users = d.data.usuarios;     localStorage.setItem('sa_users',    JSON.stringify(users)); }
 
     const ts = new Date().toLocaleTimeString('pt-BR',{hour:'2-digit',minute:'2-digit'});
     if (badge) {
@@ -2852,7 +2852,7 @@ let iaCfg={
   // Modelos por provedor
   model:'claude-sonnet-4-6',
   openaiModel:'gpt-4o-mini',
-  geminiModel:'gemini-1.5-flash',
+  geminiModel:'gemini-2.5-flash',
   deepseekModel:'deepseek-chat',
   // Configurações gerais
   persona:'voce e um assistente virtual juridico do escritorio Marcus Souza I Advogado. Responda sempre em portugues. Seja cordial, objetivo e nunca faca aconselhamento juridico ou preveja resultados. Para consultas juridicas, agende uma reuniao com o Dr. Marcus Souza.',
@@ -2984,9 +2984,9 @@ function renderIA(){
             </div>
             <div class="fg"><div class="fl">Modelo</div>
               <select id="ia-gemini-model" class="fsel">
-                <option value="gemini-1.5-flash" ${cfg.geminiModel==='gemini-1.5-flash'?'selected':''}>Gemini 1.5 Flash (Recomendado)</option>
-                <option value="gemini-1.5-pro" ${cfg.geminiModel==='gemini-1.5-pro'?'selected':''}>Gemini 1.5 Pro (Avancado)</option>
-                <option value="gemini-2.0-flash" ${cfg.geminiModel==='gemini-2.0-flash'?'selected':''}>Gemini 2.0 Flash</option>
+                <option value="gemini-2.5-flash" ${cfg.geminiModel==='gemini-2.5-flash'?'selected':''}>Gemini 2.5 Flash (Recomendado)</option>
+                <option value="gemini-2.5-flash-lite" ${cfg.geminiModel==='gemini-2.5-flash-lite'?'selected':''}>Gemini 2.5 Flash-Lite (Economico)</option>
+                <option value="gemini-2.5-pro" ${cfg.geminiModel==='gemini-2.5-pro'?'selected':''}>Gemini 2.5 Pro (Avancado)</option>
               </select>
             </div>
           </div>
@@ -3070,7 +3070,7 @@ function iaSaveCfg(){
   iaCfg.deepseekKey   = document.getElementById('ia-deepseek-key')?.value||'';
   iaCfg.model         = document.getElementById('ia-model')?.value||'claude-sonnet-4-6';
   iaCfg.openaiModel   = document.getElementById('ia-openai-model')?.value||'gpt-4o-mini';
-  iaCfg.geminiModel   = document.getElementById('ia-gemini-model')?.value||'gemini-1.5-flash';
+  iaCfg.geminiModel   = document.getElementById('ia-gemini-model')?.value||'gemini-2.5-flash';
   iaCfg.deepseekModel = document.getElementById('ia-deepseek-model')?.value||'deepseek-chat';
   iaCfg.respDelay     = parseInt(document.getElementById('ia-delay')?.value||'1200',10);
   iaCfg.persona       = document.getElementById('ia-persona')?.value||iaCfg.persona;

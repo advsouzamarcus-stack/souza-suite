@@ -10,15 +10,16 @@ const CORS = {
 const ok  = d => new Response(JSON.stringify(d), { headers: CORS });
 const err = (m,s=400) => new Response(JSON.stringify({error:m}), {status:s, headers:CORS});
 
-// Modelos em ordem de preferência (verificado em Jun 2026)
+// Modelos em ordem de preferência (verificado em 18/06/2026 — os modelos
+// antigos abaixo foram todos descontinuados pelo Google e por isso a função
+// sempre falhava: gemini-1.0/1.5 totalmente desligados; gemini-2.0-flash e
+// gemini-2.0-flash-lite desligados em 01/06/2026)
 const MODELS = [
-  'gemini-2.0-flash-exp',
-  'gemini-2.0-flash',
-  'gemini-2.0-flash-lite',
-  'gemini-1.5-flash-latest',
-  'gemini-1.5-flash',
-  'gemini-1.5-pro',
-  'gemini-pro',
+  'gemini-2.5-flash',
+  'gemini-2.5-flash-lite',
+  'gemini-flash-lite-latest',
+  'gemini-2.5-pro',
+  'gemini-3.1-flash-lite',
 ];
 
 export default async (req) => {
@@ -55,7 +56,7 @@ export default async (req) => {
   }
 
   // ── Gerar conteúdo com fallback automático ───────────────────
-  const preferred = req.headers.get('X-Gemini-Model') || 'gemini-2.0-flash';
+  const preferred = req.headers.get('X-Gemini-Model') || 'gemini-2.5-flash';
   // Colocar modelo preferido primeiro
   const order = [preferred, ...MODELS.filter(m => m !== preferred)];
 
