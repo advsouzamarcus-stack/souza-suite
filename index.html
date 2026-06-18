@@ -671,13 +671,17 @@ tr:hover td{background:#f8fafc!important}
 // ═══════════════════════════════════════════════════════════════════
 // BOOKING CONSTANTS (from INDEX.HTML)
 // ═══════════════════════════════════════════════════════════════════
-const BT={
+const BT_RAW={
   primeiro:{n:'Primeiro Atendimento',i:'👤',d:30},andamento:{n:'Andamento de Processo',i:'⚖️',d:20},
   documentos:{n:'Entrega de Documentos',i:'📄',d:15},duvidas:{n:'Dúvidas Jurídicas',i:'❓',d:20},
   retorno:{n:'Retorno de Atendimento',i:'🔄',d:20},previdenciario:{n:'Consulta Previdenciária',i:'🏦',d:40},
   trabalhista:{n:'Consulta Trabalhista',i:'💼',d:40},consumidor:{n:'Direito do Consumidor',i:'🛡️',d:30},
   autista:{n:'BPC/LOAS · Autismo',i:'💙',d:40},outros:{n:'Outros Assuntos',i:'📋',d:30}
 };
+// Proxy com fallback: qualquer chave desconhecida (ex: tipo perdido em registro
+// sincronizado antes da correção do empacotamento) cai em 'outros' em vez de
+// travar a tela inteira com "Cannot read properties of undefined".
+const BT=new Proxy(BT_RAW,{get(t,k){return t[k]||t.outros;}});
 const SS={
   solicitado:{l:'Solicitado',c:'b-req',kb:'#eff6ff',kt:'#1d4ed8'},
   agendado:{l:'Solicitado',c:'b-req',kb:'#eff6ff',kt:'#1d4ed8'}, // alias Supabase→frontend
@@ -692,7 +696,14 @@ const SS={
 };
 const AREAS=['Direito Previdenciário','BPC/LOAS','Direito dos Autistas','Direito Trabalhista','Direito Civil','Direito de Família','Direito do Consumidor','Direito de Trânsito','Direito Tributário','Direito do Idoso','ECA','Contratos','Imobiliário','Tributário','Empresarial','Outros'];
 const HRS=['10:00','10:30','11:00','11:30','12:00','12:30','13:00','13:30','14:00','14:30','15:00','15:30','16:00','16:30','17:00','17:30'];
-const TC={primeiro:'#2563eb',andamento:'#7c3aed',documentos:'#16a34a',duvidas:'#d97706',retorno:'#6b7280',previdenciario:'#0891b2',trabalhista:'#dc2626',consumidor:'#c026d3',autista:'#2563eb',outros:'#64748b'};
+const TC_RAW={primeiro:'#2563eb',andamento:'#7c3aed',documentos:'#16a34a',duvidas:'#d97706',retorno:'#6b7280',previdenciario:'#0891b2',trabalhista:'#dc2626',consumidor:'#c026d3',autista:'#2563eb',outros:'#64748b'};
+const TC=new Proxy(TC_RAW,{get(t,k){return t[k]||t.outros;}});
+const DJ_CSS = `<style>
+.dj-tabs{display:flex;gap:6px;margin-bottom:12px;flex-wrap:wrap}
+.dj-tab{padding:7px 14px;border-radius:9px;border:1px solid var(--bd);background:var(--wh);cursor:pointer;font-size:12px;font-weight:700;color:var(--mu);transition:all .14s}
+.dj-tab.on{background:var(--n);color:var(--g);border-color:var(--n)}
+.dj-tab:hover{border-color:var(--g)}
+</style>`;
 
 // ═══════════════════════════════════════════════════════════════════
 // STATE — helpers primeiro (sem dependências externas)
@@ -741,7 +752,7 @@ function copyPayLink(){navigator.clipboard?.writeText(PAYMENT.picpay).then(()=>a
 function copyPixKey(){navigator.clipboard?.writeText(PAYMENT.pix).then(()=>alert('Chave PIX copiada!'));}
 function copyBankData(){navigator.clipboard?.writeText('Banco '+PAYMENT.banco+' | Ag: '+PAYMENT.ag+' | CC: '+PAYMENT.cc+' | '+PAYMENT.fav).then(()=>alert('Dados copiados!'));}
 // Chips de usuário no login
-function renderUserChips(){const wrap=document.getElementById('uchips-wrap');const cont=document.getElementById('uchips');if(!wrap||!cont)return;const ativos=users.filter(u=>u.ativo);if(ativos.length<2){wrap.style.display='none';return;}wrap.style.display='block';cont.innerHTML=ativos.map(u=>`<div class="uchip" id="uc-${u.id}" onclick="selectChip(${u.id})"><div class="av" style="background:${ac(u.id)};color:#fff;width:32px;height:32px;font-size:11px">${initials(u.nome)}</div><div class="ucn">${esc(u.nome.split(' ')[0])}</div><div class="ucp">${ROLES[u.role]?.l||u.role}</div></div>`).join('');}
+function renderUserChips(){const wrap=document.getElementById('uchips-wrap');const cont=document.getElementById('uchips');if(!wrap||!cont)return;const ativos=users.filter(u=>u.ativo);if(ativos.length<2){wrap.style.display='none';return;}wrap.style.display='block';cont.innerHTML=ativos.map(u=>`<div class="uchip" id="uc-${u.id}" onclick="selectChip('${u.id}')"><div class="av" style="background:${ac(u.id)};color:#fff;width:32px;height:32px;font-size:11px">${initials(u.nome)}</div><div class="ucn">${esc((u.nome||'').split(' ')[0])}</div><div class="ucp">${ROLES[u.role]?.l||u.role}</div></div>`).join('');}
 function selectChip(uid){const u=users.find(x=>x.id===uid);if(!u)return;document.querySelectorAll('.uchip').forEach(c=>c.classList.remove('sel'));document.getElementById('uc-'+uid)?.classList.add('sel');const le=document.getElementById('lemail');const lp=document.getElementById('lpwd');if(le)le.value=u.email;if(lp){lp.value='';lp.focus();}}
 // Sincronização entre aparelhos
 function exportarDados(){const d={v:2,at:new Date().toISOString(),by:currentUser?.nome,users:users.map(u=>({...u})),cli,proc,tar,fin};const a=document.createElement('a');a.href='data:application/json;charset=utf-8,'+encodeURIComponent(JSON.stringify(d,null,2));a.download='sistema-'+td0+'.json';a.click();}
@@ -749,7 +760,7 @@ function importarDados(){const inp=document.createElement('input');inp.type='fil
 function exportarAcessos(){const d={v:2,t:'acessos',at:new Date().toISOString(),users:users.map(u=>({...u}))};const b64=btoa(unescape(encodeURIComponent(JSON.stringify(d))));navigator.clipboard?.writeText(b64).then(()=>alert('Código copiado! Cole no outro aparelho em "Importar acessos".'));}
 function importarAcessos(){const c=prompt('Cole o código de acessos:','');if(!c)return;try{const d=JSON.parse(decodeURIComponent(escape(atob(c.trim()))));if(!d.users||d.t!=='acessos'){alert('Código inválido.');return;}users=d.users;localStorage.setItem('sa_users',JSON.stringify(users));alert('Acessos importados! Faça o login.');location.reload();}catch(e){alert('Código inválido.');}}
 const avatarColor=['#3b82f6','#16a34a','#d97706','#9333ea','#ef4444','#0ea5e9','#f59e0b'];
-const ac=id=>avatarColor[id%avatarColor.length];
+const ac=id=>{const s=String(id);let h=0;for(let i=0;i<s.length;i++)h=(h*31+s.charCodeAt(i))|0;return avatarColor[Math.abs(h)%avatarColor.length];};
 const initials=n=>n.split(' ').filter(Boolean).slice(0,2).map(w=>w[0].toUpperCase()).join('');
 
 // DEFAULT DATA — após td0 e dt() para poder usá-los
@@ -1022,18 +1033,7 @@ async function syncFromServer() {
     let changed = false;
     if (Array.isArray(d.data.clientes))     { cli   = d.data.clientes;     localStorage.setItem('sa_cli',      JSON.stringify(cli));   changed=true; }
     if (Array.isArray(d.data.processos))    { proc  = d.data.processos;    localStorage.setItem('sa_proc',     JSON.stringify(proc));  changed=true; }
-    if (Array.isArray(d.data.agendamentos)) {
-      // Normalizar status do Supabase (EN) para o vocabulário do frontend (PT)
-      const stMap = {agendado:'solicitado', confirmado:'confirmado', realizado:'realizado', cancelado:'cancelado', remarcado:'remarcado'};
-      bk = d.data.agendamentos.map(b => ({
-        ...b,
-        status: stMap[b.status] || b.status || 'solicitado',
-        // Restaurar área/nome do campo type que foi mapeado para title
-        area: b.area || b.type || '',
-        type: b.type || 'consulta',
-      }));
-      localStorage.setItem('ms_bookings', JSON.stringify(bk)); changed=true;
-    }
+    if (Array.isArray(d.data.agendamentos)) { bk = d.data.agendamentos; localStorage.setItem('ms_bookings', JSON.stringify(bk)); changed=true; }
     if (Array.isArray(d.data.tarefas))      { tar   = d.data.tarefas;      localStorage.setItem('sa_tar',      JSON.stringify(tar));   changed=true; }
     if (Array.isArray(d.data.financeiro))   { fin   = d.data.financeiro;   localStorage.setItem('sa_fin',      JSON.stringify(fin));   changed=true; }
     if (Array.isArray(d.data.usuarios)      && d.data.usuarios.length)     { users = d.data.usuarios;     localStorage.setItem('sa_users',    JSON.stringify(users)); }
@@ -2411,7 +2411,7 @@ function renderUsers(){
     <td><span class="urole ${ROLES[u.role]?.cls||'r-colaborador'}">${ROLES[u.role]?.l||u.role}</span></td>
     <td>${u.ativo?badge('Ativo','bg'):badge('Inativo','bga')}</td>
     <td style="font-size:11px">${u.tel||'—'}</td>
-    ${p.usr?`<td><div style="display:flex;gap:3px"><button class="btn bgh xs" onclick="editUser(${u.id})">✏️</button>${u.id!==currentUser.id?`<button class="btn ${u.ativo?'bd_':'bg_'} xs" onclick="toggleUser(${u.id})">${u.ativo?'🔒':'🔓'}</button>`:''}</div></td>`:''}</tr>`).join('')}</tbody></table></div></div>`;
+    ${p.usr?`<td><div style="display:flex;gap:3px"><button class="btn bgh xs" onclick="editUser('${u.id}')">✏️</button>${u.id!==currentUser.id?`<button class="btn ${u.ativo?'bd_':'bg_'} xs" onclick="toggleUser('${u.id}')">${u.ativo?'🔒':'🔓'}</button>`:''}</div></td>`:''}</tr>`).join('')}</tbody></table></div></div>`;
   document.getElementById('admin-cnt').innerHTML=html;
 }
 function openUserModal(id){
@@ -2788,7 +2788,7 @@ function renderAcessos(){
   const denied=u=>accessLog.filter(x=>x.usuario===u.nome&&x.negado).length;
   let h='<div class="card hi" style="margin-bottom:12px"><div class="stit">&#128274; Controle de Acessos e Permissoes</div><div style="font-size:12px;color:var(--mu)">Somente o administrador tem acesso a esta area.</div></div>';
   h+='<div class="card" style="margin-bottom:12px"><div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:10px"><div class="stit">&#128101; Usuarios</div><button class="btn bp bsm" onclick="openUserModal()">+ Novo</button></div><div class="tw"><table><thead><tr><th></th><th>Usuario</th><th>Perfil</th><th>Status</th><th>Ultimo Acesso</th><th>Negados</th><th>Acoes</th></tr></thead><tbody>';
-  h+=users.map(u=>'<tr style="opacity:'+( u.ativo?1:.6)+'"><td><div class="av" style="width:30px;height:30px;font-size:11px;background:'+ac(u.id)+';color:#fff">'+initials(u.nome)+'</div></td><td><div style="font-weight:700;font-size:12px">'+esc(u.nome)+'</div><div style="font-size:10px;color:#2563eb">'+esc(u.email)+'</div></td><td><span class="urole '+(ROLES[u.role]?.cls||'r-colaborador')+'">'+( ROLES[u.role]?.l||u.role)+'</span></td><td>'+sbg(u)+'</td><td style="font-size:10px;color:var(--mu)">'+lastA(u)+'</td><td style="text-align:center">'+(denied(u)>0?'<span style="color:#dc2626;font-weight:700">'+denied(u)+'</span>':'0')+'</td><td><div style="display:flex;gap:3px"><button class="btn bsa xs" onclick="openPermModal('+u.id+')" title="Permissoes">&#128273;</button><button class="btn bgh xs" onclick="editUser('+u.id+')">&#9999;&#65039;</button>'+(u.id!==currentUser.id?'<button class="btn '+(u.ativo?'bd_':'bg_')+' xs" onclick="toggleAcesso('+u.id+')">'+(u.ativo?'&#128274;':'&#128275;')+'</button>':'')+'</div></td></tr>').join('');
+  h+=users.map(u=>'<tr style="opacity:'+( u.ativo?1:.6)+'"><td><div class="av" style="width:30px;height:30px;font-size:11px;background:'+ac(u.id)+';color:#fff">'+initials(u.nome)+'</div></td><td><div style="font-weight:700;font-size:12px">'+esc(u.nome)+'</div><div style="font-size:10px;color:#2563eb">'+esc(u.email)+'</div></td><td><span class="urole '+(ROLES[u.role]?.cls||'r-colaborador')+'">'+( ROLES[u.role]?.l||u.role)+'</span></td><td>'+sbg(u)+'</td><td style="font-size:10px;color:var(--mu)">'+lastA(u)+'</td><td style="text-align:center">'+(denied(u)>0?'<span style="color:#dc2626;font-weight:700">'+denied(u)+'</span>':'0')+'</td><td><div style="display:flex;gap:3px"><button class="btn bsa xs" onclick="openPermModal(\'' +u.id+'\')" title="Permissoes">&#128273;</button><button class="btn bgh xs" onclick="editUser(\''+u.id+'\')">&#9999;&#65039;</button>'+(u.id!==currentUser.id?'<button class="btn '+(u.ativo?'bd_':'bg_')+' xs" onclick="toggleAcesso(\''+u.id+'\')">'+(u.ativo?'&#128274;':'&#128275;')+'</button>':'')+'</div></td></tr>').join('');
   h+='</tbody></table></div></div>';
   h+='<div class="card"><div class="stit">&#128203; Log de Acessos</div><div style="display:flex;gap:8px;margin-bottom:8px"><select id="log-fu" onchange="renderLogT()" style="font-size:11px"><option value="">Todos</option>'+users.map(u=>'<option value="'+esc(u.nome)+'">'+esc(u.nome)+'</option>').join('')+'</select><select id="log-ft" onchange="renderLogT()" style="font-size:11px"><option value="">Todos</option><option value="negado">Negados</option><option value="ok">Permitidos</option></select><button class="btn bgh bsm" onclick="accessLog=[];localStorage.removeItem(&quot;sa_log&quot;);renderAcessos()">&#128465;&#65039; Limpar</button></div><div id="log-cont"></div></div>';
   document.getElementById('admin-cnt').innerHTML=h;

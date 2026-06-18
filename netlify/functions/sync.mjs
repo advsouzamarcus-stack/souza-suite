@@ -166,7 +166,11 @@ async function bkToSupa(b) {
   return {
     id:          await uid(b.id, 'appointments'),
     title:       b.area || b.type || 'Atendimento',
-    description: [b.nome, b.tel, b.resumo, b.status||'solicitado'].filter(Boolean).join(' | '),
+    // Posições fixas (nunca usar filter(Boolean) aqui — isso desloca os campos
+    // quando algum está vazio, fazendo o telefone aparecer onde devia estar o
+    // resumo, por exemplo). O 5º campo guarda o código real do tipo (chave de
+    // BT no front-end), que senão se perde e usa apenas a área como type.
+    description: [b.nome||'', b.tel||'', b.resumo||'', b.status||'solicitado', b.type||''].join(' | '),
     starts_at:   dateStr,
     ends_at:     dateStr,
     status:      ({'solicitado':'agendado','confirmado':'confirmado','realizado':'realizado','cancelado':'cancelado','remarcado':'remarcado','aguardando_docs':'agendado','contratado':'realizado','Confirmado':'confirmado','Cancelado':'cancelado','Contratado':'realizado','Realizado':'realizado','Solicitado':'agendado'}[b.status]||'agendado'),
@@ -175,12 +179,25 @@ async function bkToSupa(b) {
     updated_at:  new Date().toISOString(),
   };
 }
+function supaToUser(r) {
+  return {
+    id:     r.id,
+    nome:   r.name  || '',
+    email:  r.email || '',
+    oab:    r.oab    || '',
+    cargo:  r.cargo  || '',
+    tel:    r.tel    || '',
+    role:   r.role  || 'advogado',
+    ativo:  r.active !== false,
+  };
+}
 function supaToAgenda(r) {
   const parts = (r.description||'').split(' | ');
   return {
     id:        r.id,
-    type:      r.title    || '',
-    status:    parts[3] || r.status || 'solicitado', // 4º campo da description tem o status PT original
+    type:      parts[4] || r.title || '', // tipo real (chave BT) se já no novo formato; senão usa a área como fallback (registros antigos)
+    area:      r.title || '',
+    status:    parts[3] || r.status || 'solicitado',
     nome:      parts[0] || '',
     tel:       parts[1] || '',
     resumo:    parts[2] || '',
@@ -290,7 +307,7 @@ export default async (req) => {
           agendamentos: appointments.map(supaToAgenda),
           tarefas:      tasks.map(supaToTarefa),
           financeiro:   financial.map(supaToFin),
-          usuarios:     usrs,
+          usuarios:     usrs.map(supaToUser),
         }
       });
     } catch(e) {
