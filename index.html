@@ -654,7 +654,7 @@ tr:hover td{background:#f8fafc!important}
   <input type="hidden" id="user-id">
   <div class="frow"><div class="ff" style="flex:2"><div class="fl">Nome Completo *</div><input id="user-nome" placeholder="Dr. Nome Sobrenome"></div><div class="ff"><div class="fl">Cargo</div><input id="user-cargo" placeholder="Ex: Advogado, Estagiário..."></div></div>
   <div class="frow"><div class="ff" style="flex:2"><div class="fl">E-mail *</div><input type="email" id="user-email" placeholder="email@souzaadv.com"></div><div class="ff"><div class="fl">Telefone</div><input id="user-tel" placeholder="(21) 99999-9999"></div></div>
-  <div class="frow"><div class="ff"><div class="fl">OAB</div><input id="user-oab" placeholder="OAB/RJ 000.000"></div><div class="ff"><div class="fl">Senha *</div><input type="password" id="user-pwd" placeholder="Mínimo 6 caracteres"></div><div class="ff"><div class="fl">Função</div><select id="user-role"><option value="advogado">Advogado</option><option value="colaborador">Colaborador</option><option value="estagiario">Estagiário</option><option value="admin">Administrador</option></select></div></div>
+  <div class="frow"><div class="ff"><div class="fl">OAB</div><input id="user-oab" placeholder="OAB/RJ 000.000"></div><div class="ff"><div class="fl">Senha</div><input type="password" id="user-pwd" placeholder="Obrigatória p/ novo · em branco mantém"></div><div class="ff"><div class="fl">Função</div><select id="user-role"><option value="advogado">Advogado</option><option value="colaborador">Colaborador</option><option value="estagiario">Estagiário</option><option value="admin">Administrador</option></select></div></div>
   <div class="frow"><div class="ff"><div class="fl">Status</div><select id="user-ativo"><option value="1">Ativo</option><option value="0">Inativo</option></select></div></div>
   <div class="mfoot"><button class="btn bp" onclick="saveUser()">💾 Salvar</button><button class="btn bgh" onclick="closeMo('m-user')">Cancelar</button></div>
 </div></div>
@@ -743,7 +743,9 @@ const perm=()=>{const b=ROLES[currentUser?.role]||ROLES.estagiario;if(currentUse
 const can=(mod,act)=>{const p=perm();return !!(p[mod]&&p[mod][act]);};
 function denyAccess(area){document.getElementById('admin-cnt').innerHTML=`<div style="display:flex;flex-direction:column;align-items:center;justify-content:center;min-height:300px;gap:16px;text-align:center;padding:32px"><div style="font-size:56px">&#128274;</div><div style="font-size:18px;font-weight:700">Acesso Restrito</div><div style="max-width:400px;font-size:13px;color:var(--mu)">Você não possui autorização para acessar <b>${area}</b>.<br>Solicite liberação ao administrador.</div></div>`;}
 let accessLog=[];
-function logAccess(mod,acao,negado=false){const e={id:Date.now(),usuario:currentUser?.nome||'',perfil:ROLES[currentUser?.role]?.l||'',data:new Date().toLocaleDateString('pt-BR'),hora:new Date().toLocaleTimeString('pt-BR',{hour:'2-digit',minute:'2-digit'}),mod,acao,negado};accessLog.unshift(e);if(accessLog.length>300)accessLog=accessLog.slice(0,300);try{localStorage.setItem('sa_log',JSON.stringify(accessLog.slice(0,100)));}catch(e){}}
+function logAccess(mod,acao,negado=false){const e={id:Date.now(),usuario:currentUser?.nome||'',perfil:ROLES[currentUser?.role]?.l||'',data:new Date().toLocaleDateString('pt-BR'),hora:new Date().toLocaleTimeString('pt-BR',{hour:'2-digit',minute:'2-digit'}),mod,acao,negado};accessLog.unshift(e);if(accessLog.length>300)accessLog=accessLog.slice(0,300);try{localStorage.setItem('sa_log',JSON.stringify(accessLog.slice(0,100)));}catch(e){}
+  if(SA_JWT){fetch('/api/access_log',{method:'POST',headers:{'Content-Type':'application/json','Authorization':'Bearer '+SA_JWT},body:JSON.stringify({usuario:e.usuario,perfil:e.perfil,modulo:mod,acao,negado})}).catch(()=>{});}
+}
 function loadLog(){try{const d=localStorage.getItem('sa_log');if(d)accessLog=JSON.parse(d);}catch(e){}}
 function deepMerge(b,o){const r={...b};Object.keys(o||{}).forEach(k=>{if(typeof o[k]==='object'&&!Array.isArray(o[k]))r[k]={...(b[k]||{}),...o[k]};else r[k]=o[k];});return r;}
 // Pagamento
@@ -941,7 +943,7 @@ async function doLogin(){
     // Enriquecer com metadados locais (oab/tel/cargo) só para exibição —
     // a autenticação em si já foi validada pelo backend, isto não afeta segurança.
     const local=(users||[]).find(x=>x.email&&x.email.toLowerCase()===email);
-    currentUser={nome:result.user.name,cargo:local?.cargo||'',email:result.user.email,oab:local?.oab||'',tel:local?.tel||'',role:result.user.role,ativo:result.user.active,id:result.user.id};
+    currentUser={nome:result.user.name,cargo:local?.cargo||'',email:result.user.email,oab:local?.oab||'',tel:local?.tel||'',role:result.user.role,ativo:result.user.active,id:result.user.id,customPerms:local?.customPerms||null};
     localStorage.setItem('sa_sess',String(currentUser.id));
     showApp();
     return;
@@ -1037,6 +1039,14 @@ async function syncFromServer() {
     if (Array.isArray(d.data.tarefas))      { tar   = d.data.tarefas;      localStorage.setItem('sa_tar',      JSON.stringify(tar));   changed=true; }
     if (Array.isArray(d.data.financeiro))   { fin   = d.data.financeiro;   localStorage.setItem('sa_fin',      JSON.stringify(fin));   changed=true; }
     if (Array.isArray(d.data.usuarios)      && d.data.usuarios.length)     { users = d.data.usuarios;     localStorage.setItem('sa_users',    JSON.stringify(users)); }
+    if (Array.isArray(d.data.logs)) {
+      // Combina o log do servidor (todos os aparelhos) com qualquer entrada
+      // local ainda não confirmada no servidor (ex: POST falhou por rede).
+      const serverIds = new Set(d.data.logs.map(l => l.id));
+      const localOnly = accessLog.filter(l => !serverIds.has(l.id) && typeof l.id === 'number');
+      accessLog = [...localOnly, ...d.data.logs].slice(0, 300);
+      try { localStorage.setItem('sa_log', JSON.stringify(accessLog.slice(0,100))); } catch(e) {}
+    }
 
     const ts = new Date().toLocaleTimeString('pt-BR',{hour:'2-digit',minute:'2-digit'});
     if (badge) {
@@ -2423,17 +2433,48 @@ function openUserModal(id){
 }
 function populateUserForm(u){['nome','cargo','email','tel','oab'].forEach(f=>document.getElementById('user-'+f).value=u[f]||'');document.getElementById('user-id').value=u.id;document.getElementById('user-pwd').value=u.pwd||'';document.getElementById('user-role').value=u.role;document.getElementById('user-ativo').value=u.ativo?'1':'0';}
 const editUser=id=>openUserModal(id);
-function saveUser(){
+async function saveUser(){
   const nome=document.getElementById('user-nome').value.trim();const email=document.getElementById('user-email').value.trim();const pwd=document.getElementById('user-pwd').value;
   if(!nome||!email)return alert('Preencha nome e e-mail.');
-  const id=+document.getElementById('user-id').value;
+  const id=document.getElementById('user-id').value||'';
   if(!id&&!pwd)return alert('Defina uma senha para o novo usuário.');
-  const o={nome,cargo:document.getElementById('user-cargo').value.trim(),email,pwd:pwd||(id?(users.find(u=>u.id===id)||{}).pwd:''),oab:document.getElementById('user-oab').value.trim(),tel:document.getElementById('user-tel').value.trim(),role:document.getElementById('user-role').value,ativo:document.getElementById('user-ativo').value==='1'};
-  if(id){users.splice(users.findIndex(u=>u.id===id),1,{...o,id});}else{users.push({...o,id:gid2()});}
-  save();closeMo('m-user');renderUsers();
-  if(currentUser.id===id){currentUser=users.find(u=>u.id===id);document.getElementById('uname').textContent='Dr. '+currentUser.nome.split(' ').slice(-1)[0];document.getElementById('uav').textContent=initials(currentUser.nome);}
+  const body={nome,email,cargo:document.getElementById('user-cargo').value.trim(),oab:document.getElementById('user-oab').value.trim(),tel:document.getElementById('user-tel').value.trim(),role:document.getElementById('user-role').value,active:document.getElementById('user-ativo').value==='1'};
+  if(pwd)body.pwd=pwd;
+  const btn=document.querySelector('#m-user .btn.bgold,#m-user .bp');
+  const txtOriginal=btn?btn.textContent:'';
+  if(btn){btn.disabled=true;btn.textContent='Salvando...';}
+  try{
+    const r=await fetch(id?('/api/users/'+id):'/api/users',{
+      method:id?'PATCH':'POST',
+      headers:{'Content-Type':'application/json','Authorization':'Bearer '+SA_JWT},
+      body:JSON.stringify(body)
+    });
+    const d=await r.json();
+    if(!r.ok)throw new Error(d.error||'Falha ao salvar usuário.');
+    await syncFromServer();
+    closeMo('m-user');
+    if(aTabCur==='acessos')renderAcessos();else renderUsers();
+    if(currentUser.id===id){currentUser=users.find(u=>u.id===id)||currentUser;document.getElementById('uname').textContent='Dr. '+(currentUser.nome||'').split(' ').slice(-1)[0];document.getElementById('uav').textContent=initials(currentUser.nome);}
+  }catch(e){
+    alert('Erro ao salvar usuário: '+e.message);
+  }finally{
+    if(btn){btn.disabled=false;btn.textContent=txtOriginal;}
+  }
 }
-function toggleUser(id){if(id===currentUser.id)return alert('Não é possível desativar sua própria conta.');const idx=users.findIndex(u=>u.id===id);users[idx].ativo=!users[idx].ativo;save();renderUsers();}
+async function toggleUser(id){
+  if(id===currentUser.id)return alert('Não é possível desativar sua própria conta.');
+  const u=users.find(x=>x.id===id);if(!u)return;
+  const ativando=!u.ativo;
+  try{
+    const r=ativando
+      ? await fetch('/api/users/'+id,{method:'PATCH',headers:{'Content-Type':'application/json','Authorization':'Bearer '+SA_JWT},body:JSON.stringify({active:true})})
+      : await fetch('/api/users/'+id,{method:'DELETE',headers:{'Authorization':'Bearer '+SA_JWT}});
+    const d=await r.json();
+    if(!r.ok)throw new Error(d.error||'Falha ao atualizar usuário.');
+    await syncFromServer();
+    if(aTabCur==='acessos')renderAcessos();else renderUsers();
+  }catch(e){alert('Erro: '+e.message);}
+}
 
 // ═══════════════════════════════════════════════════════════════════
 // GOOGLE CALENDAR
@@ -2828,18 +2869,56 @@ function openPermModal(userId){
     +'<div style="display:flex;align-items:center;gap:10px;margin-bottom:14px;flex-wrap:wrap">'
     +'<span class="urole '+rc+'">'+rn+'</span>'
     +'<span style="font-size:11px;color:var(--mu)">Permissoes personalizadas sobrepoem o perfil padrao</span>'
-    +'<button class="btn bgh bsm" onclick="resetPerm('+userId+')">Reset</button>'
+    +'<button class="btn bgh bsm" onclick="resetPerm(\''+userId+'\')">Reset</button>'
     +'</div><div class="perm-grid">'+rows+'</div>'
     +'<div class="mfoot" style="margin-top:14px">'
-    +'<button class="btn bp" onclick="savePerm('+userId+')">Salvar</button> '
+    +'<button class="btn bp" onclick="savePerm(\''+userId+'\')">Salvar</button> '
     +'<button class="btn bgh" onclick="document.getElementById(&quot;m-perm-modal&quot;).remove()">Cancelar</button>'
     +'</div></div>';
   document.body.appendChild(m);
   m.addEventListener('click',e=>{if(e.target===m)m.remove();});
 }
-function savePerm(uid){const u=users.find(x=>x.id===uid);if(!u)return;const cp={};Object.keys(MOD_LBL).forEach(mod=>{cp[mod]={};Object.keys(ACT_LBL).forEach(act=>{const el=document.getElementById('pc-'+mod+'-'+act);if(el)cp[mod][act]=el.checked?1:0;});});u.customPerms=cp;save();document.getElementById('m-perm-modal')?.remove();logAccess('usuarios','permissoes salvas: '+u.nome);alert('Permissoes de '+u.nome+' salvas!');renderAcessos();}
-function resetPerm(uid){const u=users.find(x=>x.id===uid);if(!u)return;if(!confirm('Resetar permissoes de '+u.nome+' ao perfil padrao?'))return;delete u.customPerms;save();document.getElementById('m-perm-modal')?.remove();renderAcessos();}
-function toggleAcesso(uid){const u=users.find(x=>x.id===uid);if(!u)return;if(!confirm((u.ativo?'Bloquear':'Desbloquear')+' '+u.nome+'?'))return;u.ativo=!u.ativo;save();logAccess('usuarios',(u.ativo?'desbloqueado':'bloqueado')+': '+u.nome);renderAcessos();}
+async function savePerm(uid){
+  const u=users.find(x=>x.id===uid);if(!u)return;
+  const cp={};Object.keys(MOD_LBL).forEach(mod=>{cp[mod]={};Object.keys(ACT_LBL).forEach(act=>{const el=document.getElementById('pc-'+mod+'-'+act);if(el)cp[mod][act]=el.checked?1:0;});});
+  try{
+    const r=await fetch('/api/users/'+uid,{method:'PATCH',headers:{'Content-Type':'application/json','Authorization':'Bearer '+SA_JWT},body:JSON.stringify({customPerms:cp})});
+    const d=await r.json();
+    if(!r.ok)throw new Error(d.error||'Falha ao salvar permissões.');
+    await syncFromServer();
+    document.getElementById('m-perm-modal')?.remove();
+    logAccess('usuarios','permissoes salvas: '+u.nome);
+    alert('Permissoes de '+u.nome+' salvas!');
+    renderAcessos();
+  }catch(e){alert('Erro ao salvar permissões: '+e.message);}
+}
+async function resetPerm(uid){
+  const u=users.find(x=>x.id===uid);if(!u)return;
+  if(!confirm('Resetar permissoes de '+u.nome+' ao perfil padrao?'))return;
+  try{
+    const r=await fetch('/api/users/'+uid,{method:'PATCH',headers:{'Content-Type':'application/json','Authorization':'Bearer '+SA_JWT},body:JSON.stringify({customPerms:null})});
+    const d=await r.json();
+    if(!r.ok)throw new Error(d.error||'Falha ao resetar permissões.');
+    await syncFromServer();
+    document.getElementById('m-perm-modal')?.remove();
+    renderAcessos();
+  }catch(e){alert('Erro ao resetar permissões: '+e.message);}
+}
+async function toggleAcesso(uid){
+  const u=users.find(x=>x.id===uid);if(!u)return;
+  if(!confirm((u.ativo?'Bloquear':'Desbloquear')+' '+u.nome+'?'))return;
+  const ativando=!u.ativo;
+  try{
+    const r=ativando
+      ? await fetch('/api/users/'+uid,{method:'PATCH',headers:{'Content-Type':'application/json','Authorization':'Bearer '+SA_JWT},body:JSON.stringify({active:true})})
+      : await fetch('/api/users/'+uid,{method:'DELETE',headers:{'Authorization':'Bearer '+SA_JWT}});
+    const d=await r.json();
+    if(!r.ok)throw new Error(d.error||'Falha ao atualizar usuário.');
+    await syncFromServer();
+    logAccess('usuarios',(ativando?'desbloqueado':'bloqueado')+': '+u.nome);
+    renderAcessos();
+  }catch(e){alert('Erro: '+e.message);}
+}
 
 // ASSISTENTE VIRTUAL COM IA
 let iaCfg={

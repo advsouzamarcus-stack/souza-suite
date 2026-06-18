@@ -23,7 +23,8 @@ const tables = {
   appointments: ['title', 'description', 'starts_at', 'ends_at', 'status', 'channel'],
   financial_records: ['description', 'amount', 'kind', 'status', 'due_at', 'paid_at'],
   leads: ['name', 'phone', 'email', 'source', 'stage', 'summary'],
-  conversations: ['channel', 'external_thread_id', 'status', 'ai_enabled']
+  conversations: ['channel', 'external_thread_id', 'status', 'ai_enabled'],
+  access_log: ['usuario', 'perfil', 'modulo', 'acao', 'negado']
 };
 
 const tableDefaults = {
@@ -32,7 +33,8 @@ const tableDefaults = {
   appointments: { status: 'agendado' },
   financial_records: { status: 'pendente' },
   leads: { stage: 'novo' },
-  conversations: { status: 'aberta' }
+  conversations: { status: 'aberta' },
+  access_log: { negado: false }
 };
 
 let db;
@@ -63,6 +65,7 @@ function cleanRecord(table, input, user) {
     if (k === 'process_number') v = onlyDigits(v);
     if (k === 'amount') v = Number(v || 0);
     if (k === 'ai_enabled') v = v === true || v === 'true';
+    if (k === 'negado') v = v === true || v === 'true';
     out[k] = v;
   }
   if (table === 'cases' && out.process_number) out.process_number = onlyDigits(out.process_number);
@@ -87,7 +90,7 @@ async function authLogin(event) {
 }
 
 async function listUsers() {
-  const { data, error } = await supabase().from('users').select('id,name,email,role,active,created_at,updated_at').order('created_at', { ascending: false });
+  const { data, error } = await supabase().from('users').select('id,name,email,role,active,oab,cargo,tel,custom_perms,created_at,updated_at').order('created_at', { ascending: false });
   if (error) throw error;
   return response(200, data || []);
 }
@@ -99,9 +102,12 @@ async function createUser(event, current) {
   const password = String(body.password || body.pwd || '');
   const role = String(body.role || 'advogado').trim();
   const active = body.active === undefined ? true : body.active === true || body.active === 'true';
+  const oab = String(body.oab || '').trim();
+  const cargo = String(body.cargo || '').trim();
+  const tel = String(body.tel || '').trim();
   if (!name || !email || !password) return response(400, { error: 'Nome, e-mail e senha são obrigatórios.' });
   const password_hash = await bcrypt.hash(password, 12);
-  const { data, error } = await supabase().from('users').insert({ name, email, password_hash, role, active }).select('id,name,email,role,active,created_at,updated_at').single();
+  const { data, error } = await supabase().from('users').insert({ name, email, password_hash, role, active, oab, cargo, tel }).select('id,name,email,role,active,oab,cargo,tel,custom_perms,created_at,updated_at').single();
   if (error) throw error;
   return response(201, data);
 }
@@ -113,9 +119,13 @@ async function updateUser(event, id, current) {
   if (body.email !== undefined) patch.email = normalizeEmail(body.email);
   if (body.role !== undefined) patch.role = String(body.role || 'advogado').trim();
   if (body.active !== undefined) patch.active = body.active === true || body.active === 'true';
+  if (body.oab !== undefined) patch.oab = String(body.oab || '').trim();
+  if (body.cargo !== undefined) patch.cargo = String(body.cargo || '').trim();
+  if (body.tel !== undefined) patch.tel = String(body.tel || '').trim();
+  if (body.customPerms !== undefined) patch.custom_perms = body.customPerms === null ? null : body.customPerms;
   if (body.password || body.pwd) patch.password_hash = await bcrypt.hash(String(body.password || body.pwd), 12);
   delete patch.id;
-  const { data, error } = await supabase().from('users').update(patch).eq('id', id).select('id,name,email,role,active,created_at,updated_at').single();
+  const { data, error } = await supabase().from('users').update(patch).eq('id', id).select('id,name,email,role,active,oab,cargo,tel,custom_perms,created_at,updated_at').single();
   if (error) throw error;
   return response(200, data);
 }

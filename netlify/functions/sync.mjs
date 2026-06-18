@@ -192,6 +192,20 @@ function supaToUser(r) {
     tel:    r.tel    || '',
     role:   r.role  || 'advogado',
     ativo:  r.active !== false,
+    customPerms: r.custom_perms || null,
+  };
+}
+function supaToLog(r) {
+  const dt = r.created_at ? new Date(r.created_at) : new Date();
+  return {
+    id:      r.id,
+    usuario: r.usuario || '',
+    perfil:  r.perfil  || '',
+    data:    dt.toLocaleDateString('pt-BR'),
+    hora:    dt.toLocaleTimeString('pt-BR', { hour:'2-digit', minute:'2-digit' }),
+    mod:     r.modulo  || '',
+    acao:    r.acao    || '',
+    negado:  !!r.negado,
   };
 }
 function supaToAgenda(r) {
@@ -306,13 +320,14 @@ export default async (req) => {
   // ── PULL — baixar todos os dados do Supabase ─────────────────
   if(req.method === 'GET' || action === 'pull') {
     try {
-      const [clients, cases, appointments, tasks, financial, usrs] = await Promise.all([
+      const [clients, cases, appointments, tasks, financial, usrs, logs] = await Promise.all([
         supa('clients?order=created_at.desc&limit=500'),
         supa('cases?order=created_at.desc&limit=500'),
         supa('appointments?order=starts_at.asc&limit=500'),
         supa('tasks?order=due_at.asc&limit=500'),
         supa('financial_records?order=due_at.desc&limit=500'),
-        supa('users?select=id,name,email,role,active&order=id.asc'),
+        supa('users?select=id,name,email,role,active,oab,cargo,tel,custom_perms&order=id.asc'),
+        supa('access_log?order=created_at.desc&limit=300'),
       ]);
       return ok({
         ok: true,
@@ -324,6 +339,7 @@ export default async (req) => {
           tarefas:      tasks.map(supaToTarefa),
           financeiro:   financial.map(supaToFin),
           usuarios:     usrs.map(supaToUser),
+          logs:         logs.map(supaToLog),
         }
       });
     } catch(e) {
