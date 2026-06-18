@@ -5,8 +5,13 @@
 // para que esta única rota pública nunca possa, por engano, expor ou
 // comprometer as rotas autenticadas existentes.
 
-const SUPA_URL = Netlify.env.get('SUPABASE_URL') || 'https://briobxgqygjcyrbasqan.supabase.co';
-const SUPA_KEY = Netlify.env.get('SUPABASE_SERVICE_ROLE_KEY');
+function getEnv(key) {
+  try { if (typeof Netlify !== 'undefined' && Netlify.env) { const v = Netlify.env.get(key); if (v) return v; } } catch(e) {}
+  try { if (typeof process !== 'undefined' && process.env) { const v = process.env[key]; if (v) return v; } } catch(e) {}
+  return undefined;
+}
+const SUPA_URL = getEnv('SUPABASE_URL') || 'https://briobxgqygjcyrbasqan.supabase.co';
+const SUPA_KEY = getEnv('SUPABASE_SERVICE_ROLE_KEY');
 
 const CORS = {
   'Content-Type': 'application/json',

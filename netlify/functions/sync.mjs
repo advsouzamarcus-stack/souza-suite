@@ -32,9 +32,14 @@ async function uid(localId, table) {
 // Mapeia campos PT (frontend) ↔ EN (Supabase)
 // Tabelas Supabase: clients, cases, appointments, tasks, financial_records
 
-const SUPA_URL = Netlify.env.get('SUPABASE_URL') || 'https://briobxgqygjcyrbasqan.supabase.co';
-const SUPA_KEY = Netlify.env.get('SUPABASE_SERVICE_ROLE_KEY');
-const _S = Netlify.env.get('JWT_SECRET') || 'sza-2026-' + (SUPA_KEY||'').slice(-16);
+function getEnv(key) {
+  try { if (typeof Netlify !== 'undefined' && Netlify.env) { const v = Netlify.env.get(key); if (v) return v; } } catch(e) {}
+  try { if (typeof process !== 'undefined' && process.env) { const v = process.env[key]; if (v) return v; } } catch(e) {}
+  return undefined;
+}
+const SUPA_URL = getEnv('SUPABASE_URL') || 'https://briobxgqygjcyrbasqan.supabase.co';
+const SUPA_KEY = getEnv('SUPABASE_SERVICE_ROLE_KEY');
+const _S = getEnv('JWT_SECRET') || 'sza-2026-' + (SUPA_KEY||'').slice(-16);
 
 const CORS = {
   'Content-Type': 'application/json',
