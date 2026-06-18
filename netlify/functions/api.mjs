@@ -292,10 +292,15 @@ export async function handler(event) {
   if (event.httpMethod === 'OPTIONS') return { statusCode: 204, headers: cors, body: '' };
   try {
     const seg = getSegments(event);
-    if (seg[0] === 'auth' && (seg[1] === 'login' || event.queryStringParameters?.action === 'login')) return authLogin(event);
+    // IMPORTANTE: usar 'await' aqui dentro do try, e não apenas 'return funcao(...)'.
+    // Sem o await, a promise é retornada antes do try/catch ter a chance de capturar
+    // uma eventual rejeição — o erro escapa para o runtime do Netlify, que devolve um
+    // formato bruto e ilegível ({"errorType":"object","errorMessage":"[object Object]"})
+    // em vez da resposta JSON limpa que o catch abaixo deveria produzir.
+    if (seg[0] === 'auth' && (seg[1] === 'login' || event.queryStringParameters?.action === 'login')) return await authLogin(event);
     const current = requireAuth(event);
-    if (seg[0] === 'sync') return legacySync(event);
-    if (seg[0] === 'datajud') return handleDatajud(event, seg);
-    return handleTable(event, seg[0], seg[1], current);
+    if (seg[0] === 'sync') return await legacySync(event);
+    if (seg[0] === 'datajud') return await handleDatajud(event, seg);
+    return await handleTable(event, seg[0], seg[1], current);
   } catch (e) { return response(e.status || e.statusCode || 500, { ok: false, error: e.message || 'Erro interno.' }); }
 }
