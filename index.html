@@ -1257,8 +1257,15 @@ function saveCli(){
 }
 function delCli(id){
   if(confirm('Excluir este cliente?')){
-    cli=cli.filter(c=>c.id!==id);
+    const c=cli.find(x=>x.id===id);
+    cli=cli.filter(x=>x.id!==id);
     save(); renderCli();
+    // Exclusão real no servidor (antes, só removia localmente e o registro
+    // voltava na próxima sincronização, porque o "salvar" não apagava nada de fato).
+    if(c&&SA_JWT&&/^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i.test(String(c.id))){
+      fetch('/api/clients/'+c.id,{method:'DELETE',headers:{'Authorization':'Bearer '+SA_JWT}})
+        .catch(e=>console.warn('[delCli] exclusão no servidor falhou:',e.message));
+    }
     pushToServer().catch(()=>{});
   }
 }
