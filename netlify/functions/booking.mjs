@@ -78,10 +78,19 @@ export default async (req) => {
   const startsAt = (data && hora) ? `${data}T${hora}:00` : (data || new Date().toISOString().slice(0,10));
 
   const statusMap = { solicitado:'agendado', confirmado:'confirmado', realizado:'realizado', cancelado:'cancelado', remarcado:'remarcado' };
+  const descObj = {
+    nome, tel,
+    email:  clean(body.email, 200),
+    cidade: clean(body.cidade, 100),
+    estado: clean(body.estado, 2),
+    resumo: clean(body.resumo, 500),
+    status: 'solicitado',
+    type:   clean(body.type, 60),
+  };
   const row = {
     id:          await toUUID(localId, 'appointments'),
     title:       clean(body.area, 120) || clean(body.type, 60) || 'Atendimento',
-    description: [nome, tel, clean(body.resumo, 500), 'solicitado'].filter(Boolean).join(' | '),
+    description: JSON.stringify(descObj),
     starts_at:   startsAt,
     ends_at:     startsAt,
     status:      statusMap[body.status] || 'agendado',

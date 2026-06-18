@@ -163,14 +163,17 @@ function supaToProc(r) {
 async function bkToSupa(b) {
   if(!b.id) return null;
   const dateStr = b.data && b.hora ? `${b.data}T${b.hora}:00` : (b.data || new Date().toISOString().slice(0,10));
+  // JSON em vez de campos separados por ' | ': formato anterior não tinha
+  // espaço para email/cidade/estado (ficavam sempre perdidos) e, com filter
+  // antes do join, ainda desalinhava os campos quando algum vinha vazio.
+  const descObj = {
+    nome: b.nome||'', tel: b.tel||'', email: b.email||'', cidade: b.cidade||'',
+    estado: b.estado||'', resumo: b.resumo||'', status: b.status||'solicitado', type: b.type||'',
+  };
   return {
     id:          await uid(b.id, 'appointments'),
     title:       b.area || b.type || 'Atendimento',
-    // Posições fixas (nunca usar filter(Boolean) aqui — isso desloca os campos
-    // quando algum está vazio, fazendo o telefone aparecer onde devia estar o
-    // resumo, por exemplo). O 5º campo guarda o código real do tipo (chave de
-    // BT no front-end), que senão se perde e usa apenas a área como type.
-    description: [b.nome||'', b.tel||'', b.resumo||'', b.status||'solicitado', b.type||''].join(' | '),
+    description: JSON.stringify(descObj),
     starts_at:   dateStr,
     ends_at:     dateStr,
     status:      ({'solicitado':'agendado','confirmado':'confirmado','realizado':'realizado','cancelado':'cancelado','remarcado':'remarcado','aguardando_docs':'agendado','contratado':'realizado','Confirmado':'confirmado','Cancelado':'cancelado','Contratado':'realizado','Realizado':'realizado','Solicitado':'agendado'}[b.status]||'agendado'),
@@ -192,15 +195,28 @@ function supaToUser(r) {
   };
 }
 function supaToAgenda(r) {
-  const parts = (r.description||'').split(' | ');
+  let f = {};
+  try {
+    f = JSON.parse(r.description || '{}');
+    if (typeof f !== 'object' || Array.isArray(f) || f === null) f = {};
+  } catch(e) {
+    // Formato antigo (campos separados por ' | '), de registros sincronizados
+    // antes desta correção — sem email/cidade/estado, que nunca foram
+    // capturados nesse formato.
+    const parts = (r.description||'').split(' | ');
+    f = { nome: parts[0]||'', tel: parts[1]||'', resumo: parts[2]||'', status: parts[3]||'', type: parts[4]||'' };
+  }
   return {
     id:        r.id,
-    type:      parts[4] || r.title || '', // tipo real (chave BT) se já no novo formato; senão usa a área como fallback (registros antigos)
-    area:      r.title || '',
-    status:    parts[3] || r.status || 'solicitado',
-    nome:      parts[0] || '',
-    tel:       parts[1] || '',
-    resumo:    parts[2] || '',
+    type:      f.type   || r.title || '',
+    area:      r.title  || '',
+    status:    f.status || r.status || 'solicitado',
+    nome:      f.nome   || '',
+    tel:       f.tel    || '',
+    email:     f.email  || '',
+    cidade:    f.cidade || '',
+    estado:    f.estado || '',
+    resumo:    f.resumo || '',
     modal:     r.channel  || 'presencial',
     data:      (r.starts_at||'').slice(0,10),
     hora:      (r.starts_at||'').slice(11,16),
