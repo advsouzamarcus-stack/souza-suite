@@ -725,7 +725,7 @@ const esc=s=>String(s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>
 // VARIÁVEIS DE ESTADO — declaradas antes de qualquer referência
 // ═══════════════════════════════════════════════════════════════════
 let currentUser=null,users=[],cli=[],proc=[],tar=[],fin=[];
-const cn=id=>(cli.find(c=>c.id===+id)||{}).nome||'—';
+const cn=id=>(cli.find(c=>String(c.id)===String(id))||{}).nome||'—';
 
 // ═══════════════════════════════════════════════════════════════════
 // GESTÃO JURÍDICA CONSTANTS — após td0, dt() e currentUser
@@ -1260,10 +1260,11 @@ function openCliModal(id){
 const editCli=id=>openCliModal(id);
 function saveCli(){
   const nome=document.getElementById('cli-nome').value.trim();if(!nome)return alert('Informe o nome.');
-  const id=+document.getElementById('cli-id').value;
+  const id=document.getElementById('cli-id').value;
   const o={nome,cpf:document.getElementById('cli-cpf').value.trim(),tel:document.getElementById('cli-tel').value.replace(/\D/g,''),email:document.getElementById('cli-email').value.trim(),end:document.getElementById('cli-end').value.trim(),tipo:document.getElementById('cli-tipo').value,obs:document.getElementById('cli-obs').value.trim()};
-  id?cli.splice(cli.findIndex(c=>c.id===id),1,{...o,id}):cli.push({...o,id:gid2()});
+  if(id){const idx=cli.findIndex(c=>String(c.id)===String(id));if(idx>=0)cli.splice(idx,1,{...o,id});else cli.push({...o,id});}else cli.push({...o,id:gid2()});
   save();closeMo('m-cli');renderCli();
+  pushToServer().catch(()=>{});
 }
 function delCli(id){
   if(confirm('Excluir este cliente?')){
@@ -1325,11 +1326,12 @@ function openProcModal(id){
 const editProc=id=>openProcModal(id);
 function saveProc(){
   const num=document.getElementById('proc-num').value.trim();if(!num)return alert('Informe o número do processo.');
-  const cliId=+document.getElementById('proc-cli').value;if(!cliId)return alert('Selecione o cliente.');
-  const id=+document.getElementById('proc-id').value;
+  const cliId=document.getElementById('proc-cli').value;if(!cliId)return alert('Selecione o cliente.');
+  const id=document.getElementById('proc-id').value;
   const o={num,cliId,tipo:document.getElementById('proc-tipo').value,vara:document.getElementById('proc-vara').value.trim(),status:document.getElementById('proc-status').value,ini:document.getElementById('proc-ini').value,prox:document.getElementById('proc-prox').value,adv:document.getElementById('proc-adv').value,obs:document.getElementById('proc-obs').value.trim()};
-  id?proc.splice(proc.findIndex(p=>p.id===id),1,{...o,id}):proc.push({...o,id:gid2()});
+  if(id){const idx=proc.findIndex(p=>String(p.id)===String(id));if(idx>=0)proc.splice(idx,1,{...o,id});else proc.push({...o,id});}else proc.push({...o,id:gid2()});
   save();closeMo('m-proc');renderProc();
+  pushToServer().catch(()=>{});
 }
 function delProc(id){
   if(confirm('Excluir este processo?')){
@@ -1385,7 +1387,7 @@ function renderTar(){
 }
 function setTarF(f){tarFil=f;renderTar();}
 function togTar(id){const i=tar.findIndex(t=>t.id===id);tar[i].ok=!tar[i].ok;tar[i].status=tar[i].ok?'Concluído':'Pendente';save();renderTar();}
-function updTarProc(){const cId=+document.getElementById('tar-cli').value;const s=document.getElementById('tar-proc');s.innerHTML='<option value="">— Selecionar —</option>'+proc.filter(p=>!cId||p.cliId===cId).map(p=>`<option value="${p.id}">${p.num.substring(0,28)}…</option>`).join('');}
+function updTarProc(){const cId=document.getElementById('tar-cli').value;const s=document.getElementById('tar-proc');s.innerHTML='<option value="">— Selecionar —</option>'+proc.filter(p=>!cId||String(p.cliId)===String(cId)).map(p=>`<option value="${p.id}">${p.num.substring(0,28)}…</option>`).join('');}
 function openTarModal(id){
   document.getElementById('tar-id').value=id||'';
   document.getElementById('m-tar-t').textContent=id?'Editar Tarefa':'Nova Tarefa';
@@ -1398,11 +1400,14 @@ function openTarModal(id){
 const editTar=id=>openTarModal(id);
 function saveTar(openCal){
   const desc=document.getElementById('tar-desc').value.trim();if(!desc)return alert('Informe a descrição.');
-  const id=+document.getElementById('tar-id').value;
-  const o={data:document.getElementById('tar-data').value,desc,cliId:+document.getElementById('tar-cli').value||'',procId:+document.getElementById('tar-proc').value||'',prio:document.getElementById('tar-prio').value,status:document.getElementById('tar-status').value,resp:document.getElementById('tar-resp').value,local:document.getElementById('tar-local').value.trim(),ok:document.getElementById('tar-status').value==='Concluído'};
-  id?tar.splice(tar.findIndex(t=>t.id===id),1,{...o,id}):tar.push({...o,id:gid2()});
+  const id=document.getElementById('tar-id').value;
+  const cliId=document.getElementById('tar-cli').value||'';
+  const procId=document.getElementById('tar-proc').value||'';
+  const o={data:document.getElementById('tar-data').value,desc,cliId,procId,prio:document.getElementById('tar-prio').value,status:document.getElementById('tar-status').value,resp:document.getElementById('tar-resp').value,local:document.getElementById('tar-local').value.trim(),ok:document.getElementById('tar-status').value==='Concluído'};
+  if(id){const idx=tar.findIndex(t=>String(t.id)===String(id));if(idx>=0)tar.splice(idx,1,{...o,id});else tar.push({...o,id});}else tar.push({...o,id:gid2()});
   save();closeMo('m-tar');renderTar();
-  if(openCal&&o.data)window.open(gcalUrl(o.desc,o.data,o.data,'Responsável: '+o.resp+(o.procId?'\nProcesso: '+proc.find(p=>p.id===o.procId)?.num:''),o.local),'_blank');
+  pushToServer().catch(()=>{});
+  if(openCal&&o.data)window.open(gcalUrl(o.desc,o.data,o.data,'Responsável: '+o.resp+(procId?'\nProcesso: '+proc.find(p=>String(p.id)===String(procId))?.num:''),o.local),'_blank');
 }
 function calFromTar(){saveTar(true);}
 function delTar(id){
@@ -1470,12 +1475,13 @@ function openFinModal(id){
 }
 const editFin=id=>openFinModal(id);
 function saveFin(){
-  const desc=document.getElementById('fin-desc').value.trim();const cliId=+document.getElementById('fin-cli').value;
+  const desc=document.getElementById('fin-desc').value.trim();const cliId=document.getElementById('fin-cli').value;
   if(!desc||!cliId)return alert('Preencha cliente e descrição.');
-  const id=+document.getElementById('fin-id').value;
+  const id=document.getElementById('fin-id').value;
   const o={cliId,desc,ct:+document.getElementById('fin-ct').value||0,rc:+document.getElementById('fin-rc').value||0,pg:document.getElementById('fin-pg').value,st:document.getElementById('fin-st').value,data:document.getElementById('fin-data').value};
-  id?fin.splice(fin.findIndex(f=>f.id===id),1,{...o,id}):fin.push({...o,id:gid2()});
+  if(id){const idx=fin.findIndex(f=>String(f.id)===String(id));if(idx>=0)fin.splice(idx,1,{...o,id});else fin.push({...o,id});}else fin.push({...o,id:gid2()});
   save();closeMo('m-fin');renderFin();
+  pushToServer().catch(()=>{});
 }
 function delFin(id){
   if(confirm('Excluir este lançamento?')){
@@ -2815,7 +2821,7 @@ const kc=(bg,n,co,l)=>`<div class="kc" style="background:${bg}"><div class="kn" 
 function dcolor(d,active){if(!d)return'—';const i=isPast(d)&&active?'🔴 ':isNear(d)?'🟡 ':'🟢 ';const c=isPast(d)&&active?'dr':isNear(d)?'dy':'dg';return`<span class="${c}">${i}${fmtD(d)}</span>`;}
 function gcalUrl(title,date,endDate,desc,location){const s=date.replace(/-/g,'')+'T090000';const e=(endDate||date).replace(/-/g,'')+'T100000';return`https://calendar.google.com/calendar/render?action=TEMPLATE&text=${encodeURIComponent(title)}&dates=${s}/${e}&details=${encodeURIComponent(desc||'')}&location=${encodeURIComponent(location||'')}`;}
 function buildAdvSelect(id,selected){const sel=document.getElementById(id);if(!sel)return;sel.innerHTML=users.filter(u=>u.ativo&&(u.role==='admin'||u.role==='advogado')).map(u=>`<option value="${u.nome}" ${u.nome===selected?'selected':''}>${u.nome}</option>`).join('');}
-function buildCliSelect(id,selected){const sel=document.getElementById(id);if(!sel)return;sel.innerHTML='<option value="">— Selecionar —</option>'+cli.map(c=>`<option value="${c.id}" ${c.id===+selected?'selected':''}>${c.nome}</option>`).join('');}
+function buildCliSelect(id,selected){const sel=document.getElementById(id);if(!sel)return;sel.innerHTML='<option value="">— Selecionar —</option>'+cli.map(c=>`<option value="${c.id}" ${String(c.id)===String(selected)?'selected':''}>${c.nome}</option>`).join('');}
 
 
 // CONTROLE DE ACESSOS
