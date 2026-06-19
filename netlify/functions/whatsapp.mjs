@@ -16,7 +16,7 @@ function getEnv(key) {
   return process.env[key];
 }
 
-const VERIFY_TOKEN      = getEnv('WA_VERIFY_TOKEN')      || 'souzabot2026';
+const VERIFY_TOKEN      = getEnv('WA_VERIFY_TOKEN');
 const WA_PHONE_ID       = getEnv('WA_PHONE_NUMBER_ID');
 const WA_TOKEN          = getEnv('WA_TOKEN');
 const GEMINI_KEY        = getEnv('GEMINI_API_KEY');
