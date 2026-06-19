@@ -21,16 +21,6 @@
     Cache-Control = "no-store"
 
 [[redirects]]
-  from = "/api/whatsapp"
-  to = "/.netlify/functions/whatsapp"
-  status = 200
-
-[[redirects]]
-  from = "/api/whatsapp/*"
-  to = "/.netlify/functions/whatsapp/:splat"
-  status = 200
-
-[[redirects]]
   from = "/api/*"
   to = "/.netlify/functions/api/:splat"
   status = 200
