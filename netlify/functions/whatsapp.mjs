@@ -164,7 +164,7 @@ export default async function handler(req) {
         // Enviar mensagem de fallback para não deixar o cliente sem resposta
         try {
           await sendWhatsApp(from,
-            'Olá! Recebemos sua mensagem. Nossa equipe entrará em contato em breve. Para urgências, ligue: (21) 98906-1652. — Souza Advocacia'
+            'Olá! Recebemos sua mensagem. Nossa equipe entrará em contato em breve. Para urgências, ligue: (21) 96534-8183. — Souza Advocacia'
           );
         } catch {}
       }
