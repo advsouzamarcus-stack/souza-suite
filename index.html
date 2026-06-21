@@ -911,12 +911,12 @@ function showApp(){
   startClock();updNotif();
   setTimeout(djStartMonitor, 2000);
   setTimeout(syncFromServer, 1500); // Sync ao abrir
-  // Sync periódico a cada 5 minutos para manter dados atualizados
+  // Sync periódico a cada 5 minutos — mantém múltiplos dispositivos
+  // atualizados entre si. (havia 2 setInterval idênticos aqui antes,
+  // duplicando a mesma chamada sem necessidade.)
   setInterval(() => {
     if(SA_JWT || SA_JWT_REFRESH) syncFromServer().catch(()=>{});
   }, 5 * 60 * 1000);
-  // Sync periódico a cada 5 minutos para múltiplos dispositivos
-  setInterval(syncFromServer, 5 * 60 * 1000);
   aTab('dash',document.querySelector('.atab'));
 }
 function openMo(id){document.getElementById(id).classList.add('on');}
@@ -1011,6 +1011,15 @@ async function refreshJWT() {
 }
 
 // Sync Supabase — puxar dados centralizados
+// IDs com exclusão em andamento (DELETE disparado, ainda sem confirmação).
+// syncFromServer() roda a cada poucos minutos e por padrão o servidor tem
+// precedência sobre o array local -- mas se o GET periódico chegar ANTES do
+// DELETE terminar de processar no Supabase, ele traz o item "ainda lá" de
+// volta para o array local, e o próximo push de qualquer ação o recria no
+// servidor. Mantendo esses IDs aqui, syncFromServer() os filtra do
+// resultado do servidor até a exclusão ser confirmada, fechando essa janela.
+const pendingDeletes = new Set();
+
 async function syncFromServer() {
   // Tentar renovar JWT se necessário
   if (!SA_JWT && SA_JWT_REFRESH) await refreshJWT();
@@ -1031,13 +1040,17 @@ async function syncFromServer() {
     const d = await r.json();
     if (!d.ok || !d.data) { if (badge) badge.textContent = '⚠️ Sync falhou'; return; }
 
-    // Mesclar dados do servidor — servidor sempre tem precedência
+    // Mesclar dados do servidor — servidor sempre tem precedência, EXCETO
+    // para itens com exclusão em andamento (ver pendingDeletes acima):
+    // esses são removidos do resultado do servidor antes de sobrescrever o
+    // array local, para não trazer de volta algo que está sendo excluído.
+    const dropPending = arr => (arr||[]).filter(x => !pendingDeletes.has(String(x.id)));
     let changed = false;
-    if (Array.isArray(d.data.clientes))     { cli   = d.data.clientes;     localStorage.setItem('sa_cli',      JSON.stringify(cli));   changed=true; }
-    if (Array.isArray(d.data.processos))    { proc  = d.data.processos;    localStorage.setItem('sa_proc',     JSON.stringify(proc));  changed=true; }
-    if (Array.isArray(d.data.agendamentos)) { bk = d.data.agendamentos; localStorage.setItem('ms_bookings', JSON.stringify(bk)); changed=true; }
-    if (Array.isArray(d.data.tarefas))      { tar   = d.data.tarefas;      localStorage.setItem('sa_tar',      JSON.stringify(tar));   changed=true; }
-    if (Array.isArray(d.data.financeiro))   { fin   = d.data.financeiro;   localStorage.setItem('sa_fin',      JSON.stringify(fin));   changed=true; }
+    if (Array.isArray(d.data.clientes))     { cli   = dropPending(d.data.clientes);     localStorage.setItem('sa_cli',      JSON.stringify(cli));   changed=true; }
+    if (Array.isArray(d.data.processos))    { proc  = dropPending(d.data.processos);    localStorage.setItem('sa_proc',     JSON.stringify(proc));  changed=true; }
+    if (Array.isArray(d.data.agendamentos)) { bk = dropPending(d.data.agendamentos); localStorage.setItem('ms_bookings', JSON.stringify(bk)); changed=true; }
+    if (Array.isArray(d.data.tarefas))      { tar   = dropPending(d.data.tarefas);      localStorage.setItem('sa_tar',      JSON.stringify(tar));   changed=true; }
+    if (Array.isArray(d.data.financeiro))   { fin   = dropPending(d.data.financeiro);   localStorage.setItem('sa_fin',      JSON.stringify(fin));   changed=true; }
     if (Array.isArray(d.data.usuarios)      && d.data.usuarios.length)     { users = d.data.usuarios;     localStorage.setItem('sa_users',    JSON.stringify(users)); }
     if (Array.isArray(d.data.logs)) {
       // Combina o log do servidor (todos os aparelhos) com qualquer entrada
@@ -1145,10 +1158,21 @@ function togglePwd(fid,btn){const f=document.getElementById(fid);if(!f)return;co
 // sincronizado) quanto o UUID já recebido do servidor — o backend recalcula
 // o UUID determinístico (mesma lógica do push) e apaga a linha certa.
 // key: 'clientes'|'processos'|'agendamentos'|'tarefas'|'financeiro'
-function delServerRecord(key,id){
+async function delServerRecord(key,id){
   if(!SA_JWT)return;
-  fetch('/api/sync',{method:'DELETE',headers:{'Content-Type':'application/json','Authorization':'Bearer '+SA_JWT},body:JSON.stringify({key,id})})
-    .catch(e=>console.warn('[delServerRecord] exclusão em '+key+' falhou:',e.message));
+  const sid=String(id);
+  pendingDeletes.add(sid);
+  try{
+    await fetch('/api/sync',{method:'DELETE',headers:{'Content-Type':'application/json','Authorization':'Bearer '+SA_JWT},body:JSON.stringify({key,id})});
+  }catch(e){
+    console.warn('[delServerRecord] exclusão em '+key+' falhou:',e.message);
+  }finally{
+    // Mantém o id bloqueado por mais alguns segundos após a resposta:
+    // o Supabase pode levar um instante para refletir o delete em leituras
+    // subsequentes (consistência eventual), então um GET disparado bem na
+    // sequência ainda poderia trazer o item de volta.
+    setTimeout(()=>pendingDeletes.delete(sid), 8000);
+  }
 }
 function showUserMenu(){
   document.getElementById('umenu-info').innerHTML=`
@@ -1277,14 +1301,17 @@ function saveCli(){
   save();closeMo('m-cli');renderCli();
   pushToServer().catch(()=>{});
 }
-function delCli(id){
-  if(confirm('Excluir este cliente?')){
-    const c=cli.find(x=>String(x.id)===String(id));
-    cli=cli.filter(x=>String(x.id)!==String(id));
-    save(); renderCli();
-    if(c)delServerRecord('clientes',c.id);
-    pushToServer().catch(()=>{});
-  }
+async function delCli(id){
+  if(!confirm('Excluir este cliente?'))return;
+  const c=cli.find(x=>String(x.id)===String(id));
+  cli=cli.filter(x=>String(x.id)!==String(id));
+  localStorage.setItem('sa_cli',JSON.stringify(cli));
+  renderCli();
+  // Aguarda o DELETE no servidor ANTES de liberar qualquer push/sync
+  // subsequente -- sem isso, o sync periódico de 5 em 5 min pode buscar a
+  // versão ainda não excluída do servidor e "ressuscitar" o registro no
+  // próximo push de qualquer ação do usuário.
+  if(c)await delServerRecord('clientes',c.id);
 }
 
 // ═══════════════════════════════════════════════════════════════════
@@ -1339,13 +1366,12 @@ function saveProc(){
   save();closeMo('m-proc');renderProc();
   pushToServer().catch(()=>{});
 }
-function delProc(id){
-  if(confirm('Excluir este processo?')){
-    proc=proc.filter(p=>String(p.id)!==String(id));
-    save(); renderProc();
-    delServerRecord('processos',id);
-    pushToServer().catch(()=>{});
-  }
+async function delProc(id){
+  if(!confirm('Excluir este processo?'))return;
+  proc=proc.filter(p=>String(p.id)!==String(id));
+  localStorage.setItem('sa_proc',JSON.stringify(proc));
+  renderProc();
+  await delServerRecord('processos',id);
 }
 function addProcToCalendar(id){const r=proc.find(p=>String(p.id)===String(id));if(!r||!r.prox)return;window.open(gcalUrl('⚖️ Movimentação: '+r.num.substring(0,20),r.prox,r.prox,'Processo: '+r.num+'\nCliente: '+cn(r.cliId)+'\nAdvogado: '+r.adv,r.vara),'_blank');}
 function searchProcNum(num,vara){
@@ -1417,13 +1443,12 @@ function saveTar(openCal){
   if(openCal&&o.data)window.open(gcalUrl(o.desc,o.data,o.data,'Responsável: '+o.resp+(procId?'\nProcesso: '+proc.find(p=>String(p.id)===String(procId))?.num:''),o.local),'_blank');
 }
 function calFromTar(){saveTar(true);}
-function delTar(id){
-  if(confirm('Excluir esta tarefa?')){
-    tar=tar.filter(t=>String(t.id)!==String(id));
-    save(); renderTar();
-    delServerRecord('tarefas',id);
-    pushToServer().catch(()=>{});
-  }
+async function delTar(id){
+  if(!confirm('Excluir esta tarefa?'))return;
+  tar=tar.filter(t=>String(t.id)!==String(id));
+  localStorage.setItem('sa_tar',JSON.stringify(tar));
+  renderTar();
+  await delServerRecord('tarefas',id);
 }
 function addToCalendar(id){const t=tar.find(x=>String(x.id)===String(id));if(!t)return;window.open(gcalUrl(t.desc,t.data,t.data,'Responsável: '+t.resp+(t.procId?'\nProcesso: '+proc.find(p=>String(p.id)===String(t.procId))?.num:''),t.local),'_blank');}
 
@@ -1491,13 +1516,12 @@ function saveFin(){
   save();closeMo('m-fin');renderFin();
   pushToServer().catch(()=>{});
 }
-function delFin(id){
-  if(confirm('Excluir este lançamento?')){
-    fin=fin.filter(f=>String(f.id)!==String(id));
-    save(); renderFin();
-    delServerRecord('financeiro',id);
-    pushToServer().catch(()=>{});
-  }
+async function delFin(id){
+  if(!confirm('Excluir este lançamento?'))return;
+  fin=fin.filter(f=>String(f.id)!==String(id));
+  localStorage.setItem('sa_fin',JSON.stringify(fin));
+  renderFin();
+  await delServerRecord('financeiro',id);
 }
 
 // ═══════════════════════════════════════════════════════════════════
@@ -2707,13 +2731,22 @@ function autoSaveDet(id){
   if(btn){ const orig=btn.textContent; btn.textContent='✅ Salvo!'; setTimeout(()=>btn.textContent=orig,1500); }
 }
 
-function delDet(id){
+async function delDet(id){
   if(!confirm('Excluir este agendamento?'))return;
   bk=bk.filter(b=>String(b.id)!==String(id));
-  saveBk(); updNotif();
-  delServerRecord('agendamentos',id);
+  localStorage.setItem('ms_bookings',JSON.stringify(bk));
+  updNotif();
   closeMo('mo-detail');
   const at=document.querySelector('.atab.on'); if(at)at.click();
+  // Importante: aguardar a confirmação do DELETE no servidor ANTES de
+  // qualquer outro push acontecer. Antes, saveBk() chamava pushToServer()
+  // (upsert) em paralelo com a exclusão, sem ordem garantida -- se o sync
+  // automático de 5 em 5 minutos rodasse no meio desse intervalo, ele
+  // buscava a versão ainda não excluída do servidor, sobrescrevia o array
+  // local, e o próximo push de QUALQUER ação recriava o registro
+  // "fantasma" -- exatamente o efeito de o agendamento excluído voltar
+  // sozinho minutos depois.
+  await delServerRecord('agendamentos',id);
 }
 function showPending(){const p=bk.filter(b=>b.status==='solicitado');if(!p.length){alert('✅ Nenhum agendamento pendente!');return;}document.getElementById('mo-det-i').innerHTML=`<div class="mot">⏳ Aguardando Confirmação (${p.length})</div>${p.map(b=>arw(b)).join('')}`;openMo('mo-detail');}
 
