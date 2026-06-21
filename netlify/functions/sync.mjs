@@ -44,7 +44,7 @@ const _S = getEnv('JWT_SECRET') || 'sza-2026-' + (SUPA_KEY||'').slice(-16);
 const CORS = {
   'Content-Type': 'application/json',
   'Access-Control-Allow-Origin': '*',
-  'Access-Control-Allow-Methods': 'GET,POST,OPTIONS',
+  'Access-Control-Allow-Methods': 'GET,POST,DELETE,OPTIONS',
   'Access-Control-Allow-Headers': 'Content-Type,Authorization',
 };
 const ok  = d => new Response(JSON.stringify(d), { headers: CORS });
