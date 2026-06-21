@@ -129,9 +129,15 @@ async function updateUser(event, id, current) {
   if (error) throw error;
   return response(200, data);
 }
-async function deleteUser(id, current) {
-  if (!isAdmin(current)) return response(403, { error: 'Somente administrador pode bloquear usuários.' });
-  if (id === current.sub) return response(400, { error: 'Não é permitido bloquear o próprio usuário logado.' });
+async function deleteUser(id, current, event) {
+  if (!isAdmin(current)) return response(403, { error: 'Somente administrador pode bloquear ou excluir usuários.' });
+  if (id === current.sub) return response(400, { error: 'Não é permitido bloquear/excluir o próprio usuário logado.' });
+  const hard = event?.queryStringParameters?.hard === 'true' || event?.queryStringParameters?.hard === '1';
+  if (hard) {
+    const { error } = await supabase().from('users').delete().eq('id', id);
+    if (error) throw error;
+    return response(200, { ok: true, deleted: id });
+  }
   const { data, error } = await supabase().from('users').update({ active: false }).eq('id', id).select('id,name,email,role,active,created_at,updated_at').single();
   if (error) throw error;
   return response(200, data);
@@ -142,7 +148,7 @@ async function handleTable(event, table, id, current) {
     if (event.httpMethod === 'GET') return listUsers();
     if (event.httpMethod === 'POST') return createUser(event, current);
     if (['PUT', 'PATCH'].includes(event.httpMethod)) return updateUser(event, id, current);
-    if (event.httpMethod === 'DELETE') return deleteUser(id, current);
+    if (event.httpMethod === 'DELETE') return deleteUser(id, current, event);
   }
   if (!tables[table]) return response(404, { error: 'Rota não encontrada.' });
   const client = supabase().from(table);

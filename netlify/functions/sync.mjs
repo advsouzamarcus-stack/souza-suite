@@ -395,6 +395,30 @@ export default async (req) => {
     });
   }
 
+  // ── DELETE — excluir um registro específico no Supabase ──────
+  // Aceita tanto o UUID real quanto o id local (numérico ou string,
+  // ex: o que vem de gid2()/gidb() antes do primeiro sync) — nesse
+  // segundo caso, recalculamos o mesmo UUID determinístico usado no
+  // push (uid()) para localizar e remover a linha certa.
+  if(req.method === 'DELETE') {
+    let body;
+    try { body = await req.json(); } catch { return err('JSON inválido'); }
+    const TABLE_BY_KEY = {
+      clientes: 'clients', processos: 'cases', agendamentos: 'appointments',
+      tarefas: 'tasks', financeiro: 'financial_records',
+    };
+    const table = TABLE_BY_KEY[body.key] || body.table;
+    const rawId = body.id;
+    if(!table || !rawId) return err('Informe key (ou table) e id.');
+    try {
+      const realId = await uid(rawId, table);
+      await supa(`${table}?id=eq.${encodeURIComponent(realId)}`, 'DELETE');
+      return ok({ ok: true, table, id: realId });
+    } catch(e) {
+      return err('Erro ao excluir: '+e.message, 500);
+    }
+  }
+
   return err('Método não suportado', 405);
 };
 

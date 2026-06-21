@@ -755,7 +755,7 @@ function copyPixKey(){navigator.clipboard?.writeText(PAYMENT.pix).then(()=>alert
 function copyBankData(){navigator.clipboard?.writeText('Banco '+PAYMENT.banco+' | Ag: '+PAYMENT.ag+' | CC: '+PAYMENT.cc+' | '+PAYMENT.fav).then(()=>alert('Dados copiados!'));}
 // Chips de usuário no login
 function renderUserChips(){const wrap=document.getElementById('uchips-wrap');const cont=document.getElementById('uchips');if(!wrap||!cont)return;const ativos=users.filter(u=>u.ativo);if(ativos.length<2){wrap.style.display='none';return;}wrap.style.display='block';cont.innerHTML=ativos.map(u=>`<div class="uchip" id="uc-${u.id}" onclick="selectChip('${u.id}')"><div class="av" style="background:${ac(u.id)};color:#fff;width:32px;height:32px;font-size:11px">${initials(u.nome)}</div><div class="ucn">${esc((u.nome||'').split(' ')[0])}</div><div class="ucp">${ROLES[u.role]?.l||u.role}</div></div>`).join('');}
-function selectChip(uid){const u=users.find(x=>x.id===uid);if(!u)return;document.querySelectorAll('.uchip').forEach(c=>c.classList.remove('sel'));document.getElementById('uc-'+uid)?.classList.add('sel');const le=document.getElementById('lemail');const lp=document.getElementById('lpwd');if(le)le.value=u.email;if(lp){lp.value='';lp.focus();}}
+function selectChip(uid){const u=users.find(x=>String(x.id)===String(uid));if(!u)return;document.querySelectorAll('.uchip').forEach(c=>c.classList.remove('sel'));document.getElementById('uc-'+uid)?.classList.add('sel');const le=document.getElementById('lemail');const lp=document.getElementById('lpwd');if(le)le.value=u.email;if(lp){lp.value='';lp.focus();}}
 // Sincronização entre aparelhos
 function exportarDados(){const d={v:2,at:new Date().toISOString(),by:currentUser?.nome,users:users.map(u=>({...u})),cli,proc,tar,fin};const a=document.createElement('a');a.href='data:application/json;charset=utf-8,'+encodeURIComponent(JSON.stringify(d,null,2));a.download='sistema-'+td0+'.json';a.click();}
 function importarDados(){const inp=document.createElement('input');inp.type='file';inp.accept='.json';inp.onchange=async e=>{const f=e.target.files[0];if(!f)return;try{const d=JSON.parse(await f.text());if(!d.v||!d.users?.length){alert('Arquivo inválido.');return;}if(!confirm('Importar dados? Os dados locais serão substituídos.'))return;users=d.users;if(d.cli)cli=d.cli;if(d.proc)proc=d.proc;if(d.tar)tar=d.tar;if(d.fin)fin=d.fin;['users','cli','proc','tar','fin'].forEach(k=>localStorage.setItem('sa_'+k,JSON.stringify(k==='users'?users:k==='cli'?cli:k==='proc'?proc:k==='tar'?tar:fin)));alert('Dados importados! Faça o login.');location.reload();}catch(err){alert('Erro: '+err.message);}};inp.click();}
@@ -1139,6 +1139,17 @@ async function pushToServer() {
   }
 }
 function togglePwd(fid,btn){const f=document.getElementById(fid);if(!f)return;const s=f.type==='password';f.type=s?'text':'password';btn.textContent=s?'🙈':'👁️';}
+// Exclusão real no servidor (Supabase) — sem isto, o "delete" só removia
+// do array local e o registro voltava no próximo sync, porque pushToServer()
+// só faz upsert (nunca apaga). Aceita tanto o id local (ainda não
+// sincronizado) quanto o UUID já recebido do servidor — o backend recalcula
+// o UUID determinístico (mesma lógica do push) e apaga a linha certa.
+// key: 'clientes'|'processos'|'agendamentos'|'tarefas'|'financeiro'
+function delServerRecord(key,id){
+  if(!SA_JWT)return;
+  fetch('/api/sync',{method:'DELETE',headers:{'Content-Type':'application/json','Authorization':'Bearer '+SA_JWT},body:JSON.stringify({key,id})})
+    .catch(e=>console.warn('[delServerRecord] exclusão em '+key+' falhou:',e.message));
+}
 function showUserMenu(){
   document.getElementById('umenu-info').innerHTML=`
     <div style="display:flex;align-items:center;gap:10px;margin-bottom:10px">
@@ -1212,7 +1223,7 @@ function renderDash(){
   const tod=tar.filter(t=>t.data===td0);
   html+=`<div class="card"><div class="stitle">📌 Tarefas de Hoje — ${new Date().toLocaleDateString('pt-BR',{weekday:'long',day:'2-digit',month:'long'})}</div>`;
   if(!tod.length)html+=`<p style="color:var(--mu);font-size:12px">Nenhuma tarefa agendada para hoje.</p>`;
-  else html+=`<div class="tw"><table><thead><tr><th>Descrição</th><th>Cliente</th><th>Prioridade</th><th>Status</th><th>Responsável</th><th>📅</th></tr></thead><tbody>${tod.map(t=>`<tr style="opacity:${t.ok?.5:1}"><td>${t.ok?`<s style="color:var(--mu)">${t.desc}</s>`:t.desc}</td><td>${cn(t.cliId)}</td><td>${pbadge(t.prio)}</td><td>${sbadge(t.status)}</td><td>${t.resp}</td><td><button class="btn bca xs" onclick="addToCalendar(${t.id})">📅</button></td></tr>`).join('')}</tbody></table></div>`;
+  else html+=`<div class="tw"><table><thead><tr><th>Descrição</th><th>Cliente</th><th>Prioridade</th><th>Status</th><th>Responsável</th><th>📅</th></tr></thead><tbody>${tod.map(t=>`<tr style="opacity:${t.ok?.5:1}"><td>${t.ok?`<s style="color:var(--mu)">${t.desc}</s>`:t.desc}</td><td>${cn(t.cliId)}</td><td>${pbadge(t.prio)}</td><td>${sbadge(t.status)}</td><td>${t.resp}</td><td><button class="btn bca xs" onclick="addToCalendar('${t.id}')">📅</button></td></tr>`).join('')}</tbody></table></div>`;
   html+=`</div>`;
   const todAg=bk.filter(b=>b.data===td0).sort((a,b_)=>a.hora.localeCompare(b_.hora));
   if(todAg.length){
@@ -1245,15 +1256,15 @@ function renderCli(){
       <td style="color:#2563eb;font-size:11px">${c.email||'—'}</td>
       <td>${tbadge(c.tipo)}</td>
       <td class="eli" style="font-size:11px;color:var(--mu)">${c.obs||'—'}</td>
-      <td><div style="display:flex;gap:3px"><button class="btn bwa xs" onclick="openWA(${c.id})">📱 WA</button><button class="btn bma xs" onclick="openEmailModal(${c.id})">✉️</button></div></td>
-      ${p.e?`<td><div style="display:flex;gap:3px"><button class="btn bgh xs" onclick="editCli(${c.id})">✏️</button>${p.del?`<button class="btn bd_ xs" onclick="delCli(${c.id})">🗑️</button>`:''}</div></td>`:''}</tr>`).join('')}
+      <td><div style="display:flex;gap:3px"><button class="btn bwa xs" onclick="openWA('${c.id}')">📱 WA</button><button class="btn bma xs" onclick="openEmailModal('${c.id}')">✉️</button></div></td>
+      ${p.e?`<td><div style="display:flex;gap:3px"><button class="btn bgh xs" onclick="editCli('${c.id}')">✏️</button>${p.del?`<button class="btn bd_ xs" onclick="delCli('${c.id}')">🗑️</button>`:''}</div></td>`:''}</tr>`).join('')}
     </tbody></table></div></div>`;
   document.getElementById('admin-cnt').innerHTML=html;
 }
 function openCliModal(id){
   document.getElementById('cli-id').value=id||'';
   document.getElementById('m-cli-t').textContent=id?'Editar Cliente':'Novo Cliente';
-  if(id){const c=cli.find(x=>x.id===id);['nome','cpf','tel','email','end','obs'].forEach(f=>document.getElementById('cli-'+f).value=c[f]||'');document.getElementById('cli-tipo').value=c.tipo;}
+  if(id){const c=cli.find(x=>String(x.id)===String(id));['nome','cpf','tel','email','end','obs'].forEach(f=>document.getElementById('cli-'+f).value=c[f]||'');document.getElementById('cli-tipo').value=c.tipo;}
   else{['nome','cpf','tel','email','end','obs'].forEach(f=>document.getElementById('cli-'+f).value='');document.getElementById('cli-tipo').value='Novo';}
   openMo('m-cli');
 }
@@ -1268,15 +1279,10 @@ function saveCli(){
 }
 function delCli(id){
   if(confirm('Excluir este cliente?')){
-    const c=cli.find(x=>x.id===id);
-    cli=cli.filter(x=>x.id!==id);
+    const c=cli.find(x=>String(x.id)===String(id));
+    cli=cli.filter(x=>String(x.id)!==String(id));
     save(); renderCli();
-    // Exclusão real no servidor (antes, só removia localmente e o registro
-    // voltava na próxima sincronização, porque o "salvar" não apagava nada de fato).
-    if(c&&SA_JWT&&/^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i.test(String(c.id))){
-      fetch('/api/clients/'+c.id,{method:'DELETE',headers:{'Authorization':'Bearer '+SA_JWT}})
-        .catch(e=>console.warn('[delCli] exclusão no servidor falhou:',e.message));
-    }
+    if(c)delServerRecord('clientes',c.id);
     pushToServer().catch(()=>{});
   }
 }
@@ -1306,10 +1312,10 @@ function renderProc(){
       <td style="font-size:11px;white-space:nowrap">${r.adv}</td>
       <td class="eli" style="font-size:11px;color:var(--mu)">${r.obs||'—'}</td>
       <td><div style="display:flex;gap:3px">
-        ${r.prox?`<button class="btn bca xs" onclick="addProcToCalendar(${r.id})">📅</button>`:''}
+        ${r.prox?`<button class="btn bca xs" onclick="addProcToCalendar('${r.id}')">📅</button>`:''}
         <button class="btn bsa xs" onclick="searchProcNum('${r.num}','${r.vara}')">🔍</button>
-        ${p.e?`<button class="btn bgh xs" onclick="editProc(${r.id})">✏️</button>`:''}
-        ${p.del?`<button class="btn bd_ xs" onclick="delProc(${r.id})">🗑️</button>`:''}
+        ${p.e?`<button class="btn bgh xs" onclick="editProc('${r.id}')">✏️</button>`:''}
+        ${p.del?`<button class="btn bd_ xs" onclick="delProc('${r.id}')">🗑️</button>`:''}
       </div></td></tr>`).join('')}
     </tbody></table></div></div>`;
   document.getElementById('admin-cnt').innerHTML=html;
@@ -1317,9 +1323,9 @@ function renderProc(){
 function openProcModal(id){
   document.getElementById('proc-id').value=id||'';
   document.getElementById('m-proc-t').textContent=id?'Editar Processo':'Novo Processo';
-  buildCliSelect('proc-cli',id?(proc.find(x=>x.id===id)||{}).cliId:'');
-  buildAdvSelect('proc-adv',id?(proc.find(x=>x.id===id)||{}).adv:'');
-  if(id){const r=proc.find(x=>x.id===id);['num','vara','obs'].forEach(f=>document.getElementById('proc-'+f).value=r[f]||'');document.getElementById('proc-tipo').value=r.tipo;document.getElementById('proc-status').value=r.status;document.getElementById('proc-ini').value=r.ini||'';document.getElementById('proc-prox').value=r.prox||'';}
+  buildCliSelect('proc-cli',id?(proc.find(x=>String(x.id)===String(id))||{}).cliId:'');
+  buildAdvSelect('proc-adv',id?(proc.find(x=>String(x.id)===String(id))||{}).adv:'');
+  if(id){const r=proc.find(x=>String(x.id)===String(id));['num','vara','obs'].forEach(f=>document.getElementById('proc-'+f).value=r[f]||'');document.getElementById('proc-tipo').value=r.tipo;document.getElementById('proc-status').value=r.status;document.getElementById('proc-ini').value=r.ini||'';document.getElementById('proc-prox').value=r.prox||'';}
   else{['num','vara','obs'].forEach(f=>document.getElementById('proc-'+f).value='');document.getElementById('proc-ini').value=td0;document.getElementById('proc-prox').value='';document.getElementById('proc-status').value='Em andamento';}
   openMo('m-proc');
 }
@@ -1335,12 +1341,13 @@ function saveProc(){
 }
 function delProc(id){
   if(confirm('Excluir este processo?')){
-    proc=proc.filter(p=>p.id!==id);
+    proc=proc.filter(p=>String(p.id)!==String(id));
     save(); renderProc();
+    delServerRecord('processos',id);
     pushToServer().catch(()=>{});
   }
 }
-function addProcToCalendar(id){const r=proc.find(p=>p.id===id);if(!r||!r.prox)return;window.open(gcalUrl('⚖️ Movimentação: '+r.num.substring(0,20),r.prox,r.prox,'Processo: '+r.num+'\nCliente: '+cn(r.cliId)+'\nAdvogado: '+r.adv,r.vara),'_blank');}
+function addProcToCalendar(id){const r=proc.find(p=>String(p.id)===String(id));if(!r||!r.prox)return;window.open(gcalUrl('⚖️ Movimentação: '+r.num.substring(0,20),r.prox,r.prox,'Processo: '+r.num+'\nCliente: '+cn(r.cliId)+'\nAdvogado: '+r.adv,r.vara),'_blank');}
 function searchProcNum(num,vara){
   const t=vara.toLowerCase();let url;
   if(t.includes('tjrj')||t.includes('vara')||t.includes('jec'))url='https://www3.tjrj.jus.br/consultaprocessual/#/consultapornumero?numProcesso='+encodeURIComponent(num);
@@ -1370,7 +1377,7 @@ function renderTar(){
   <div class="card"><div class="tw"><table>
     <thead><tr><th>✓</th><th>Data</th><th>Descrição</th><th>Cliente</th><th>Prioridade</th><th>Status</th><th>Responsável</th><th>Ações</th></tr></thead>
     <tbody>${filt.map(t=>`<tr class="${!t.ok&&isPast(t.data)?'late':''}" style="opacity:${t.ok?.55:1}">
-      <td><input type="checkbox" ${t.ok?'checked':''} onchange="togTar(${t.id})"></td>
+      <td><input type="checkbox" ${t.ok?'checked':''} onchange="togTar('${t.id}')"></td>
       <td style="white-space:nowrap;font-size:11px" class="${!t.ok?(isPast(t.data)?'dr':t.data===td0?'dy':''):''}">
         ${!t.ok&&isPast(t.data)?'🔴 ':!t.ok&&t.data===td0?'📌 ':''}${fmtD(t.data)}</td>
       <td>${t.ok?`<s style="color:var(--mu)">${t.desc}</s>`:t.desc}</td>
@@ -1378,22 +1385,22 @@ function renderTar(){
       <td>${pbadge(t.prio)}</td><td>${sbadge(t.status)}</td>
       <td style="font-size:11px;white-space:nowrap">${t.resp}</td>
       <td><div style="display:flex;gap:3px">
-        <button class="btn bca xs" onclick="addToCalendar(${t.id})">📅</button>
-        ${p.e?`<button class="btn bgh xs" onclick="editTar(${t.id})">✏️</button>`:''}
-        ${p.del?`<button class="btn bd_ xs" onclick="delTar(${t.id})">🗑️</button>`:''}
+        <button class="btn bca xs" onclick="addToCalendar('${t.id}')">📅</button>
+        ${p.e?`<button class="btn bgh xs" onclick="editTar('${t.id}')">✏️</button>`:''}
+        ${p.del?`<button class="btn bd_ xs" onclick="delTar('${t.id}')">🗑️</button>`:''}
       </div></td></tr>`).join('')}
     </tbody></table></div></div>`;
   document.getElementById('admin-cnt').innerHTML=html;
 }
 function setTarF(f){tarFil=f;renderTar();}
-function togTar(id){const i=tar.findIndex(t=>t.id===id);tar[i].ok=!tar[i].ok;tar[i].status=tar[i].ok?'Concluído':'Pendente';save();renderTar();}
+function togTar(id){const i=tar.findIndex(t=>String(t.id)===String(id));tar[i].ok=!tar[i].ok;tar[i].status=tar[i].ok?'Concluído':'Pendente';save();renderTar();pushToServer().catch(()=>{});}
 function updTarProc(){const cId=document.getElementById('tar-cli').value;const s=document.getElementById('tar-proc');s.innerHTML='<option value="">— Selecionar —</option>'+proc.filter(p=>!cId||String(p.cliId)===String(cId)).map(p=>`<option value="${p.id}">${p.num.substring(0,28)}…</option>`).join('');}
 function openTarModal(id){
   document.getElementById('tar-id').value=id||'';
   document.getElementById('m-tar-t').textContent=id?'Editar Tarefa':'Nova Tarefa';
   document.getElementById('tar-resp').innerHTML='<option value="">— Selecionar —</option>'+users.filter(u=>u.ativo).map(u=>`<option value="${u.nome}">${u.nome}</option>`).join('');
-  buildCliSelect('tar-cli',id?(tar.find(x=>x.id===id)||{}).cliId:'');
-  if(id){const t=tar.find(x=>x.id===id);document.getElementById('tar-data').value=t.data;document.getElementById('tar-desc').value=t.desc;document.getElementById('tar-prio').value=t.prio;document.getElementById('tar-status').value=t.status;document.getElementById('tar-local').value=t.local||'';document.getElementById('tar-resp').value=t.resp;setTimeout(()=>{updTarProc();document.getElementById('tar-proc').value=t.procId||'';},50);}
+  buildCliSelect('tar-cli',id?(tar.find(x=>String(x.id)===String(id))||{}).cliId:'');
+  if(id){const t=tar.find(x=>String(x.id)===String(id));document.getElementById('tar-data').value=t.data;document.getElementById('tar-desc').value=t.desc;document.getElementById('tar-prio').value=t.prio;document.getElementById('tar-status').value=t.status;document.getElementById('tar-local').value=t.local||'';document.getElementById('tar-resp').value=t.resp;setTimeout(()=>{updTarProc();document.getElementById('tar-proc').value=t.procId||'';},50);}
   else{document.getElementById('tar-data').value=td0;['desc','local'].forEach(f=>document.getElementById('tar-'+f).value='');document.getElementById('tar-prio').value='Alta';document.getElementById('tar-status').value='Pendente';document.getElementById('tar-resp').value=currentUser.nome;document.getElementById('tar-proc').innerHTML='<option value="">— Selecionar —</option>';}
   openMo('m-tar');
 }
@@ -1412,12 +1419,13 @@ function saveTar(openCal){
 function calFromTar(){saveTar(true);}
 function delTar(id){
   if(confirm('Excluir esta tarefa?')){
-    tar=tar.filter(t=>t.id!==id);
+    tar=tar.filter(t=>String(t.id)!==String(id));
     save(); renderTar();
+    delServerRecord('tarefas',id);
     pushToServer().catch(()=>{});
   }
 }
-function addToCalendar(id){const t=tar.find(x=>x.id===id);if(!t)return;window.open(gcalUrl(t.desc,t.data,t.data,'Responsável: '+t.resp+(t.procId?'\nProcesso: '+proc.find(p=>p.id===t.procId)?.num:''),t.local),'_blank');}
+function addToCalendar(id){const t=tar.find(x=>String(x.id)===String(id));if(!t)return;window.open(gcalUrl(t.desc,t.data,t.data,'Responsável: '+t.resp+(t.procId?'\nProcesso: '+proc.find(p=>String(p.id)===String(t.procId))?.num:''),t.local),'_blank');}
 
 // ═══════════════════════════════════════════════════════════════════
 // SEMANA
@@ -1429,7 +1437,7 @@ function renderSem(){
   let html=`<div class="krow">${kc('#eff6ff',tot,'#2563eb','Tarefas')}${kc('#f0fdf4',ok,'#16a34a','Concluídas')}${kc('#faf5ff',tot-ok,'#7c3aed','Pendentes')}${kc('#f8fafc',pct+'%',pct>70?'#16a34a':pct>40?'#d97706':'#dc2626','Produtividade')}</div>`;
   html+=`<div class="card" style="margin-bottom:13px"><div style="display:flex;justify-content:space-between;font-size:12px;margin-bottom:5px"><span style="font-weight:700">Progresso da Semana</span><span style="color:var(--mu)">${ok}/${tot}</span></div><div class="pb"><div class="pf" style="width:${pct}%;background:${pct>70?'#16a34a':pct>40?'#d97706':'#ef4444'}"></div></div></div>`;
   const days=Array.from({length:7},(_,i)=>{const d=new Date();d.setDate(d.getDate()+i);const ds=d.toISOString().split('T')[0];return{ds,lbl:d.toLocaleDateString('pt-BR',{weekday:'short',day:'2-digit',month:'short'}),tasks:tar.filter(t=>t.data===ds),isT:i===0};});
-  html+=`<div class="wgrid">${days.map(({ds,lbl,tasks,isT})=>`<div class="wcard ${isT?'tod':''}"><div class="wday" style="color:${isT?'#2563eb':'var(--tx)'}">📌 ${isT?'HOJE — ':''}${lbl}</div>${!tasks.length?`<div style="color:var(--mu);font-size:11px;font-style:italic">Sem tarefas</div>`:tasks.map(t=>`<div class="titem"><input type="checkbox" ${t.ok?'checked':''} onchange="togTar(${t.id})"><div style="flex:1"><div style="${t.ok?'text-decoration:line-through;color:var(--mu);':''}font-size:11px;font-weight:600">${t.desc}</div><div style="color:var(--mu);font-size:10px">${cn(t.cliId)}</div></div></div>`).join('')}</div>`).join('')}</div>`;
+  html+=`<div class="wgrid">${days.map(({ds,lbl,tasks,isT})=>`<div class="wcard ${isT?'tod':''}"><div class="wday" style="color:${isT?'#2563eb':'var(--tx)'}">📌 ${isT?'HOJE — ':''}${lbl}</div>${!tasks.length?`<div style="color:var(--mu);font-size:11px;font-style:italic">Sem tarefas</div>`:tasks.map(t=>`<div class="titem"><input type="checkbox" ${t.ok?'checked':''} onchange="togTar('${t.id}')"><div style="flex:1"><div style="${t.ok?'text-decoration:line-through;color:var(--mu);':''}font-size:11px;font-weight:600">${t.desc}</div><div style="color:var(--mu);font-size:10px">${cn(t.cliId)}</div></div></div>`).join('')}</div>`).join('')}</div>`;
   document.getElementById('admin-cnt').innerHTML=html;
 }
 
@@ -1462,14 +1470,14 @@ function renderFin(){
   const totC=fin.reduce((s,f)=>s+(+f.ct||0),0),totR=fin.reduce((s,f)=>s+(+f.rc||0),0),totP=totC-totR;
   let html=`<div class="krow">${kc('#eff6ff',fmt(totC),'#2563eb','Total Contratado')}${kc('#f0fdf4',fmt(totR),'#16a34a','Total Recebido')}${kc(totP>0?'#fef2f2':'#f8fafc',fmt(totP),totP>0?'#dc2626':'#94a3b8','A Receber')}${kc('#faf5ff',(totC>0?Math.round(totR/totC*100):0)+'%','#7c3aed','Taxa Recebimento')}</div>`;
   html+=`<div class="fbar"><input id="fin-q" style="max-width:240px" placeholder="🔍 Buscar..." value="${q}" oninput="renderFin()">${p.e?`<button class="btn bp" onclick="openFinModal()">+ Novo Lançamento</button>`:''}</div>`;
-  html+=`<div class="card"><div class="tw"><table><thead><tr><th>Cliente</th><th>Descrição</th><th>Data</th><th>Contratado</th><th>Recebido</th><th>Pendente</th><th>Pagamento</th><th>Status</th>${p.e?'<th>Ações</th>':''}</tr></thead><tbody>${filt.map(f=>{const pen=(+f.ct||0)-(+f.rc||0);return`<tr><td style="font-weight:600;white-space:nowrap">${cn(f.cliId)}</td><td>${f.desc}</td><td style="white-space:nowrap;font-size:11px">${fmtD(f.data)}</td><td style="font-weight:600;white-space:nowrap">${fmt(f.ct||0)}</td><td style="color:#16a34a;font-weight:600;white-space:nowrap">${fmt(f.rc||0)}</td><td style="color:${pen>0?'#dc2626':'#16a34a'};font-weight:600;white-space:nowrap">${fmt(pen)}</td><td>${f.pg}</td><td>${fsbadge(f.st)}</td>${p.e?`<td><div style="display:flex;gap:3px"><button class="btn bgh xs" onclick="editFin(${f.id})">✏️</button>${p.del?`<button class="btn bd_ xs" onclick="delFin(${f.id})">🗑️</button>`:''}</div></td>`:''}</tr>`;}).join('')}<tr style="background:#f1f5f9;font-weight:700"><td colspan="3">TOTAIS</td><td style="color:#2563eb;white-space:nowrap">${fmt(totC)}</td><td style="color:#16a34a;white-space:nowrap">${fmt(totR)}</td><td style="color:${totP>0?'#dc2626':'#16a34a'};white-space:nowrap">${fmt(totP)}</td><td colspan="${p.e?3:2}"></td></tr></tbody></table></div></div>`;
+  html+=`<div class="card"><div class="tw"><table><thead><tr><th>Cliente</th><th>Descrição</th><th>Data</th><th>Contratado</th><th>Recebido</th><th>Pendente</th><th>Pagamento</th><th>Status</th>${p.e?'<th>Ações</th>':''}</tr></thead><tbody>${filt.map(f=>{const pen=(+f.ct||0)-(+f.rc||0);return`<tr><td style="font-weight:600;white-space:nowrap">${cn(f.cliId)}</td><td>${f.desc}</td><td style="white-space:nowrap;font-size:11px">${fmtD(f.data)}</td><td style="font-weight:600;white-space:nowrap">${fmt(f.ct||0)}</td><td style="color:#16a34a;font-weight:600;white-space:nowrap">${fmt(f.rc||0)}</td><td style="color:${pen>0?'#dc2626':'#16a34a'};font-weight:600;white-space:nowrap">${fmt(pen)}</td><td>${f.pg}</td><td>${fsbadge(f.st)}</td>${p.e?`<td><div style="display:flex;gap:3px"><button class="btn bgh xs" onclick="editFin('${f.id}')">✏️</button>${p.del?`<button class="btn bd_ xs" onclick="delFin('${f.id}')">🗑️</button>`:''}</div></td>`:''}</tr>`;}).join('')}<tr style="background:#f1f5f9;font-weight:700"><td colspan="3">TOTAIS</td><td style="color:#2563eb;white-space:nowrap">${fmt(totC)}</td><td style="color:#16a34a;white-space:nowrap">${fmt(totR)}</td><td style="color:${totP>0?'#dc2626':'#16a34a'};white-space:nowrap">${fmt(totP)}</td><td colspan="${p.e?3:2}"></td></tr></tbody></table></div></div>`;
   document.getElementById('admin-cnt').innerHTML=html;
 }
 function openFinModal(id){
   document.getElementById('fin-id').value=id||'';
   document.getElementById('m-fin-t').textContent=id?'Editar Lançamento':'Novo Lançamento';
-  buildCliSelect('fin-cli',id?(fin.find(x=>x.id===id)||{}).cliId:'');
-  if(id){const f=fin.find(x=>x.id===id);document.getElementById('fin-desc').value=f.desc;document.getElementById('fin-data').value=f.data||'';document.getElementById('fin-ct').value=f.ct||0;document.getElementById('fin-rc').value=f.rc||0;document.getElementById('fin-pg').value=f.pg;document.getElementById('fin-st').value=f.st;}
+  buildCliSelect('fin-cli',id?(fin.find(x=>String(x.id)===String(id))||{}).cliId:'');
+  if(id){const f=fin.find(x=>String(x.id)===String(id));document.getElementById('fin-desc').value=f.desc;document.getElementById('fin-data').value=f.data||'';document.getElementById('fin-ct').value=f.ct||0;document.getElementById('fin-rc').value=f.rc||0;document.getElementById('fin-pg').value=f.pg;document.getElementById('fin-st').value=f.st;}
   else{document.getElementById('fin-desc').value='';document.getElementById('fin-data').value=td0;document.getElementById('fin-ct').value=0;document.getElementById('fin-rc').value=0;document.getElementById('fin-pg').value='PIX';document.getElementById('fin-st').value='Pendente';}
   openMo('m-fin');
 }
@@ -1485,8 +1493,9 @@ function saveFin(){
 }
 function delFin(id){
   if(confirm('Excluir este lançamento?')){
-    fin=fin.filter(f=>f.id!==id);
+    fin=fin.filter(f=>String(f.id)!==String(id));
     save(); renderFin();
+    delServerRecord('financeiro',id);
     pushToServer().catch(()=>{});
   }
 }
@@ -1531,15 +1540,15 @@ function renderCom(){
   </div>
   </div>
   <div class="card"><div class="stitle">📋 Comunicações Individuais</div>
-  <div class="tw"><table><thead><tr><th>Cliente</th><th>Telefone</th><th>E-mail</th><th>Tipo</th><th>WhatsApp</th><th>E-mail</th></tr></thead><tbody>${cli.map(c=>`<tr><td style="font-weight:600">${c.nome}</td><td>${c.tel||'—'}</td><td style="color:#2563eb;font-size:11px">${c.email||'—'}</td><td>${tbadge(c.tipo)}</td><td>${c.tel?`<button class="btn bwa xs" onclick="openWA(${c.id})">📱 WhatsApp</button>`:'—'}</td><td>${c.email?`<button class="btn bma xs" onclick="openEmailModal(${c.id})">✉️ E-mail</button>`:'—'}</td></tr>`).join('')}</tbody></table></div></div>`;
+  <div class="tw"><table><thead><tr><th>Cliente</th><th>Telefone</th><th>E-mail</th><th>Tipo</th><th>WhatsApp</th><th>E-mail</th></tr></thead><tbody>${cli.map(c=>`<tr><td style="font-weight:600">${c.nome}</td><td>${c.tel||'—'}</td><td style="color:#2563eb;font-size:11px">${c.email||'—'}</td><td>${tbadge(c.tipo)}</td><td>${c.tel?`<button class="btn bwa xs" onclick="openWA('${c.id}')">📱 WhatsApp</button>`:'—'}</td><td>${c.email?`<button class="btn bma xs" onclick="openEmailModal('${c.id}')">✉️ E-mail</button>`:'—'}</td></tr>`).join('')}</tbody></table></div></div>`;
   document.getElementById('admin-cnt').innerHTML=html;
 }
-function openWA(cliId){waCliId=cliId;const c=cli.find(x=>x.id===cliId);document.getElementById('wa-cliinfo').innerHTML=`<strong>${c.nome}</strong><br>📱 ${c.tel||'Sem telefone cadastrado'}`;document.getElementById('wa-msg').value=WA_TPLS.audiencia(c.nome.split(' ')[0]);openMo('m-wa');}
-function setWAMsg(btn,tpl){const c=cli.find(x=>x.id===waCliId);if(!c)return;document.getElementById('wa-msg').value=WA_TPLS[tpl](c.nome.split(' ')[0]);}
-function sendWA(){const c=cli.find(x=>x.id===waCliId);if(!c||!c.tel)return alert('Cliente sem telefone.');const num='55'+c.tel.replace(/\D/g,'');const msg=encodeURIComponent(document.getElementById('wa-msg').value);window.open(`https://wa.me/${num}?text=${msg}`,'_blank');closeMo('m-wa');}
-function openEmailModal(cliId){emailCliId=cliId;const c=cli.find(x=>x.id===cliId);document.getElementById('email-cliinfo').innerHTML=`<strong>${c.nome}</strong><br>✉️ ${c.email||'Sem e-mail cadastrado'}`;setEmailTpl('audiencia');openMo('m-email');}
-function setEmailTpl(tpl){const c=cli.find(x=>x.id===emailCliId);if(!c)return;const t=EMAIL_TPLS[tpl];document.getElementById('email-sub').value=t.sub;document.getElementById('email-body').value=t.body(c.nome.split(' ')[0]);}
-function sendEmail(){const c=cli.find(x=>x.id===emailCliId);if(!c||!c.email)return alert('Cliente sem e-mail.');const sub=encodeURIComponent(document.getElementById('email-sub').value);const body=encodeURIComponent(document.getElementById('email-body').value);window.location.href=`mailto:${c.email}?subject=${sub}&body=${body}`;closeMo('m-email');}
+function openWA(cliId){waCliId=cliId;const c=cli.find(x=>String(x.id)===String(cliId));document.getElementById('wa-cliinfo').innerHTML=`<strong>${c.nome}</strong><br>📱 ${c.tel||'Sem telefone cadastrado'}`;document.getElementById('wa-msg').value=WA_TPLS.audiencia(c.nome.split(' ')[0]);openMo('m-wa');}
+function setWAMsg(btn,tpl){const c=cli.find(x=>String(x.id)===String(waCliId));if(!c)return;document.getElementById('wa-msg').value=WA_TPLS[tpl](c.nome.split(' ')[0]);}
+function sendWA(){const c=cli.find(x=>String(x.id)===String(waCliId));if(!c||!c.tel)return alert('Cliente sem telefone.');const num='55'+c.tel.replace(/\D/g,'');const msg=encodeURIComponent(document.getElementById('wa-msg').value);window.open(`https://wa.me/${num}?text=${msg}`,'_blank');closeMo('m-wa');}
+function openEmailModal(cliId){emailCliId=cliId;const c=cli.find(x=>String(x.id)===String(cliId));document.getElementById('email-cliinfo').innerHTML=`<strong>${c.nome}</strong><br>✉️ ${c.email||'Sem e-mail cadastrado'}`;setEmailTpl('audiencia');openMo('m-email');}
+function setEmailTpl(tpl){const c=cli.find(x=>String(x.id)===String(emailCliId));if(!c)return;const t=EMAIL_TPLS[tpl];document.getElementById('email-sub').value=t.sub;document.getElementById('email-body').value=t.body(c.nome.split(' ')[0]);}
+function sendEmail(){const c=cli.find(x=>String(x.id)===String(emailCliId));if(!c||!c.email)return alert('Cliente sem e-mail.');const sub=encodeURIComponent(document.getElementById('email-sub').value);const body=encodeURIComponent(document.getElementById('email-body').value);window.location.href=`mailto:${c.email}?subject=${sub}&body=${body}`;closeMo('m-email');}
 function openWAMass(){const grp=document.getElementById('wa-group').value;const tpl=document.getElementById('wa-tpl-mass').value;const filt=cli.filter(c=>grp==='ativos'?c.tipo==='Ativo':grp==='novos'?c.tipo==='Novo':c.tipo==='Inativo');let html='';filt.forEach(c=>{if(!c.tel)return;const num='55'+c.tel.replace(/\D/g,'');const msg=encodeURIComponent(WA_TPLS[tpl](c.nome.split(' ')[0]));html+=`<div style="display:flex;align-items:center;justify-content:space-between;padding:5px 0;border-bottom:1px solid var(--bd);font-size:12px"><span>${c.nome}</span><a href="https://wa.me/${num}?text=${msg}" target="_blank" class="btn bwa xs">📱</a></div>`;});document.getElementById('wa-mass-list').innerHTML=html||'<p style="color:var(--mu);font-size:11px">Nenhum cliente com telefone neste grupo.</p>';}
 function openEmailMass(){const grp=document.getElementById('email-group').value;const tpl=document.getElementById('email-tpl-mass').value;const filt=cli.filter(c=>(grp==='ativos'?c.tipo==='Ativo':grp==='novos'?c.tipo==='Novo':c.tipo==='Inativo')&&c.email);if(!filt.length)return alert('Nenhum cliente com e-mail neste grupo.');const emails=filt.map(c=>c.email).join(',');const t=EMAIL_TPLS[tpl];window.location.href=`mailto:${emails}?subject=${encodeURIComponent(t.sub)}&body=${encodeURIComponent(t.body('Prezado(a)'))}` ;}
 function exportAllCal(){let events='BEGIN:VCALENDAR\nVERSION:2.0\nPRODID:-//Marcus Souza I Advogado//PT\n';tar.filter(t=>!t.ok&&t.data>=td0).forEach(t=>{const s=t.data.replace(/-/g,'')+'T090000Z';events+=`BEGIN:VEVENT\nDTSTART:${s}\nDTEND:${s.replace('090000','100000')}\nSUMMARY:${t.desc}\nDESCRIPTION:Cliente: ${cn(t.cliId)} | Resp: ${t.resp}\nLOCATION:${t.local||''}\nEND:VEVENT\n`;});events+='END:VCALENDAR';const b=new Blob([events],{type:'text/calendar'});const a=document.createElement('a');a.href=URL.createObjectURL(b);a.download='tarefas_souza.ics';a.click();}
@@ -1948,7 +1957,7 @@ function renderBusca(){
         <td>${sbadge(p.status)}</td>
         <td id="djcell-mov-${p.id}" class="dj-sync-cell" style="color:var(--mu)">—</td>
         <td id="djcell-dt-${p.id}"  class="dj-sync-cell" style="color:var(--mu)">—</td>
-        <td><button class="btn bsa xs" onclick="djSyncProc(${p.id},'${p.num}')" title="Consultar no Datajud">⚡</button></td>
+        <td><button class="btn bsa xs" onclick="djSyncProc('${p.id}','${p.num}')" title="Consultar no Datajud">⚡</button></td>
       </tr>`).join('')}
       </tbody></table></div>
     </div>
@@ -2082,15 +2091,32 @@ function djRenderProcesso(s, tribKey){
   const sigiloHtml = s.nivelSigilo > 0
     ? `<span class="dj-tag" style="background:#4b1a1a;color:#fca5a5">🔒 Sigilo ${s.nivelSigilo}</span>` : '';
 
+  // Cruza com o cadastro local: a API pública do Datajud não devolve nomes
+  // das partes (ver nota abaixo) — mas se este processo já está cadastrado
+  // no escritório, mostramos o cliente vinculado, que é a informação que
+  // de fato substitui "quem são as partes" no seu dia a dia.
+  const numClean = numRaw(s.numeroProcesso);
+  const procLocal = proc.find(p=>numRaw(p.num)===numClean);
+  const clienteVinc = (procLocal && procLocal.cliId) ? cn(procLocal.cliId) : null;
+
+  // Descrição técnica completa de cada complemento (não só o rótulo): o
+  // campo "descricao" do Datajud é o nome técnico da categoria do
+  // complemento (ex: tipo_de_peticao, motivo_da_redistribuicao) — é o que
+  // explica o que aquele valor representa, então mostramos os dois juntos
+  // em vez de só concatenar nomes soltos.
   const movsHtml = movs.slice(0,50).map(m=>{
-    const comps = (m.complementosTabelados||[]).map(c=>c.nome).filter(Boolean).join(', ');
+    const comps = (m.complementosTabelados||[]).filter(c=>c&&c.nome);
+    const compsHtml = comps.map(c=>{
+      const rotulo = (c.descricao||'').replace(/_/g,' ');
+      return `<div class="dj-mov-comp" style="margin-top:2px">↳ <b>${esc(c.nome)}</b>${rotulo?` <span style="color:var(--mu)">(${esc(rotulo)})</span>`:''}</div>`;
+    }).join('');
     const orgao = m.orgaoJulgador ? (m.orgaoJulgador.nomeOrgao || m.orgaoJulgador.nome || '') : '';
     return `<div class="dj-mov-row">
       <div class="dj-mov-dt">${fmtDJ(m.dataHora)}</div>
       <div class="dj-mov-nm">
         <span class="dj-tag mov" style="font-size:10px;padding:1px 5px">${m.codigo||''}</span>
         ${esc(m.nome||'—')}
-        ${comps?`<span class="dj-mov-comp">↳ ${esc(comps)}</span>`:''}
+        ${compsHtml}
       </div>
       <div class="dj-mov-org">${esc(orgao)}</div>
     </div>`;
@@ -2109,6 +2135,13 @@ function djRenderProcesso(s, tribKey){
         </div>
       </div>
       <button class="btn bp" onclick="djImportarProc()" style="font-size:11px;flex-shrink:0">📥 Importar</button>
+    </div>
+
+    <div class="dj-field" style="margin-bottom:10px;background:${clienteVinc?'#0d2818':'#1a1a0d'};border-radius:8px;padding:9px 11px">
+      <div class="dj-field-l">👤 Partes</div>
+      ${clienteVinc
+        ? `<div class="dj-field-v" style="font-size:12px">Cliente vinculado no escritório: <b>${esc(clienteVinc)}</b></div>`
+        : `<div style="font-size:11px;color:var(--mu);line-height:1.5">A API Pública do Datajud (CNJ) não disponibiliza nome das partes nem de advogados — apenas capa processual e movimentações, por restrição de privacidade (Portaria CNJ 160/2020). Para ver as partes, consulte o PJe/e-SAJ/Projudi do tribunal. Se este processo já estiver cadastrado com um cliente vinculado aqui no escritório, ele aparece aqui automaticamente.</div>`}
     </div>
 
     <div class="dj-grid">
@@ -2147,7 +2180,7 @@ function djRenderProcesso(s, tribKey){
     <div style="margin-top:14px">
       <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:8px">
         <b style="font-size:13px">📅 Movimentações — ${movs.length} total${movs.length>50?' (exibindo últimas 50)':''}</b>
-        <span style="font-size:10px;color:var(--mu)">Mais recente primeiro · Código TPU</span>
+        <span style="font-size:10px;color:var(--mu)">Mais recente primeiro · Código TPU · Detalhamento completo dos complementos</span>
       </div>
       <div class="dj-mov-list">${movsHtml||'<div style="color:var(--mu);font-size:12px;padding:10px">Sem movimentos registrados.</div>'}</div>
       ${movs.length>50?`<div style="text-align:center;font-size:11px;color:var(--mu);padding:8px;border-top:1px solid var(--bo)">
@@ -2427,13 +2460,13 @@ function renderUsers(){
     <td><span class="urole ${ROLES[u.role]?.cls||'r-colaborador'}">${ROLES[u.role]?.l||u.role}</span></td>
     <td>${u.ativo?badge('Ativo','bg'):badge('Inativo','bga')}</td>
     <td style="font-size:11px">${u.tel||'—'}</td>
-    ${p.usr?`<td><div style="display:flex;gap:3px"><button class="btn bgh xs" onclick="editUser('${u.id}')">✏️</button>${u.id!==currentUser.id?`<button class="btn ${u.ativo?'bd_':'bg_'} xs" onclick="toggleUser('${u.id}')">${u.ativo?'🔒':'🔓'}</button>`:''}</div></td>`:''}</tr>`).join('')}</tbody></table></div></div>`;
+    ${p.usr?`<td><div style="display:flex;gap:3px"><button class="btn bgh xs" onclick="editUser('${u.id}')">✏️</button>${u.id!==currentUser.id?`<button class="btn ${u.ativo?'bd_':'bg_'} xs" onclick="toggleUser('${u.id}')">${u.ativo?'🔒':'🔓'}</button><button class="btn bd_ xs" onclick="hardDeleteUser('${u.id}','${esc(u.nome).replace(/'/g,"\\'")}')" title="Excluir permanentemente">🗑️</button>`:''}</div></td>`:''}</tr>`).join('')}</tbody></table></div></div>`;
   document.getElementById('admin-cnt').innerHTML=html;
 }
 function openUserModal(id){
   document.getElementById('user-id').value=id||'';
   document.getElementById('m-user-t').textContent=id?'Editar Usuário':'Novo Usuário';
-  if(id){const u=users.find(x=>x.id===id);['nome','cargo','email','tel','oab'].forEach(f=>document.getElementById('user-'+f).value=u[f]||'');document.getElementById('user-pwd').value=u.pwd||'';document.getElementById('user-role').value=u.role;document.getElementById('user-ativo').value=u.ativo?'1':'0';}
+  if(id){const u=users.find(x=>String(x.id)===String(id));['nome','cargo','email','tel','oab'].forEach(f=>document.getElementById('user-'+f).value=u[f]||'');document.getElementById('user-pwd').value=u.pwd||'';document.getElementById('user-role').value=u.role;document.getElementById('user-ativo').value=u.ativo?'1':'0';}
   else{['nome','cargo','email','tel','oab','pwd'].forEach(f=>document.getElementById('user-'+f).value='');document.getElementById('user-role').value='advogado';document.getElementById('user-ativo').value='1';}
   openMo('m-user');
 }
@@ -2460,7 +2493,7 @@ async function saveUser(){
     await syncFromServer();
     closeMo('m-user');
     if(aTabCur==='acessos')renderAcessos();else renderUsers();
-    if(currentUser.id===id){currentUser=users.find(u=>u.id===id)||currentUser;document.getElementById('uname').textContent='Dr. '+(currentUser.nome||'').split(' ').slice(-1)[0];document.getElementById('uav').textContent=initials(currentUser.nome);}
+    if(String(currentUser.id)===String(id)){currentUser=users.find(u=>String(u.id)===String(id))||currentUser;document.getElementById('uname').textContent='Dr. '+(currentUser.nome||'').split(' ').slice(-1)[0];document.getElementById('uav').textContent=initials(currentUser.nome);}
   }catch(e){
     alert('Erro ao salvar usuário: '+e.message);
   }finally{
@@ -2468,8 +2501,8 @@ async function saveUser(){
   }
 }
 async function toggleUser(id){
-  if(id===currentUser.id)return alert('Não é possível desativar sua própria conta.');
-  const u=users.find(x=>x.id===id);if(!u)return;
+  if(String(id)===String(currentUser.id))return alert('Não é possível desativar sua própria conta.');
+  const u=users.find(x=>String(x.id)===String(id));if(!u)return;
   const ativando=!u.ativo;
   try{
     const r=ativando
@@ -2480,6 +2513,23 @@ async function toggleUser(id){
     await syncFromServer();
     if(aTabCur==='acessos')renderAcessos();else renderUsers();
   }catch(e){alert('Erro: '+e.message);}
+}
+// Exclusão PERMANENTE do usuário (remove a linha de verdade — diferente do
+// toggleUser/cadeado, que só marca active:false). Usado para apagar de vez
+// contas de teste; pede confirmação dupla por ser irreversível.
+async function hardDeleteUser(id,nome){
+  if(id===currentUser.id)return alert('Não é possível excluir sua própria conta.');
+  if(!confirm(`Excluir PERMANENTEMENTE o usuário "${nome}"?\n\nEsta ação não pode ser desfeita.`))return;
+  if(!confirm('Tem certeza? O registro será removido definitivamente do banco de dados.'))return;
+  try{
+    const r=await fetch('/api/users/'+id+'?hard=true',{method:'DELETE',headers:{'Authorization':'Bearer '+SA_JWT}});
+    const d=await r.json();
+    if(!r.ok)throw new Error(d.error||'Falha ao excluir usuário.');
+    users=users.filter(u=>u.id!==id);
+    await syncFromServer();
+    if(aTabCur==='acessos')renderAcessos();else renderUsers();
+    alert('✅ Usuário excluído permanentemente.');
+  }catch(e){alert('Erro ao excluir: '+e.message);}
 }
 
 // ═══════════════════════════════════════════════════════════════════
@@ -2595,7 +2645,7 @@ function arw(b){
   </div>`;
 }
 function showDet(id){
-  const b=bk.find(x=>x.id===id);if(!b)return;
+  const b=bk.find(x=>String(x.id)===String(id));if(!b)return;
   const t=BT[b.type];const mmap={videoconferencia:'📹 Videoconferência',ligacao:'📞 Ligação',whatsapp:'💬 WhatsApp'};
   const allSt=Object.entries(SS).map(([k,v])=>`<option value="${k}" ${b.status===k?'selected':''}>${v.l}</option>`).join('');
   document.getElementById('mo-det-i').innerHTML=`
@@ -2625,7 +2675,7 @@ function showDet(id){
   openMo('mo-detail');
 }
 function saveDet(id){
-  const i=bk.findIndex(b=>b.id===id);
+  const i=bk.findIndex(b=>String(b.id)===String(id));
   if(i<0)return;
   bk[i].status  = document.getElementById('det-st').value;
   bk[i].obs     = document.getElementById('det-obs').value;
@@ -2645,7 +2695,7 @@ function saveDet(id){
 }
 // autoSaveDet — salva status imediatamente ao alterar no select (sem fechar modal)
 function autoSaveDet(id){
-  const i=bk.findIndex(b=>b.id===id);
+  const i=bk.findIndex(b=>String(b.id)===String(id));
   if(i<0)return;
   const newStatus = document.getElementById('det-st').value;
   if(bk[i].status === newStatus) return; // sem mudança
@@ -2659,8 +2709,9 @@ function autoSaveDet(id){
 
 function delDet(id){
   if(!confirm('Excluir este agendamento?'))return;
-  bk=bk.filter(b=>b.id!==id);
+  bk=bk.filter(b=>String(b.id)!==String(id));
   saveBk(); updNotif();
+  delServerRecord('agendamentos',id);
   closeMo('mo-detail');
   const at=document.querySelector('.atab.on'); if(at)at.click();
 }
@@ -2835,7 +2886,7 @@ function renderAcessos(){
   const denied=u=>accessLog.filter(x=>x.usuario===u.nome&&x.negado).length;
   let h='<div class="card hi" style="margin-bottom:12px"><div class="stit">&#128274; Controle de Acessos e Permissoes</div><div style="font-size:12px;color:var(--mu)">Somente o administrador tem acesso a esta area.</div></div>';
   h+='<div class="card" style="margin-bottom:12px"><div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:10px"><div class="stit">&#128101; Usuarios</div><button class="btn bp bsm" onclick="openUserModal()">+ Novo</button></div><div class="tw"><table><thead><tr><th></th><th>Usuario</th><th>Perfil</th><th>Status</th><th>Ultimo Acesso</th><th>Negados</th><th>Acoes</th></tr></thead><tbody>';
-  h+=users.map(u=>'<tr style="opacity:'+( u.ativo?1:.6)+'"><td><div class="av" style="width:30px;height:30px;font-size:11px;background:'+ac(u.id)+';color:#fff">'+initials(u.nome)+'</div></td><td><div style="font-weight:700;font-size:12px">'+esc(u.nome)+'</div><div style="font-size:10px;color:#2563eb">'+esc(u.email)+'</div></td><td><span class="urole '+(ROLES[u.role]?.cls||'r-colaborador')+'">'+( ROLES[u.role]?.l||u.role)+'</span></td><td>'+sbg(u)+'</td><td style="font-size:10px;color:var(--mu)">'+lastA(u)+'</td><td style="text-align:center">'+(denied(u)>0?'<span style="color:#dc2626;font-weight:700">'+denied(u)+'</span>':'0')+'</td><td><div style="display:flex;gap:3px"><button class="btn bsa xs" onclick="openPermModal(\'' +u.id+'\')" title="Permissoes">&#128273;</button><button class="btn bgh xs" onclick="editUser(\''+u.id+'\')">&#9999;&#65039;</button>'+(u.id!==currentUser.id?'<button class="btn '+(u.ativo?'bd_':'bg_')+' xs" onclick="toggleAcesso(\''+u.id+'\')">'+(u.ativo?'&#128274;':'&#128275;')+'</button>':'')+'</div></td></tr>').join('');
+  h+=users.map(u=>'<tr style="opacity:'+( u.ativo?1:.6)+'"><td><div class="av" style="width:30px;height:30px;font-size:11px;background:'+ac(u.id)+';color:#fff">'+initials(u.nome)+'</div></td><td><div style="font-weight:700;font-size:12px">'+esc(u.nome)+'</div><div style="font-size:10px;color:#2563eb">'+esc(u.email)+'</div></td><td><span class="urole '+(ROLES[u.role]?.cls||'r-colaborador')+'">'+( ROLES[u.role]?.l||u.role)+'</span></td><td>'+sbg(u)+'</td><td style="font-size:10px;color:var(--mu)">'+lastA(u)+'</td><td style="text-align:center">'+(denied(u)>0?'<span style="color:#dc2626;font-weight:700">'+denied(u)+'</span>':'0')+'</td><td><div style="display:flex;gap:3px"><button class="btn bsa xs" onclick="openPermModal(\'' +u.id+'\')" title="Permissoes">&#128273;</button><button class="btn bgh xs" onclick="editUser(\''+u.id+'\')">&#9999;&#65039;</button>'+(u.id!==currentUser.id?'<button class="btn '+(u.ativo?'bd_':'bg_')+' xs" onclick="toggleAcesso(\''+u.id+'\')">'+(u.ativo?'&#128274;':'&#128275;')+'</button><button class="btn bd_ xs" onclick="hardDeleteUser(\''+u.id+'\',\''+esc(u.nome).replace(/'/g,"\\'")+'\')" title="Excluir permanentemente">&#128465;&#65039;</button>':'')+'</div></td></tr>').join('');
   h+='</tbody></table></div></div>';
   h+='<div class="card"><div class="stit">&#128203; Log de Acessos</div><div style="display:flex;gap:8px;margin-bottom:8px"><select id="log-fu" onchange="renderLogT()" style="font-size:11px"><option value="">Todos</option>'+users.map(u=>'<option value="'+esc(u.nome)+'">'+esc(u.nome)+'</option>').join('')+'</select><select id="log-ft" onchange="renderLogT()" style="font-size:11px"><option value="">Todos</option><option value="negado">Negados</option><option value="ok">Permitidos</option></select><button class="btn bgh bsm" onclick="accessLog=[];localStorage.removeItem(&quot;sa_log&quot;);renderAcessos()">&#128465;&#65039; Limpar</button></div><div id="log-cont"></div></div>';
   document.getElementById('admin-cnt').innerHTML=h;
@@ -2853,7 +2904,7 @@ function renderLogT(){
   c.innerHTML='<div style="max-height:280px;overflow-y:auto"><div class="log-row" style="font-weight:700;font-size:10px;text-transform:uppercase;color:var(--mu);background:#f8fafc"><div>Data/Hora</div><div>Usuario</div><div>Modulo</div><div>Status</div></div>'+logs.slice(0,80).map(l=>'<div class="log-row"><div style="font-size:10px">'+l.data+'<br>'+l.hora+'</div><div style="font-size:11px;font-weight:600">'+esc(l.usuario)+'</div><div style="font-size:11px">'+esc(l.mod)+'</div><div>'+(l.negado?'<span style="color:#dc2626;font-size:10px">&#10006; NEGADO</span>':'<span style="color:#16a34a;font-size:10px">&#10003;</span>')+'</div></div>').join('')+'</div>';
 }
 function openPermModal(userId){
-  const u=users.find(x=>x.id===userId);if(!u)return;
+  const u=users.find(x=>String(x.id)===String(userId));if(!u)return;
   const base=ROLES[u.role]||ROLES.estagiario;
   const merged=u.customPerms?deepMerge(base,u.customPerms):base;
   let rows='';
@@ -2885,7 +2936,7 @@ function openPermModal(userId){
   m.addEventListener('click',e=>{if(e.target===m)m.remove();});
 }
 async function savePerm(uid){
-  const u=users.find(x=>x.id===uid);if(!u)return;
+  const u=users.find(x=>String(x.id)===String(uid));if(!u)return;
   const cp={};Object.keys(MOD_LBL).forEach(mod=>{cp[mod]={};Object.keys(ACT_LBL).forEach(act=>{const el=document.getElementById('pc-'+mod+'-'+act);if(el)cp[mod][act]=el.checked?1:0;});});
   try{
     const r=await fetch('/api/users/'+uid,{method:'PATCH',headers:{'Content-Type':'application/json','Authorization':'Bearer '+SA_JWT},body:JSON.stringify({customPerms:cp})});
@@ -2899,7 +2950,7 @@ async function savePerm(uid){
   }catch(e){alert('Erro ao salvar permissões: '+e.message);}
 }
 async function resetPerm(uid){
-  const u=users.find(x=>x.id===uid);if(!u)return;
+  const u=users.find(x=>String(x.id)===String(uid));if(!u)return;
   if(!confirm('Resetar permissoes de '+u.nome+' ao perfil padrao?'))return;
   try{
     const r=await fetch('/api/users/'+uid,{method:'PATCH',headers:{'Content-Type':'application/json','Authorization':'Bearer '+SA_JWT},body:JSON.stringify({customPerms:null})});
@@ -2911,7 +2962,7 @@ async function resetPerm(uid){
   }catch(e){alert('Erro ao resetar permissões: '+e.message);}
 }
 async function toggleAcesso(uid){
-  const u=users.find(x=>x.id===uid);if(!u)return;
+  const u=users.find(x=>String(x.id)===String(uid));if(!u)return;
   if(!confirm((u.ativo?'Bloquear':'Desbloquear')+' '+u.nome+'?'))return;
   const ativando=!u.ativo;
   try{
@@ -3421,8 +3472,11 @@ document.addEventListener('DOMContentLoaded',()=>{
   if(ls){ls.classList.remove('on');ls.style.display='none';}
   try{load();loadLog();iaLoadCfg();}catch(e){console.warn('load:',e);users=D_USERS;}
   if(!users||!users.length)users=D_USERS;
-  const sid=parseInt(localStorage.getItem('sa_sess')||'0',10);
-  if(sid>0){const u=users.find(x=>x.id===sid&&x.ativo);if(u){currentUser=u;showApp();return;}localStorage.removeItem('sa_sess');}
+  // sa_sess guarda o id do usuário (UUID string desde a migração para Supabase);
+  // parseInt() cortava no primeiro caractere não numérico do UUID e nunca
+  // batia com nenhum usuário real, então a sessão "lembrada" nunca restaurava.
+  const sid=localStorage.getItem('sa_sess')||'';
+  if(sid){const u=users.find(x=>String(x.id)===String(sid)&&x.ativo);if(u){currentUser=u;showApp();return;}localStorage.removeItem('sa_sess');}
   go('s-home');
 });
 </script>
