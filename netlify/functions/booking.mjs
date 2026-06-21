@@ -58,7 +58,7 @@ function clean(s, max) {
 }
 
 export default async (req) => {
-  if (req.method === 'OPTIONS') return new Response('', { status: 204, headers: CORS });
+  if (req.method === 'OPTIONS') return new Response(null, { status: 204, headers: CORS });
   if (req.method !== 'POST') return err('Método não permitido.', 405);
   if (!SUPA_KEY) return err('Servidor não configurado (SUPABASE_SERVICE_ROLE_KEY ausente).', 500);
 

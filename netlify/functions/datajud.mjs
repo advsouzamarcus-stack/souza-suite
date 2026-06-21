@@ -76,7 +76,7 @@ const ok  = d => new Response(JSON.stringify(d), { headers: CORS });
 const err = (m,s=400) => new Response(JSON.stringify({error:m}), {status:s,headers:CORS});
 
 export default async (req) => {
-  if (req.method === 'OPTIONS') return new Response('',{status:204,headers:CORS});
+  if (req.method === 'OPTIONS') return new Response(null,{status:204,headers:CORS});
   if (req.method !== 'POST') return err('Use POST',405);
 
   let body;
