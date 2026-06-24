@@ -862,7 +862,18 @@ function load(){
   cli=_ld.cli||D_CLI; proc=_ld.proc||D_PROC; tar=_ld.tar||D_TAR; fin=_ld.fin||D_FIN;
   bk=JSON.parse(localStorage.getItem('ms_bookings')||'[]');
   const gc=localStorage.getItem('ms_gcal');if(gc)gcfg=JSON.parse(gc);
-  if(!bk.length)seedBk();
+  // seedBk() NÃO é mais chamado automaticamente aqui. Antes, toda vez que
+  // load() rodava (refresh, nova aba, etc.) com bk vazio -- incluindo
+  // depois de uma exclusão real e legítima de todos os agendamentos, ou
+  // simplesmente antes do syncFromServer() ainda ter trazido os dados
+  // reais do servidor -- ele recriava os 6 agendamentos fictícios de
+  // demonstração (Maria Fernanda, Carlos Eduardo, Ana Paula, Roberto,
+  // Joana, Lucia) com datas calculadas a partir de HOJE (td0, dt(1),
+  // dt(2)...). Como saveBk() faz push imediato para o servidor, isso
+  // sobrescrevia agendamentos reais excluídos -- e como as datas eram
+  // recalculadas a cada vez, pareciam "agendamentos voltando com data
+  // posterior". Quem quiser repovoar os dados de demonstração pode chamar
+  // seedBk() manualmente pela aba Config ou pelo console.
 }
 function seedBk(){
   bk=[
