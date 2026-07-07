@@ -132,6 +132,7 @@ async function procToSupa(p) {
     subject:         p.obs   || '',
     phase:           p.fase  || p.prox || '',
     status:          p.status|| 'Em andamento',
+    lawyer:          p.adv   || '',
     last_movement_at: p.djMovDt || null,
     datajud_payload: p.djMov ? JSON.stringify({mov: p.djMov, syncAt: p.djSyncAt}) : null,
     created_at:      p.ini   || p.criadoEm || new Date().toISOString(),
@@ -151,6 +152,7 @@ function supaToProc(r) {
     status:    r.status         || 'Em andamento',
     ini:       r.created_at     || '',
     prox:      r.phase          || '',
+    adv:       r.lawyer         || '',
     obs:       r.subject        || '',
     djMov:     djInfo.mov       || '',
     djMovDt:   r.last_movement_at || '',
@@ -252,6 +254,7 @@ async function tarToSupa(t) {
     status:      t.ok ? 'concluida' : ({'Pendente':'pendente','Em andamento':'em_andamento','Concluída':'concluida','Cancelada':'cancelada','concluida':'concluida','pendente':'pendente'}[t.status]||'pendente'),
     priority:    ({'Alta':'alta','Média':'media','Media':'media','Baixa':'baixa','Urgente':'urgente','alta':'alta','media':'media','baixa':'baixa'}[t.prio]||'media'),
     assigned_to: null,
+    assigned_to_name: t.resp || '',
     created_at:  t.criadoEm || new Date().toISOString(),
     updated_at:  new Date().toISOString(),
   };
@@ -264,10 +267,10 @@ function supaToTarefa(r) {
     local:  r.description || '',
     cliId:  r.client_id   || null,
     procId: r.case_id     || null,
-    prio:   r.priority    || 'Média',
-    status: r.status      || 'Pendente',
-    resp:   r.assigned_to || '',
-    ok:     r.status === 'Concluída',
+    prio:   ({'alta':'Alta','media':'Média','baixa':'Baixa','urgente':'Urgente'}[r.priority] || 'Média'),
+    status: ({'pendente':'Pendente','em_andamento':'Em andamento','concluida':'Concluído','cancelada':'Cancelada'}[r.status] || 'Pendente'),
+    resp:   r.assigned_to_name || '',
+    ok:     r.status === 'concluida',
   };
 }
 
@@ -280,10 +283,11 @@ async function finToSupa(f) {
     client_id:   f.cliId ? await uid(f.cliId, 'clients') : null,
     description: f.desc || '',
     amount:      parseFloat(f.ct || f.valor || 0),
+    amount_received: parseFloat(f.rc || 0),
     kind:        ({'PIX':'receita','Transferência':'receita','TED':'receita','Crédito':'receita','Débito':'receita','Dinheiro':'receita','Boleto':'receita','Cartão':'receita','Honorários':'receita','Despesa':'despesa','despesa':'despesa','receita':'receita'}[f.pg]||'receita'),
     status:      ({'Pago':'pago','Parcial':'pago','Pendente':'pendente','Cancelado':'cancelado','Atrasado':'atrasado','pago':'pago','pendente':'pendente','atrasado':'atrasado'}[f.st]||'pendente'),
     due_at:      (f.data || new Date().toISOString()).slice(0,10),
-    paid_at:     f.st === 'Pago' ? f.data : null,
+    paid_at:     (f.st === 'Pago' || f.st === 'pago') ? f.data : null,
     created_at:  f.criadoEm || new Date().toISOString(),
     updated_at:  new Date().toISOString(),
   };
@@ -294,9 +298,9 @@ function supaToFin(r) {
     cliId: r.client_id   || null,
     desc:  r.description || '',
     ct:    r.amount      || 0,
-    rc:    r.status === 'Pago' ? r.amount : 0,
+    rc:    r.amount_received || 0,
     pg:    r.kind        || 'PIX',
-    st:    r.status      || 'Pendente',
+    st:    ({'pago':'Pago','pendente':'Pendente','atrasado':'Atrasado','cancelado':'Cancelado'}[r.status] || 'Pendente'),
     data:  (r.due_at||'').slice(0,10),
   };
 }

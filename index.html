@@ -547,9 +547,8 @@ tr:hover td{background:#f8fafc!important}
     <button class="atab" onclick="aTab('busca',this)">🔎 Busca Proc.</button>
     <button class="atab" id="tab-users-btn" onclick="aTab('usuarios',this)">👤 Usuários</button>
     <button class="atab" id="tab-acessos-btn" onclick="aTab('acessos',this)">🔐 Controle Acesso</button>
-    <button class="atab" onclick="aTab('ia',this)">🤖 Assistente IA</button>
-    <button class="atab" onclick="aTab('gcal',this)">🔗 Google Cal</button>
     <button class="atab" onclick="aTab('config',this)">⚙️ Config</button>
+    <button class="atab" onclick="aTab('gcal',this)">🔗 Google Cal</button>
   </div>
 
   <main id="admin-cnt" style="padding-top:14px"></main>
@@ -1091,7 +1090,7 @@ async function syncFromServer() {
           'agenda-hoje':renderAgenda, 'tarefas':renderTar,
           'financeiro':renderFin, 'metricas':renderMetricas,
           'semana':renderSem, 'mes':renderCal, 'cal-agend':renderAgCal,
-          'comunicacoes':renderCom, 'usuarios':renderUsers, 'ia':renderIA
+          'comunicacoes':renderCom, 'usuarios':renderUsers
         };
         if (aTabCur && rf[aTabCur]) rf[aTabCur]();
       } catch(_) { /* re-render silencioso */ }
@@ -1216,7 +1215,7 @@ function aTab(tab,btn){
     semana:renderSem,calmes:renderCal,financeiro:renderFin,comunicacoes:renderCom,
     agenda:renderAgenda,agcal:renderAgCal,kanban:renderKanban,agendamentos:renderAgendamentos,
     metricas:renderMetricas,busca:renderBusca,usuarios:renderUsers,gcal:renderGCal,
-    config:renderConfig,acessos:renderAcessos,ia:renderIA
+    config:renderConfig,acessos:renderAcessos
   };
   document.getElementById('admin-cnt').innerHTML='';
   logAccess(tab,'visualizar');
@@ -1328,14 +1327,28 @@ async function delCli(id){
 // ═══════════════════════════════════════════════════════════════════
 // PROCESSOS
 // ═══════════════════════════════════════════════════════════════════
+const PROC_TIPOS=['Trabalhista','Consumidor','Previdenciário','Cível','Criminal','Família','Tributário','Empresarial'];
 function renderProc(){
   const q=(document.getElementById('proc-q')||{value:''}).value.toLowerCase();
   const sf=(document.getElementById('proc-sf')||{value:'Todos'}).value;
-  const filt=proc.filter(p=>{const m=!q||p.num.includes(q)||cn(p.cliId).toLowerCase().includes(q);return m&&(sf==='Todos'||p.status===sf);});
+  const tf=(document.getElementById('proc-tf')||{value:'Todas'}).value;
+  const nf=(document.getElementById('proc-nf')||{value:''}).value.toLowerCase();
+  const obf=(document.getElementById('proc-obf')||{value:''}).value.toLowerCase();
+  const filt=proc.filter(p=>{
+    const m=!q||p.num.includes(q)||cn(p.cliId).toLowerCase().includes(q)||(p.obs||'').toLowerCase().includes(q);
+    const st=sf==='Todos'||p.status===sf;
+    const tp=tf==='Todas'||p.tipo===tf;
+    const nm=!nf||cn(p.cliId).toLowerCase().includes(nf);
+    const ob=!obf||(p.obs||'').toLowerCase().includes(obf);
+    return m&&st&&tp&&nm&&ob;
+  });
   const p=perm();
   let html=`<div class="fbar">
-    <input id="proc-q" style="max-width:230px" placeholder="🔍 Número ou cliente..." value="${q}" oninput="renderProc()">
-    <select id="proc-sf" onchange="renderProc()" style="max-width:160px"><option>Todos</option><option>Em andamento</option><option>Finalizado</option><option>Suspenso</option></select>
+    <input id="proc-q" style="max-width:200px" placeholder="🔍 Número ou cliente..." value="${q}" oninput="renderProc()">
+    <select id="proc-sf" onchange="renderProc()" style="max-width:150px"><option>Todos</option><option>Em andamento</option><option>Finalizado</option><option>Suspenso</option></select>
+    <select id="proc-tf" onchange="renderProc()" style="max-width:150px"><option>Todas</option>${PROC_TIPOS.map(t=>`<option ${t===tf?'selected':''}>${t}</option>`).join('')}</select>
+    <input id="proc-nf" style="max-width:170px" placeholder="👤 Filtrar por nome..." value="${nf}" oninput="renderProc()">
+    <input id="proc-obf" style="max-width:190px" placeholder="📝 Filtrar por observações..." value="${obf}" oninput="renderProc()">
     <span style="font-size:11px;color:var(--mu)">${filt.length} processo(s)</span>
     ${p.e?`<button class="btn bp" onclick="openProcModal()">+ Novo Processo</button>`:''}
   </div>
@@ -1400,14 +1413,23 @@ function searchProcNum(num,vara){
 const TAR_FILS=['Todas','Hoje','Atrasadas','Pendentes','Concluídas'];
 function renderTar(){
   const q=(document.getElementById('tar-q')||{value:''}).value.toLowerCase();
+  const rf=(document.getElementById('tar-rf')||{value:'Todos'}).value;
+  const nf=(document.getElementById('tar-nf')||{value:''}).value.toLowerCase();
+  const obf=(document.getElementById('tar-obf')||{value:''}).value.toLowerCase();
   const filt=tar.filter(t=>{
-    const m=!q||t.desc.toLowerCase().includes(q)||cn(t.cliId).toLowerCase().includes(q);
+    const m=!q||t.desc.toLowerCase().includes(q)||cn(t.cliId).toLowerCase().includes(q)||(t.local||'').toLowerCase().includes(q);
     const f=tarFil==='Todas'||(tarFil==='Hoje'&&t.data===td0)||(tarFil==='Atrasadas'&&t.data<td0&&!t.ok)||(tarFil==='Pendentes'&&!t.ok)||(tarFil==='Concluídas'&&t.ok);
-    return m&&f;
+    const r=rf==='Todos'||t.resp===rf;
+    const nm=!nf||cn(t.cliId).toLowerCase().includes(nf);
+    const ob=!obf||(t.local||'').toLowerCase().includes(obf);
+    return m&&f&&r&&nm&&ob;
   }).sort((a,b)=>a.data.localeCompare(b.data));
   const p=perm();
   let html=`<div class="fbar">
-    <input id="tar-q" style="max-width:220px" placeholder="🔍 Buscar tarefa..." value="${q}" oninput="renderTar()">
+    <input id="tar-q" style="max-width:200px" placeholder="🔍 Buscar tarefa..." value="${q}" oninput="renderTar()">
+    <select id="tar-rf" onchange="renderTar()" style="max-width:150px"><option>Todos</option>${users.filter(u=>u.ativo).map(u=>`<option ${u.nome===rf?'selected':''}>${u.nome}</option>`).join('')}</select>
+    <input id="tar-nf" style="max-width:160px" placeholder="👤 Filtrar por nome..." value="${nf}" oninput="renderTar()">
+    <input id="tar-obf" style="max-width:190px" placeholder="📝 Filtrar por observações..." value="${obf}" oninput="renderTar()">
     <div style="display:flex;gap:4px;flex-wrap:wrap">${TAR_FILS.map(f=>`<button class="btn ${f===tarFil?'bp':'bgh'} bsm" onclick="setTarF('${f}')">${f}</button>`).join('')}</div>
     ${p.e?`<button class="btn bp" onclick="openTarModal()">+ Nova Tarefa</button>`:''}
   </div>
@@ -1556,15 +1578,20 @@ function renderCom(){
   let html=`<div class="ccrow">
   <div class="card cc">
     <div class="stitle">📱 WhatsApp em Massa</div>
-    <select id="wa-group" style="margin-bottom:8px;width:100%"><option value="ativos">Todos os Clientes Ativos</option><option value="novos">Clientes Novos</option><option value="inativos">Clientes Inativos</option></select>
+    <select id="wa-group" style="margin-bottom:8px;width:100%"><option value="ativos">Todos os Clientes Ativos</option><option value="novos">Clientes Novos</option><option value="inativos">Clientes Inativos</option><option value="todos">Todos os Clientes</option></select>
+    <select id="wa-mode" style="margin-bottom:8px;width:100%" onchange="toggleWAMode()"><option value="tpl">Usar modelo pronto</option><option value="livre">✍️ Mensagem livre personalizada</option></select>
     <select id="wa-tpl-mass" style="margin-bottom:8px;width:100%"><option value="audiencia">Lembrete de Audiência</option><option value="prazo">Prazo Processual</option><option value="docs">Solicitar Documentos</option><option value="cobranca">Cobrança de Honorários</option><option value="update">Atualização do Processo</option></select>
+    <textarea id="wa-livre-msg" style="display:none;margin-bottom:8px;width:100%;min-height:90px" placeholder="Digite a mensagem. Use {nome} para inserir o primeiro nome do cliente automaticamente."></textarea>
     <button class="btn bwa" style="width:100%" onclick="openWAMass()">📱 Gerar Links WhatsApp</button>
     <div id="wa-mass-list" style="margin-top:10px"></div>
   </div>
   <div class="card cc">
     <div class="stitle">✉️ E-mail em Massa</div>
-    <select id="email-group" style="margin-bottom:8px;width:100%"><option value="ativos">Todos os Clientes Ativos</option><option value="novos">Clientes Novos</option><option value="inativos">Clientes Inativos</option></select>
+    <select id="email-group" style="margin-bottom:8px;width:100%"><option value="ativos">Todos os Clientes Ativos</option><option value="novos">Clientes Novos</option><option value="inativos">Clientes Inativos</option><option value="todos">Todos os Clientes</option></select>
+    <select id="email-mode" style="margin-bottom:8px;width:100%" onchange="toggleEmailMode()"><option value="tpl">Usar modelo pronto</option><option value="livre">✍️ Mensagem livre personalizada</option></select>
     <select id="email-tpl-mass" style="margin-bottom:8px;width:100%"><option value="audiencia">Notificação de Audiência</option><option value="prazo">Alerta de Prazo</option><option value="docs">Solicitação de Documentos</option><option value="cobranca">Cobrança de Honorários</option><option value="update">Atualização Processual</option></select>
+    <input id="email-livre-sub" style="display:none;margin-bottom:8px;width:100%" placeholder="Assunto do e-mail">
+    <textarea id="email-livre-msg" style="display:none;margin-bottom:8px;width:100%;min-height:70px" placeholder="Digite a mensagem. Use {nome} para inserir o primeiro nome do cliente automaticamente."></textarea>
     <button class="btn bma" style="width:100%" onclick="openEmailMass()">✉️ Abrir E-mail em Massa</button>
   </div>
   <div class="card cc">
@@ -1584,8 +1611,44 @@ function sendWA(){const c=cli.find(x=>String(x.id)===String(waCliId));if(!c||!c.
 function openEmailModal(cliId){emailCliId=cliId;const c=cli.find(x=>String(x.id)===String(cliId));document.getElementById('email-cliinfo').innerHTML=`<strong>${c.nome}</strong><br>✉️ ${c.email||'Sem e-mail cadastrado'}`;setEmailTpl('audiencia');openMo('m-email');}
 function setEmailTpl(tpl){const c=cli.find(x=>String(x.id)===String(emailCliId));if(!c)return;const t=EMAIL_TPLS[tpl];document.getElementById('email-sub').value=t.sub;document.getElementById('email-body').value=t.body(c.nome.split(' ')[0]);}
 function sendEmail(){const c=cli.find(x=>String(x.id)===String(emailCliId));if(!c||!c.email)return alert('Cliente sem e-mail.');const sub=encodeURIComponent(document.getElementById('email-sub').value);const body=encodeURIComponent(document.getElementById('email-body').value);window.location.href=`mailto:${c.email}?subject=${sub}&body=${body}`;closeMo('m-email');}
-function openWAMass(){const grp=document.getElementById('wa-group').value;const tpl=document.getElementById('wa-tpl-mass').value;const filt=cli.filter(c=>grp==='ativos'?c.tipo==='Ativo':grp==='novos'?c.tipo==='Novo':c.tipo==='Inativo');let html='';filt.forEach(c=>{if(!c.tel)return;const num='55'+c.tel.replace(/\D/g,'');const msg=encodeURIComponent(WA_TPLS[tpl](c.nome.split(' ')[0]));html+=`<div style="display:flex;align-items:center;justify-content:space-between;padding:5px 0;border-bottom:1px solid var(--bd);font-size:12px"><span>${c.nome}</span><a href="https://wa.me/${num}?text=${msg}" target="_blank" class="btn bwa xs">📱</a></div>`;});document.getElementById('wa-mass-list').innerHTML=html||'<p style="color:var(--mu);font-size:11px">Nenhum cliente com telefone neste grupo.</p>';}
-function openEmailMass(){const grp=document.getElementById('email-group').value;const tpl=document.getElementById('email-tpl-mass').value;const filt=cli.filter(c=>(grp==='ativos'?c.tipo==='Ativo':grp==='novos'?c.tipo==='Novo':c.tipo==='Inativo')&&c.email);if(!filt.length)return alert('Nenhum cliente com e-mail neste grupo.');const emails=filt.map(c=>c.email).join(',');const t=EMAIL_TPLS[tpl];window.location.href=`mailto:${emails}?subject=${encodeURIComponent(t.sub)}&body=${encodeURIComponent(t.body('Prezado(a)'))}` ;}
+function comGroupFilter(c,grp){return grp==='todos'||(grp==='ativos'?c.tipo==='Ativo':grp==='novos'?c.tipo==='Novo':c.tipo==='Inativo');}
+function toggleWAMode(){const livre=document.getElementById('wa-mode').value==='livre';document.getElementById('wa-tpl-mass').style.display=livre?'none':'';document.getElementById('wa-livre-msg').style.display=livre?'':'none';}
+function toggleEmailMode(){const livre=document.getElementById('email-mode').value==='livre';document.getElementById('email-tpl-mass').style.display=livre?'none':'';document.getElementById('email-livre-sub').style.display=livre?'':'none';document.getElementById('email-livre-msg').style.display=livre?'':'none';}
+function openWAMass(){
+  const grp=document.getElementById('wa-group').value;
+  const livre=document.getElementById('wa-mode').value==='livre';
+  const tpl=document.getElementById('wa-tpl-mass').value;
+  const livreMsg=document.getElementById('wa-livre-msg').value.trim();
+  if(livre&&!livreMsg)return alert('Digite a mensagem livre antes de gerar os links.');
+  const filt=cli.filter(c=>comGroupFilter(c,grp));
+  let html='';
+  filt.forEach(c=>{
+    if(!c.tel)return;
+    const num='55'+c.tel.replace(/\D/g,'');
+    const nome=c.nome.split(' ')[0];
+    const txt=livre?livreMsg.replaceAll('{nome}',nome):WA_TPLS[tpl](nome);
+    const msg=encodeURIComponent(txt);
+    html+=`<div style="display:flex;align-items:center;justify-content:space-between;padding:5px 0;border-bottom:1px solid var(--bd);font-size:12px"><span>${c.nome}</span><a href="https://wa.me/${num}?text=${msg}" target="_blank" class="btn bwa xs">📱</a></div>`;
+  });
+  document.getElementById('wa-mass-list').innerHTML=html||'<p style="color:var(--mu);font-size:11px">Nenhum cliente com telefone neste grupo.</p>';
+}
+function openEmailMass(){
+  const grp=document.getElementById('email-group').value;
+  const livre=document.getElementById('email-mode').value==='livre';
+  const tpl=document.getElementById('email-tpl-mass').value;
+  const filt=cli.filter(c=>comGroupFilter(c,grp)&&c.email);
+  if(!filt.length)return alert('Nenhum cliente com e-mail neste grupo.');
+  const emails=filt.map(c=>c.email).join(',');
+  if(livre){
+    const sub=document.getElementById('email-livre-sub').value.trim();
+    const body=document.getElementById('email-livre-msg').value.trim();
+    if(!sub||!body)return alert('Preencha assunto e mensagem antes de enviar.');
+    window.location.href=`mailto:${emails}?subject=${encodeURIComponent(sub)}&body=${encodeURIComponent(body.replaceAll('{nome}','Prezado(a)'))}`;
+    return;
+  }
+  const t=EMAIL_TPLS[tpl];
+  window.location.href=`mailto:${emails}?subject=${encodeURIComponent(t.sub)}&body=${encodeURIComponent(t.body('Prezado(a)'))}` ;
+}
 function exportAllCal(){let events='BEGIN:VCALENDAR\nVERSION:2.0\nPRODID:-//Marcus Souza I Advogado//PT\n';tar.filter(t=>!t.ok&&t.data>=td0).forEach(t=>{const s=t.data.replace(/-/g,'')+'T090000Z';events+=`BEGIN:VEVENT\nDTSTART:${s}\nDTEND:${s.replace('090000','100000')}\nSUMMARY:${t.desc}\nDESCRIPTION:Cliente: ${cn(t.cliId)} | Resp: ${t.resp}\nLOCATION:${t.local||''}\nEND:VEVENT\n`;});events+='END:VCALENDAR';const b=new Blob([events],{type:'text/calendar'});const a=document.createElement('a');a.href=URL.createObjectURL(b);a.download='tarefas_souza.ics';a.click();}
 function exportPrazos(){let events='BEGIN:VCALENDAR\nVERSION:2.0\nPRODID:-//Marcus Souza I Advogado//PT\n';proc.filter(p=>p.prox&&p.prox>=td0&&p.status==='Em andamento').forEach(p=>{const s=p.prox.replace(/-/g,'')+'T090000Z';events+=`BEGIN:VEVENT\nDTSTART:${s}\nDTEND:${s.replace('090000','100000')}\nSUMMARY:⚖️ Movimentação: ${p.num.substring(0,20)}\nDESCRIPTION:Processo: ${p.num} | Cliente: ${cn(p.cliId)} | Adv: ${p.adv}\nLOCATION:${p.vara||''}\nEND:VEVENT\n`;});events+='END:VCALENDAR';const b=new Blob([events],{type:'text/calendar'});const a=document.createElement('a');a.href=URL.createObjectURL(b);a.download='prazos_souza.ics';a.click();}
 
@@ -1798,7 +1861,6 @@ async function djConsultar(numProc){
     throw new Error(e.message||'Erro ao consultar Datajud');
   }
 }
-async function djSyncProc(procId,numProc,cellId){const cell=document.getElementById(cellId||'dj-'+procId);if(cell)cell.innerHTML='<span class="sync-load">&#9203; consultando...</span>';try{const{hits,trib,nd}=await djConsultar(numProc);if(!hits.length){if(cell)cell.innerHTML='<span class="sync-warn">&#9888; Nao encontrado</span>';return;}const s=hits[0]._source;const movs=(s.movimentos||[]).sort((a,b)=>new Date(b.dataHora)-new Date(a.dataHora));const ult=movs[0];const grauN={'G1':'1 Grau','G2':'2 Grau','JE':'Juizado'}[s.grau]||s.grau||'';if(cell)cell.innerHTML=ult?'<span class="sync-ok">&#10003; '+esc((ult.nome||'').substring(0,26))+'</span><br><span style="font-size:9px;color:var(--mu)">'+fmtDJ(ult.dataHora)+' &middot; '+(trib||'').toUpperCase()+'</span>':'<span class="sync-warn">Sem movimentos</span>';const pi=proc.findIndex(p=>numRaw(p.num)===nd);if(pi>=0){proc[pi].djMov=ult?.nome||'';proc[pi].djMovDt=fmtDJ(ult?.dataHora);proc[pi].djSyncAt=new Date().toLocaleDateString('pt-BR');save();}logAccess('processos','sync: '+nd.substring(0,15));}catch(e){if(cell)cell.innerHTML='<span class="sync-err" title="'+esc(e.message)+'">&#9888; '+esc((e.message||'Erro').substring(0,28))+'</span>';}}
 async function djSyncAll(){const st=document.getElementById('proc-sync-st');const ativos=proc.filter(p=>p.status!=='Finalizado');if(!ativos.length){if(st)st.textContent='Nenhum processo ativo.';return;}let ok=0,err=0;for(let i=0;i<ativos.length;i++){if(st)st.textContent=(i+1)+'/'+ativos.length;try{await djSyncProc(ativos[i].id,ativos[i].num);ok++;}catch(e){err++;}await new Promise(r=>setTimeout(r,400));}if(st)st.textContent='&#10003; '+ok+' OK'+(err?' &middot; &#9888; '+err+' erro(s)':'');renderProc();}
 let djMonTimer=null;
 function djStartMonitor(){djStopMonitor();djMonTimer=setInterval(async()=>{const ativos=proc.filter(p=>p.status!=='Finalizado');for(const p of ativos){try{const{hits,nd}=await djConsultar(p.num);if(!hits.length)continue;const s=hits[0]._source;const movs=(s.movimentos||[]).sort((a,b)=>new Date(b.dataHora)-new Date(a.dataHora));const ult=movs[0];const pi=proc.findIndex(x=>x.id===p.id);if(pi>=0&&ult?.nome&&ult.nome!==proc[pi].djMov){proc[pi].djMov=ult.nome;proc[pi].djMovDt=fmtDJ(ult.dataHora);proc[pi].djSyncAt=new Date().toLocaleDateString('pt-BR');save();logAccess('processos','novo movimento: '+ult.nome,false);}}catch(e){}await new Promise(r=>setTimeout(r,500));}},(4*60*60*1000));}
@@ -1864,7 +1926,6 @@ function renderBusca(){
   document.getElementById('admin-cnt').innerHTML = DJ_CSS + `
   <div class="dj-tabs">
     <button class="dj-tab on" onclick="djTab('num',this)">🔢 Por Número</button>
-    <button class="dj-tab"    onclick="djTab('adv',this)">⚖️ Busca Avançada</button>
     <button class="dj-tab"    onclick="djTab('sync',this)">🔄 Sincronizar</button>
     <button class="dj-tab"    onclick="djTab('portais',this)">🔗 Portais</button>
   </div>
@@ -1893,75 +1954,6 @@ function renderBusca(){
       </div>
       <div id="dj-result-num" style="margin-top:14px"></div>
     </div>
-  </div>
-
-  <!-- PAINEL 2: Busca Avançada ────────────────────────────────────── -->
-  <div class="dj-panel" id="djp-adv">
-    <div class="card hi" style="margin-bottom:12px">
-      <div class="stitle">🔍 Busca Avançada — Query DSL Datajud</div>
-      <div style="font-size:12px;color:var(--mu);margin-bottom:14px">
-        Combine filtros por classe processual, órgão julgador, assunto, grau e data.
-        Suporta paginação com <code>search_after</code> para grandes volumes (até 10.000/página).
-      </div>
-      <div class="frow" style="flex-wrap:wrap;gap:10px">
-        <div class="ff" style="flex:2;min-width:180px">
-          <div class="fl">Tribunal</div>
-          ${selectTrib('dj-adv-trib')}
-        </div>
-        <div class="ff" style="flex:1;min-width:120px">
-          <div class="fl">Grau</div>
-          <select id="dj-adv-grau">
-            <option value="">Todos</option>
-            <option value="G1">G1 — 1º Grau</option>
-            <option value="G2">G2 — 2º Grau</option>
-            <option value="JE">JE — Juizado Especial</option>
-            <option value="TR">TR — Turma Recursal</option>
-            <option value="SU">SU — Superior</option>
-          </select>
-        </div>
-        <div class="ff" style="flex:1;min-width:120px">
-          <div class="fl">Cód. Classe (TPU)</div>
-          <input id="dj-adv-classe" placeholder="ex: 1116 = Exec.Fiscal" type="number">
-        </div>
-        <div class="ff" style="flex:1;min-width:120px">
-          <div class="fl">Cód. Órgão Julgador</div>
-          <input id="dj-adv-orgao" placeholder="ex: 13597" type="number">
-        </div>
-        <div class="ff" style="flex:1;min-width:120px">
-          <div class="fl">Cód. Assunto (TPU)</div>
-          <input id="dj-adv-assunto" placeholder="ex: 10263" type="number">
-        </div>
-        <div class="ff" style="flex:1;min-width:110px">
-          <div class="fl">Resultados/pág.</div>
-          <select id="dj-adv-size">
-            <option value="10">10</option>
-            <option value="25" selected>25</option>
-            <option value="50">50</option>
-            <option value="100">100</option>
-          </select>
-        </div>
-      </div>
-      <div class="frow" style="gap:10px;margin-top:8px;flex-wrap:wrap">
-        <div class="ff">
-          <div class="fl">Data Ajuizamento — De</div>
-          <input id="dj-adv-dt-ini" type="date">
-        </div>
-        <div class="ff">
-          <div class="fl">Data Ajuizamento — Até</div>
-          <input id="dj-adv-dt-fim" type="date">
-        </div>
-        <div class="ff" style="flex:3">
-          <div class="fl">Número do Processo (opcional)</div>
-          <input id="dj-adv-num" placeholder="Busca full-text no número">
-        </div>
-      </div>
-      <div style="display:flex;gap:8px;margin-top:12px;align-items:center;flex-wrap:wrap">
-        <button class="btn bp" id="dj-btn-adv" onclick="djBuscarAdv(false)">🔍 Buscar</button>
-        <button class="btn bsa" onclick="djLimparAdv()">✕ Limpar</button>
-        <span id="dj-adv-info" style="font-size:11px;color:var(--mu)"></span>
-      </div>
-    </div>
-    <div id="dj-result-adv"></div>
   </div>
 
   <!-- PAINEL 3: Sincronizar ──────────────────────────────────────── -->
@@ -2252,162 +2244,6 @@ function djImportarProc(){
   };
   proc.push(novo); save();
   alert(`Processo ${s.numeroProcesso} importado!\nAbra a aba Processos para vincular ao cliente.`);
-}
-
-// ══════════════════════════════════════════════════════════════════
-// PAINEL 2 — BUSCA AVANÇADA (Query DSL + paginação search_after)
-// ══════════════════════════════════════════════════════════════════
-
-function djBuscarAdv(paginar){
-  const tribKey = document.getElementById('dj-adv-trib').value;
-  const alias   = DJ_ENDPOINTS[tribKey];
-  const res     = document.getElementById('dj-result-adv');
-  const btn     = document.getElementById('dj-btn-adv');
-  const info    = document.getElementById('dj-adv-info');
-
-  if(!alias){ res.innerHTML=`<div class="dj-err">Tribunal não mapeado.</div>`; return; }
-
-  const classe  = document.getElementById('dj-adv-classe').value.trim();
-  const orgao   = document.getElementById('dj-adv-orgao').value.trim();
-  const assunto = document.getElementById('dj-adv-assunto').value.trim();
-  const grau    = document.getElementById('dj-adv-grau').value;
-  const dtIni   = document.getElementById('dj-adv-dt-ini').value;
-  const dtFim   = document.getElementById('dj-adv-dt-fim').value;
-  const numAdv  = document.getElementById('dj-adv-num').value.trim();
-  const size    = parseInt(document.getElementById('dj-adv-size').value)||25;
-
-  // Monta must[] conforme documentação oficial do Datajud
-  const must = [];
-  if(classe)  must.push({match:{'classe.codigo': parseInt(classe)}});
-  if(orgao)   must.push({match:{'orgaoJulgador.codigo': parseInt(orgao)}});
-  if(assunto) must.push({match:{'assuntos.codigo': parseInt(assunto)}});
-  if(grau)    must.push({match:{grau}});
-  if(numAdv)  must.push({match:{numeroProcesso: numRaw(numAdv)}});
-
-  const filter = [];
-  if(dtIni||dtFim){
-    const range = {};
-    if(dtIni) range.gte = dtIni + 'T00:00:00.000Z';
-    if(dtFim) range.lte = dtFim + 'T23:59:59.999Z';
-    filter.push({range:{dataAjuizamento: range}});
-  }
-
-  if(!must.length && !filter.length){
-    alert('Informe ao menos um critério de busca.'); return;
-  }
-
-  const body = {
-    size,
-    query: { bool: { must, filter } },
-    sort: [{'@timestamp':{'order':'asc'}}]  // obrigatório para search_after
-  };
-
-  if(paginar && djSearchAfter){ body.search_after = djSearchAfter; }
-  else { djSearchAfter = null; djCurrentPage = 0; }
-
-  djCurrentAlias = alias;
-  djCurrentQuery = body;
-
-  const loadMsg = paginar
-    ? `⏳ Carregando página ${djCurrentPage+2}...`
-    : `⏳ Consultando ${tribKey.toUpperCase()}...`;
-
-  if(!paginar) res.innerHTML = `<div class="dj-loading">${loadMsg}</div>`;
-  info.textContent = loadMsg;
-  btn.disabled = true;
-
-  djSearch(alias, body).then(data=>{
-    btn.disabled = false;
-    const hits  = (data&&data.hits&&data.hits.hits)||[];
-    const total = data&&data.hits&&data.hits.total&&data.hits.total.value||0;
-
-    if(!paginar) djCurrentTotal = total;
-    djCurrentPage++;
-
-    if(!hits.length && !paginar){
-      res.innerHTML=`<div class="dj-err">Nenhum processo encontrado com os critérios informados.</div>`;
-      info.textContent=''; return;
-    }
-
-    // Extrair search_after do último hit
-    if(hits.length){
-      const lastSort = hits[hits.length-1].sort;
-      djSearchAfter = lastSort || null;
-    } else { djSearchAfter = null; }
-
-    const countSeen = (djCurrentPage-1)*size + hits.length;
-
-    info.textContent = `${countSeen.toLocaleString('pt-BR')} de ${total>=10000?'10.000+':total.toLocaleString('pt-BR')} processos`;
-
-    const linhas = hits.map(h=>{
-      const s = h._source;
-      const assuntosS = djAssuntos(s.assuntos).map(a=>a.nome).join('; ').substring(0,60);
-      return `<div class="dj-adv-row" onclick="djAbrirProcesso('${esc(s.numeroProcesso)}','${tribKey}')">
-        <div style="font-family:monospace;font-size:11px;word-break:break-all">${esc(s.numeroProcesso)}</div>
-        <div style="font-size:11px">${esc((s.classe&&s.classe.nome)||'—')}</div>
-        <div style="font-size:11px">${esc((s.orgaoJulgador&&s.orgaoJulgador.nome)||'—')}</div>
-        <div style="font-size:11px;color:var(--mu)">${fmtDJ(s.dataAjuizamento)}${assuntosS?` · ${assuntosS}`:''}</div>
-      </div>`;
-    }).join('');
-
-    const tabela = `
-      <div class="dj-adv-result">
-        <div class="dj-adv-row dj-adv-head">
-          <div>Número CNJ</div><div>Classe</div><div>Órgão</div><div>Ajuizamento · Assuntos</div>
-        </div>
-        ${linhas}
-      </div>`;
-
-    if(paginar){ 
-      const old = res.querySelector('.dj-adv-result');
-      if(old){ old.insertAdjacentHTML('beforeend', linhas); }
-    } else {
-      res.innerHTML = tabela;
-    }
-
-    // Botão "carregar mais" com search_after
-    let pag = res.querySelector('.dj-pag');
-    if(pag) pag.remove();
-    if(djSearchAfter && hits.length === size){
-      res.insertAdjacentHTML('beforeend',`<div class="dj-pag">
-        <button class="btn bp" onclick="djBuscarAdv(true)">⬇ Carregar mais ${size}</button>
-        <span style="font-size:11px;color:var(--mu)">Página ${djCurrentPage} · ${countSeen.toLocaleString('pt-BR')} carregados</span>
-        <span style="font-size:11px;color:var(--mu)">Clique em um processo para ver detalhes</span>
-      </div>`);
-    }
-
-  }).catch(e=>{
-    btn.disabled = false;
-    info.textContent='';
-    if(!paginar) res.innerHTML=`<div class="dj-err"><b>Erro:</b> ${esc(e.message)}</div>`;
-  });
-}
-
-// Abre processo da busca avançada no painel de número
-function djAbrirProcesso(num, tribKey){
-  // Muda para aba Por Número e preenche
-  document.querySelectorAll('.dj-tab').forEach(b=>b.classList.remove('on'));
-  document.querySelectorAll('.dj-panel').forEach(p=>p.classList.remove('on'));
-  const btn = document.querySelector('.dj-tab');
-  if(btn) btn.classList.add('on');
-  const p = document.getElementById('djp-num');
-  if(p) p.classList.add('on');
-  const inp = document.getElementById('dj-num');
-  const sel = document.getElementById('dj-trib');
-  if(inp) inp.value = num;
-  if(sel && DJ_ENDPOINTS[tribKey] && sel.querySelector(`option[value="${tribKey}"]`)) sel.value = tribKey;
-  djAutoDetect();
-  djBuscarNum();
-}
-
-function djLimparAdv(){
-  ['dj-adv-classe','dj-adv-orgao','dj-adv-assunto','dj-adv-num','dj-adv-dt-ini','dj-adv-dt-fim']
-    .forEach(id=>{ const el=document.getElementById(id); if(el) el.value=''; });
-  const r = document.getElementById('dj-result-adv');
-  const i = document.getElementById('dj-adv-info');
-  if(r) r.innerHTML='';
-  if(i) i.textContent='';
-  djSearchAfter=null; djCurrentPage=0; djCurrentTotal=0;
 }
 
 // ══════════════════════════════════════════════════════════════════
@@ -3021,463 +2857,6 @@ async function toggleAcesso(uid){
   }catch(e){alert('Erro: '+e.message);}
 }
 
-// ASSISTENTE VIRTUAL COM IA
-let iaCfg={
-  provider:'claude',
-  // API Keys por provedor
-  apiKey:'',           // Claude (Anthropic) — sk-ant-...
-  openaiKey:'',        // OpenAI (ChatGPT) — sk-...
-  geminiKey:'',        // Google Gemini — AIza...
-  deepseekKey:'',      // DeepSeek — sk-...
-  // Modelos por provedor
-  model:'claude-sonnet-4-6',
-  openaiModel:'gpt-4o-mini',
-  geminiModel:'gemini-2.5-flash',
-  deepseekModel:'deepseek-chat',
-  // Configurações gerais
-  persona:'voce e um assistente virtual juridico do escritorio Marcus Souza I Advogado. Responda sempre em portugues. Seja cordial, objetivo e nunca faca aconselhamento juridico ou preveja resultados. Para consultas juridicas, agende uma reuniao com o Dr. Marcus Souza.',
-  respDelay:1200,voz:false,agendamento:true,docs:true,faq:true
-};
-let iaHist=[];
-let iaTyping=false;
-
-function renderIA(){
-  const cfg=iaCfg;
-  document.getElementById('admin-cnt').innerHTML=`
-  <div style="display:grid;grid-template-columns:1fr 320px;gap:12px;height:calc(100vh - 120px)">
-
-    <!-- Chat principal -->
-    <div class="card" style="display:flex;flex-direction:column;padding:0;overflow:hidden">
-      <div style="padding:14px 16px;border-bottom:1px solid var(--bd);display:flex;align-items:center;gap:10px">
-        <div style="width:36px;height:36px;background:linear-gradient(135deg,var(--g),#2563eb);border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:18px">&#129302;</div>
-        <div>
-          <div style="font-weight:700;font-size:13px">Assistente Virtual IA</div>
-          <div style="font-size:10px;color:var(--mu)">Marcus Souza I Advogado &mdash; ${iaActiveKey(cfg.provider)?'&#10003; '+iaProviderLabel(cfg.provider)+' ativo':'&#9888; Configure a API Key'}</div>
-        </div>
-        <div style="margin-left:auto;display:flex;gap:6px">
-          <button class="btn bgh bsm" onclick="iaClearChat()">&#128465;&#65039; Limpar</button>
-          <button class="btn bsa bsm" onclick="iaExportChat()">&#128229; Exportar</button>
-        </div>
-      </div>
-      <div class="ia-messages" id="ia-msgs">
-        <div class="ia-bubble ia">
-          Ola! Sou o assistente virtual do escritorio <strong>Marcus Souza I Advogado</strong>. &#128522;<br><br>
-          Posso ajudar com:<br>
-          &bull; Informacoes sobre o escritorio<br>
-          &bull; Agendamento de consultas<br>
-          &bull; Duvidas gerais juridicas (sem aconselhamento)<br>
-          &bull; Acompanhamento de processos<br>
-          &bull; Formas de pagamento<br><br>
-          Como posso ajudar?
-        </div>
-      </div>
-      <div style="padding:10px 14px;border-top:1px solid var(--bd)">
-        <div style="display:flex;gap:6px;margin-bottom:8px;flex-wrap:wrap">
-          <button class="btn bgh xs" onclick="iaSuggest('Quero agendar uma consulta')">&#128197; Agendar</button>
-          <button class="btn bgh xs" onclick="iaSuggest('Qual e o endereco do escritorio?')">&#128205; Endereco</button>
-          <button class="btn bgh xs" onclick="iaSuggest('Quais sao as formas de pagamento?')">&#128176; Pagamento</button>
-          <button class="btn bgh xs" onclick="iaSuggest('Como acompanho meu processo?')">&#9878; Processo</button>
-          ${cfg.docs?'<button class="btn bgh xs" onclick="iaUploadDoc()">&#128196; Enviar doc</button>':''}
-          ${cfg.voz?'<button class="btn bgh xs" id="ia-mic-btn" onclick="iaToggleMic()">&#127908; Audio</button>':''}
-        </div>
-        <div style="display:flex;gap:8px">
-          <input id="ia-input" class="fi" placeholder="Digite sua mensagem..." style="flex:1"
-            onkeydown="if(event.key==='Enter'&&!event.shiftKey){event.preventDefault();iaSend();}">
-          <button class="btn bgold" onclick="iaSend()" style="padding:10px 16px">&#10148;</button>
-        </div>
-      </div>
-    </div>
-
-    <!-- Painel de configuracao -->
-    <div style="display:flex;flex-direction:column;gap:10px;overflow-y:auto">
-
-      <div class="card">
-        <div class="stit">&#9881;&#65039; Configuracao da IA</div>
-
-        <!-- Seletor de provedor -->
-        <div class="fg" style="margin-bottom:12px">
-          <div class="fl" style="font-weight:700">Provedor Ativo</div>
-          <select id="ia-provider" class="fsel" onchange="iaToggleProviderFields()" style="font-size:13px;font-weight:600">
-            <option value="claude" ${cfg.provider==='claude'?'selected':''}>&#129302; Claude (Anthropic)</option>
-            <option value="openai" ${cfg.provider==='openai'?'selected':''}>&#129302; ChatGPT (OpenAI)</option>
-            <option value="gemini" ${cfg.provider==='gemini'?'selected':''}>&#10024; Gemini (Google)</option>
-            <option value="deepseek" ${cfg.provider==='deepseek'?'selected':''}>&#129520; DeepSeek</option>
-          </select>
-          <div id="ia-provider-badge" style="margin-top:6px;font-size:11px;color:var(--mu)"></div>
-        </div>
-
-        <div style="border-top:1px solid var(--bd);padding-top:10px;margin-bottom:10px">
-
-          <!-- Claude -->
-          <div id="ia-fields-claude" class="ia-prov-fields">
-            <div style="display:flex;align-items:center;gap:8px;margin-bottom:8px">
-              <div style="width:28px;height:28px;background:#c1440e;border-radius:6px;display:flex;align-items:center;justify-content:center;font-size:14px">&#129302;</div>
-              <div><div style="font-size:12px;font-weight:700">Anthropic Claude</div><div style="font-size:10px;color:var(--mu)">console.anthropic.com</div></div>
-            </div>
-            <div class="fg"><div class="fl">API Key <span style="color:#dc2626">*</span></div>
-              <div style="position:relative">
-                <input type="password" id="ia-key" class="fi" value="${esc(cfg.apiKey)}" placeholder="sk-ant-api03-..." style="padding-right:42px;font-family:monospace;font-size:11px">
-                <button type="button" onclick="togglePwd('ia-key',this)" style="position:absolute;right:10px;top:50%;transform:translateY(-50%);background:none;border:none;cursor:pointer;font-size:14px;color:var(--mu)">&#128065;&#65039;</button>
-              </div>
-            </div>
-            <div class="fg"><div class="fl">Modelo</div>
-              <select id="ia-model" class="fsel">
-                <option value="claude-sonnet-4-6" ${cfg.model==='claude-sonnet-4-6'?'selected':''}>Claude Sonnet 4.6 (Recomendado)</option>
-                <option value="claude-haiku-4-5-20251001" ${cfg.model==='claude-haiku-4-5-20251001'?'selected':''}>Claude Haiku 4.5 (Economico)</option>
-                <option value="claude-opus-4-6" ${cfg.model==='claude-opus-4-6'?'selected':''}>Claude Opus 4.6 (Avancado)</option>
-              </select>
-            </div>
-          </div>
-
-          <!-- OpenAI -->
-          <div id="ia-fields-openai" class="ia-prov-fields" style="display:none">
-            <div style="display:flex;align-items:center;gap:8px;margin-bottom:8px">
-              <div style="width:28px;height:28px;background:#10a37f;border-radius:6px;display:flex;align-items:center;justify-content:center;font-size:14px">&#129302;</div>
-              <div><div style="font-size:12px;font-weight:700">OpenAI ChatGPT</div><div style="font-size:10px;color:var(--mu)">platform.openai.com/api-keys</div></div>
-            </div>
-            <div class="fg"><div class="fl">API Key <span style="color:#dc2626">*</span></div>
-              <div style="position:relative">
-                <input type="password" id="ia-openai-key" class="fi" value="${esc(cfg.openaiKey)}" placeholder="sk-proj-..." style="padding-right:42px;font-family:monospace;font-size:11px">
-                <button type="button" onclick="togglePwd('ia-openai-key',this)" style="position:absolute;right:10px;top:50%;transform:translateY(-50%);background:none;border:none;cursor:pointer;font-size:14px;color:var(--mu)">&#128065;&#65039;</button>
-              </div>
-            </div>
-            <div class="fg"><div class="fl">Modelo</div>
-              <select id="ia-openai-model" class="fsel">
-                <option value="gpt-4o-mini" ${cfg.openaiModel==='gpt-4o-mini'?'selected':''}>GPT-4o Mini (Recomendado)</option>
-                <option value="gpt-4o" ${cfg.openaiModel==='gpt-4o'?'selected':''}>GPT-4o (Avancado)</option>
-                <option value="gpt-3.5-turbo" ${cfg.openaiModel==='gpt-3.5-turbo'?'selected':''}>GPT-3.5 Turbo (Economico)</option>
-              </select>
-            </div>
-          </div>
-
-          <!-- Gemini -->
-          <div id="ia-fields-gemini" class="ia-prov-fields" style="display:none">
-            <div style="display:flex;align-items:center;gap:8px;margin-bottom:8px">
-              <div style="width:28px;height:28px;background:#4285f4;border-radius:6px;display:flex;align-items:center;justify-content:center;font-size:14px">&#10024;</div>
-              <div><div style="font-size:12px;font-weight:700">Google Gemini</div><div style="font-size:10px;color:var(--mu)">aistudio.google.com/apikey</div></div>
-            </div>
-            <div class="fg"><div class="fl">API Key <span style="color:#dc2626">*</span></div>
-              <div style="position:relative">
-                <input type="password" id="ia-gemini-key" class="fi" value="${esc(cfg.geminiKey)}" placeholder="AIzaSy..." style="padding-right:42px;font-family:monospace;font-size:11px">
-                <button type="button" onclick="togglePwd('ia-gemini-key',this)" style="position:absolute;right:10px;top:50%;transform:translateY(-50%);background:none;border:none;cursor:pointer;font-size:14px;color:var(--mu)">&#128065;&#65039;</button>
-              </div>
-            </div>
-            <div class="fg"><div class="fl">Modelo</div>
-              <select id="ia-gemini-model" class="fsel">
-                <option value="gemini-2.5-flash" ${cfg.geminiModel==='gemini-2.5-flash'?'selected':''}>Gemini 2.5 Flash (Recomendado)</option>
-                <option value="gemini-2.5-flash-lite" ${cfg.geminiModel==='gemini-2.5-flash-lite'?'selected':''}>Gemini 2.5 Flash-Lite (Economico)</option>
-                <option value="gemini-2.5-pro" ${cfg.geminiModel==='gemini-2.5-pro'?'selected':''}>Gemini 2.5 Pro (Avancado)</option>
-              </select>
-            </div>
-          </div>
-
-          <!-- DeepSeek -->
-          <div id="ia-fields-deepseek" class="ia-prov-fields" style="display:none">
-            <div style="display:flex;align-items:center;gap:8px;margin-bottom:8px">
-              <div style="width:28px;height:28px;background:#1a56db;border-radius:6px;display:flex;align-items:center;justify-content:center;font-size:14px">&#129520;</div>
-              <div><div style="font-size:12px;font-weight:700">DeepSeek</div><div style="font-size:10px;color:var(--mu)">platform.deepseek.com</div></div>
-            </div>
-            <div class="fg"><div class="fl">API Key <span style="color:#dc2626">*</span></div>
-              <div style="position:relative">
-                <input type="password" id="ia-deepseek-key" class="fi" value="${esc(cfg.deepseekKey)}" placeholder="sk-..." style="padding-right:42px;font-family:monospace;font-size:11px">
-                <button type="button" onclick="togglePwd('ia-deepseek-key',this)" style="position:absolute;right:10px;top:50%;transform:translateY(-50%);background:none;border:none;cursor:pointer;font-size:14px;color:var(--mu)">&#128065;&#65039;</button>
-              </div>
-            </div>
-            <div class="fg"><div class="fl">Modelo</div>
-              <select id="ia-deepseek-model" class="fsel">
-                <option value="deepseek-chat" ${cfg.deepseekModel==='deepseek-chat'?'selected':''}>deepseek-chat (Recomendado)</option>
-                <option value="deepseek-reasoner" ${cfg.deepseekModel==='deepseek-reasoner'?'selected':''}>deepseek-reasoner (Raciocinio)</option>
-              </select>
-            </div>
-          </div>
-        </div>
-
-        <!-- Delay + Botoes -->
-        <div class="fg"><div class="fl">Delay de resposta (ms)</div>
-          <input id="ia-delay" type="number" class="fi" value="${cfg.respDelay}" min="0" max="5000" step="100">
-          <div style="font-size:10px;color:var(--mu);margin-top:3px">Simula tempo de digitacao. 0 = instantaneo.</div>
-        </div>
-        <div style="display:flex;gap:6px;margin-top:8px;flex-wrap:wrap">
-          <button class="btn bp bsm" onclick="iaSaveCfg()" style="flex:1">&#128190; Salvar</button>
-          <button class="btn bgh bsm" onclick="iaTestAPI()" style="flex:1">&#128270; Testar</button>
-        </div>
-        <div id="ia-test-res" style="font-size:11px;margin-top:8px"></div>
-
-        <!-- Status das keys -->
-        <div style="margin-top:10px;border-top:1px solid var(--bd);padding-top:8px">
-          <div style="font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.5px;color:var(--mu);margin-bottom:6px">Status das API Keys</div>
-          <div style="display:flex;flex-direction:column;gap:4px">
-            <div style="display:flex;justify-content:space-between;font-size:11px"><span>&#129302; Claude</span><span style="color:${cfg.apiKey?'#16a34a':'#dc2626'}">${cfg.apiKey?'&#10003; Configurada':'&#10060; Nao configurada'}</span></div>
-            <div style="display:flex;justify-content:space-between;font-size:11px"><span>&#129302; ChatGPT</span><span style="color:${cfg.openaiKey?'#16a34a':'#dc2626'}">${cfg.openaiKey?'&#10003; Configurada':'&#10060; Nao configurada'}</span></div>
-            <div style="display:flex;justify-content:space-between;font-size:11px"><span>&#10024; Gemini</span><span style="color:${cfg.geminiKey?(cfg.geminiKey.startsWith('AIza')?'#16a34a':'#d97706'):'#dc2626'}">${cfg.geminiKey?(cfg.geminiKey.startsWith('AIza')?'&#10003; Configurada':'&#9888; Key inválida — obter em aistudio.google.com/apikey'):'&#10060; Nao configurada'}</span></div>
-            <div style="display:flex;justify-content:space-between;font-size:11px"><span>&#129520; DeepSeek</span><span style="color:${cfg.deepseekKey?'#16a34a':'#dc2626'}">${cfg.deepseekKey?'&#10003; Configurada':'&#10060; Nao configurada'}</span></div>
-          </div>
-        </div>
-      </div>
-
-      <div class="card">
-        <div class="stit">&#129302; Personalidade do Assistente</div>
-        <div class="fg"><div class="fl">Instrucao do sistema (persona)</div>
-          <textarea id="ia-persona" style="width:100%;min-height:120px;font-size:11px;padding:8px;border:1px solid var(--bd);border-radius:8px;resize:vertical;font-family:inherit">${esc(cfg.persona)}</textarea>
-        </div>
-        <div class="al al-warn" style="font-size:10px">Nunca habilite aconselhamento juridico, previsao de resultados ou analise de documentos na persona do assistente.</div>
-      </div>
-
-      <div class="card">
-        <div class="stit">&#128736;&#65039; Funcionalidades</div>
-        ${[['agendamento','&#128197; Agendamento automatico','Permite ao cliente agendar diretamente no chat'],['docs','&#128196; Recebimento de documentos','Aceita envio de documentos pelo cliente'],['voz','&#127908; Resposta por audio','Usa Web Speech API para voz (browser)'],['faq','&#10067; FAQ automatico','Responde perguntas frequentes sem chamar a API']].map(([k,l,d])=>`<div style="display:flex;justify-content:space-between;align-items:center;padding:8px 0;border-bottom:1px solid var(--bd)"><div><div style="font-size:12px;font-weight:600">${l}</div><div style="font-size:10px;color:var(--mu)">${d}</div></div><label class="ptog"><input type="checkbox" id="ia-${k}" ${cfg[k]?'checked':''}><span class="pslider"></span></label></div>`).join('')}
-      </div>
-
-      <div class="card">
-        <div class="stit">&#128200; Historico</div>
-        <div style="font-size:12px;color:var(--mu);margin-bottom:8px">${iaHist.length} mensagens nesta sessao</div>
-        <div style="font-size:11px;font-weight:700;margin-bottom:6px">Leads capturados nesta sessao:</div>
-        <div id="ia-leads" style="font-size:11px;color:var(--mu)">Nenhum lead ainda.</div>
-      </div>
-
-    </div>
-  </div>`;
-  iaRenderLeads();
-  setTimeout(iaToggleProviderFields,50);
-}
-
-// Configuracao da IA
-function iaSaveCfg(){
-  iaCfg.provider      = document.getElementById('ia-provider')?.value||'claude';
-  iaCfg.apiKey        = document.getElementById('ia-key')?.value||'';
-  iaCfg.openaiKey     = document.getElementById('ia-openai-key')?.value||'';
-  iaCfg.geminiKey     = document.getElementById('ia-gemini-key')?.value||'';
-  iaCfg.deepseekKey   = document.getElementById('ia-deepseek-key')?.value||'';
-  iaCfg.model         = document.getElementById('ia-model')?.value||'claude-sonnet-4-6';
-  iaCfg.openaiModel   = document.getElementById('ia-openai-model')?.value||'gpt-4o-mini';
-  iaCfg.geminiModel   = document.getElementById('ia-gemini-model')?.value||'gemini-2.5-flash';
-  iaCfg.deepseekModel = document.getElementById('ia-deepseek-model')?.value||'deepseek-chat';
-  iaCfg.respDelay     = parseInt(document.getElementById('ia-delay')?.value||'1200',10);
-  iaCfg.persona       = document.getElementById('ia-persona')?.value||iaCfg.persona;
-  ['agendamento','docs','voz','faq'].forEach(k=>{iaCfg[k]=!!document.getElementById('ia-'+k)?.checked;});
-  try{localStorage.setItem('ia_cfg',JSON.stringify(iaCfg));}catch(e){}
-  alert('Configuracao salva!');
-  renderIA();
-}
-
-function iaLoadCfg(){try{const d=localStorage.getItem('ia_cfg');if(d)iaCfg={...iaCfg,...JSON.parse(d)};}catch(e){}}
-
-function iaToggleProviderFields(){
-  const p=document.getElementById('ia-provider')?.value||'claude';
-  ['claude','openai','gemini','deepseek'].forEach(id=>{
-    const el=document.getElementById('ia-fields-'+id);
-    if(el)el.style.display=id===p?'block':'none';
-  });
-  const badge=document.getElementById('ia-provider-badge');
-  const key=iaActiveKey(p);
-  if(badge){
-    const urls={claude:'console.anthropic.com/settings/keys',openai:'platform.openai.com/api-keys',gemini:'aistudio.google.com/apikey',deepseek:'platform.deepseek.com/api_keys'};
-    badge.innerHTML=key
-      ?'<span style="color:#16a34a">&#10003; API Key configurada</span>'
-      :'<span style="color:#d97706">&#9888; API Key nao configurada &mdash; <a href="https://'+urls[p]+'" target="_blank" style="color:#2563eb">Obter chave</a></span>';
-  }
-}
-
-// Testar API
-async function iaTestAPI(){
-  const res=document.getElementById('ia-test-res');
-  const provider=document.getElementById('ia-provider')?.value||iaCfg.provider;
-  if(res)res.innerHTML='<span style="color:var(--mu)">&#9203; Testando '+iaProviderLabel(provider)+'...</span>';
-  try{
-    const resp=await iaCallAPI([{role:'user',content:'Oi'}],provider,8);
-    if(res)res.innerHTML='<span style="color:#16a34a">&#10003; '+iaProviderLabel(provider)+' funcionando! Modelo: '+resp.model+'</span>';
-  }catch(e){
-    if(res)res.innerHTML='<span style="color:#dc2626">&#10060; Erro: '+esc(e.message)+'</span>';
-  }
-}
-
-function iaProviderLabel(p){
-  return {claude:'Claude (Anthropic)',openai:'ChatGPT (OpenAI)',gemini:'Gemini (Google)',deepseek:'DeepSeek'}[p]||p;
-}
-
-// Chave ativa do provedor
-function iaActiveKey(p){
-  p=p||iaCfg.provider;
-  return {claude:iaCfg.apiKey,openai:iaCfg.openaiKey,gemini:iaCfg.geminiKey,deepseek:iaCfg.deepseekKey}[p]||'';
-}
-
-// Modelo ativo do provedor
-function iaActiveModel(p){
-  p=p||iaCfg.provider;
-  return {claude:iaCfg.model,openai:iaCfg.openaiModel,gemini:iaCfg.geminiModel,deepseek:iaCfg.deepseekModel}[p]||'';
-}
-
-// Chamada unificada para qualquer provedor
-async function iaCallAPI(messages, provider, maxTokens){
-  provider=provider||iaCfg.provider;
-  const key=iaActiveKey(provider);
-  const model=iaActiveModel(provider);
-  if(!key) throw new Error('API Key do '+iaProviderLabel(provider)+' nao configurada.');
-
-  // Sistema de prompt
-  const sys=iaCfg.persona+' | Info: Tel (21) 96534-8183 | adv.souzamarcus@gmail.com | OAB/RJ 250.430 | Seg-Sex 8h-18h';
-
-  let url,headers,body,respText,respModel;
-
-  if(provider==='claude'){
-    url='https://api.anthropic.com/v1/messages';
-    headers={'Content-Type':'application/json','x-api-key':key,'anthropic-version':'2023-06-01'};
-    body={model,max_tokens:maxTokens||600,system:sys,messages};
-    const r=await fetch(url,{method:'POST',headers,body:JSON.stringify(body)});
-    const d=await r.json();
-    if(d.error) throw new Error(d.error.message||'Erro Anthropic');
-    respText=d.content?.[0]?.text||'';
-    respModel=d.model||model;
-
-  }else if(provider==='openai'){
-    url='https://api.openai.com/v1/chat/completions';
-    headers={'Content-Type':'application/json','Authorization':'Bearer '+key};
-    const msgs=[{role:'system',content:sys},...messages];
-    body={model,max_tokens:maxTokens||600,messages:msgs};
-    const r=await fetch(url,{method:'POST',headers,body:JSON.stringify(body)});
-    const d=await r.json();
-    if(d.error) throw new Error(d.error.message||'Erro OpenAI');
-    respText=d.choices?.[0]?.message?.content||'';
-    respModel=d.model||model;
-
-  }else if(provider==='gemini'){
-    // Rotear via Netlify Function para evitar CORS e usar fallback de modelos
-    const r=await fetch('/api/gemini',{
-      method:'POST',
-      headers:{'Content-Type':'application/json','X-Gemini-Model':model},
-      body:JSON.stringify({apiKey:key,messages,system:sys,maxTokens:maxTokens||600})
-    });
-    const d=await r.json();
-    if(!d.ok) throw new Error(d.error||'Erro Gemini');
-    if(d.fallback) console.warn('[Gemini] Modelo',model,'indisponível. Usando:',d.model);
-    respText=d.text||'';
-    respModel=d.model||model;
-
-  }else if(provider==='deepseek'){
-    // DeepSeek usa API compatível com OpenAI
-    url='https://api.deepseek.com/v1/chat/completions';
-    headers={'Content-Type':'application/json','Authorization':'Bearer '+key};
-    const msgs=[{role:'system',content:sys},...messages];
-    body={model,max_tokens:maxTokens||600,messages:msgs};
-    const r=await fetch(url,{method:'POST',headers,body:JSON.stringify(body)});
-    const d=await r.json();
-    if(d.error) throw new Error(d.error.message||'Erro DeepSeek');
-    respText=d.choices?.[0]?.message?.content||'';
-    respModel=d.model||model;
-
-  }else{
-    throw new Error('Provedor desconhecido: '+provider);
-  }
-
-  return {text:respText, model:respModel};
-}
-
-// FAQ embutido (sem chamar API)
-const IA_FAQ=[
-  {q:['endereco','localizacao','onde fica','onde voces ficam'],r:'&#128205; Nosso escritorio fica no Rio de Janeiro/RJ. Entre em contato pelo WhatsApp (21) 96534-8183 para obter o endereco completo.'},
-  {q:['whatsapp','telefone','contato','ligar','chamar'],r:'&#128222; Nosso WhatsApp: <strong>(21) 96534-8183</strong>. Atendemos de segunda a sexta, das 8h as 18h.'},
-  {q:['pagamento','pagar','honorario','custo','preco','valor','quanto custa'],r:'&#128176; Aceitamos PIX (chave: adv.souzamarcus@gmail.com), cartao de credito, debito e transferencia bancaria. O valor dos honorarios e definido apos a consulta inicial.'},
-  {q:['pix','chave pix'],r:'&#9889; Chave PIX: <strong>adv.souzamarcus@gmail.com</strong>'},
-  {q:['area','areas','atende','especialidade','trabalhista','consumidor','previdenciario','familia'],r:'&#9878; Atuamos em: Direito do Consumidor, Trabalhista, Previdenciario, Familiar, Civil, Saude, INSS e outros. Agende uma consulta para avaliarmos seu caso!'},
-  {q:['processo','andamento','como esta','meu processo'],r:'&#9878; Para consultar o andamento do seu processo, acesse o portal do tribunal pelo numero CNJ ou entre em contato pelo WhatsApp. Nosso sistema tambem permite consulta direta pelo Datajud.'},
-  {q:['horario','funciona','atende','atendimento'],r:'&#8986; Atendemos de <strong>segunda a sexta, das 8h as 18h</strong>. Fora do horario, deixe sua mensagem e retornamos em breve!'},
-];
-
-function iaFAQ(msg){
-  const low=msg.toLowerCase();
-  for(const f of IA_FAQ){if(f.q.some(q=>low.includes(q)))return f.r;}
-  return null;
-}
-
-// Leads capturados
-let iaLeads=[];
-function iaRenderLeads(){
-  const el=document.getElementById('ia-leads');if(!el)return;
-  if(!iaLeads.length){el.innerHTML='Nenhum lead ainda.';return;}
-  el.innerHTML=iaLeads.map(l=>'<div style="background:#f8fafc;border:1px solid var(--bd);border-radius:6px;padding:8px;margin-bottom:6px"><div style="font-weight:700">'+esc(l.nome)+'</div><div>'+esc(l.tel||'')+'</div><div style="font-size:10px;color:var(--mu)">'+esc(l.area||'')+'</div></div>').join('');
-}
-function iaExtractLead(msg){
-  const tel=msg.match(/\(?(\d{2})\)?[\s-]?(\d{4,5})[\s-]?(\d{4})/);
-  if(tel&&!iaLeads.find(l=>l.tel===tel[0])){
-    iaLeads.push({nome:'Lead #'+(iaLeads.length+1),tel:tel[0],area:'Chat IA',data:new Date().toLocaleString('pt-BR')});
-    iaRenderLeads();
-  }
-}
-
-// Enviar mensagem
-async function iaSend(){
-  const inp=document.getElementById('ia-input');
-  const msgs=document.getElementById('ia-msgs');
-  if(!inp||!msgs)return;
-  const txt=inp.value.trim();if(!txt)return;
-  inp.value='';
-  // Mensagem do usuário
-  msgs.innerHTML+='<div class="ia-bubble usr">'+esc(txt)+'</div>';
-  msgs.scrollTop=msgs.scrollHeight;
-  iaExtractLead(txt);
-  // Verificar FAQ
-  if(iaCfg.faq){const faq=iaFAQ(txt);if(faq){await new Promise(r=>setTimeout(r,iaCfg.respDelay));msgs.innerHTML+='<div class="ia-bubble ia">'+faq+'</div>';msgs.scrollTop=msgs.scrollHeight;return;}}
-  // Verificar agendamento
-  if(iaCfg.agendamento&&/agendar|consulta|marcar|horario|reuniao/.test(txt.toLowerCase())){
-    await new Promise(r=>setTimeout(r,iaCfg.respDelay));
-    const agBtn=document.createElement('div');
-    agBtn.className='ia-bubble ia';
-    const agBtnTxt=document.createElement('span');
-    agBtnTxt.innerHTML='&#128197; Que otimo! Vou encaminhar voce para o agendamento online.<br><br>';
-    const agBtnAg=document.createElement('button');
-    agBtnAg.className='btn bgold bsm';
-    agBtnAg.style.marginTop='4px';
-    agBtnAg.textContent='&#128197; Agendar agora';
-    agBtnAg.onclick=()=>go('s-type');
-    agBtn.appendChild(agBtnTxt);agBtn.appendChild(agBtnAg);
-    msgs.appendChild(agBtn);
-    msgs.scrollTop=msgs.scrollHeight;return;
-  }
-  // Verificar API Key do provedor ativo
-  const activeKey=iaActiveKey();
-  if(!activeKey){
-    const pLabel=iaProviderLabel(iaCfg.provider);
-    msgs.innerHTML+='<div class="ia-bubble ia">&#128561; A API Key do <strong>'+pLabel+'</strong> nao foi configurada. O administrador precisa inserir a chave na aba Assistente IA. Enquanto isso: <strong>(21) 96534-8183</strong></div>';
-    msgs.scrollTop=msgs.scrollHeight;return;
-  }
-  // Typing indicator
-  msgs.innerHTML+='<div class="ia-typing" id="ia-typ"><div class="ia-dot"></div><div class="ia-dot"></div><div class="ia-dot"></div></div>';
-  msgs.scrollTop=msgs.scrollHeight;
-  // Historico para contexto
-  const hist=[];
-  msgs.querySelectorAll('.ia-bubble').forEach(b=>{if(b.classList.contains('usr'))hist.push({role:'user',content:b.textContent});else if(!b.id&&!b.classList.contains('ia-typing'))hist.push({role:'assistant',content:b.textContent});});
-  hist.push({role:'user',content:txt});
-  // Chamar provedor ativo
-  try{
-    await new Promise(r=>setTimeout(r,iaCfg.respDelay));
-    const result=await iaCallAPI(hist.slice(-8));
-    document.getElementById('ia-typ')?.remove();
-    const resp=result.text||'Nao entendi. Pode reformular?';
-    msgs.innerHTML+='<div class="ia-bubble ia">'+esc(resp).replace(/\n/g,'<br>')+'</div>';
-    if(iaCfg.voz&&'speechSynthesis' in window){const u=new SpeechSynthesisUtterance(resp);u.lang='pt-BR';speechSynthesis.speak(u);}
-  }catch(e){
-    document.getElementById('ia-typ')?.remove();
-    msgs.innerHTML+='<div class="ia-bubble ia" style="color:#dc2626">&#9888; Erro ao chamar a IA ('+iaProviderLabel(iaCfg.provider)+'): '+esc(e.message)+'</div>';
-  }
-  msgs.scrollTop=msgs.scrollHeight;
-}
-
-function iaSuggest(txt){const inp=document.getElementById('ia-input');if(inp){inp.value=txt;iaSend();}}
-function iaClearChat(){iaHist=[];const msgs=document.getElementById('ia-msgs');if(msgs)msgs.innerHTML='<div class="ia-bubble ia">Chat reiniciado. Como posso ajudar?</div>';}
-function iaExportChat(){const msgs=document.getElementById('ia-msgs');if(!msgs)return;const txt=Array.from(msgs.querySelectorAll('.ia-bubble')).map(b=>(b.classList.contains('usr')?'CLIENTE: ':'IA: ')+b.textContent).join('\n\n');const a=document.createElement('a');a.href='data:text/plain;charset=utf-8,'+encodeURIComponent(txt);a.download='chat-ia-'+td0+'.txt';a.click();}
-function iaUploadDoc(){const inp=document.createElement('input');inp.type='file';inp.accept='.pdf,.doc,.docx,.jpg,.png';inp.onchange=e=>{const f=e.target.files[0];if(!f)return;const msgs=document.getElementById('ia-msgs');if(msgs){msgs.innerHTML+='<div class="ia-bubble usr">&#128196; Documento enviado: '+esc(f.name)+'</div><div class="ia-bubble ia">&#10003; Documento recebido! <strong>'+esc(f.name)+'</strong> sera analisado pelo Dr. Marcus Souza. Entraremos em contato em ate 24h. Deseja agendar uma consulta para discutir o documento?</div>';msgs.scrollTop=msgs.scrollHeight;}};inp.click();}
-let iaMicActive=false;
-function iaToggleMic(){
-  if(!('webkitSpeechRecognition' in window||'SpeechRecognition' in window)){alert('Seu browser nao suporta reconhecimento de voz.');return;}
-  const SR=window.SpeechRecognition||window.webkitSpeechRecognition;
-  const btn=document.getElementById('ia-mic-btn');
-  if(iaMicActive){iaMicActive=false;if(btn)btn.textContent='&#127908; Audio';return;}
-  iaMicActive=true;if(btn)btn.innerHTML='&#128308; Gravando...';
-  const rec=new SR();rec.lang='pt-BR';rec.continuous=false;rec.interimResults=false;
-  rec.onresult=e=>{const txt=e.results[0][0].transcript;const inp=document.getElementById('ia-input');if(inp){inp.value=txt;iaSend();}};
-  rec.onend=()=>{iaMicActive=false;if(btn)btn.textContent='&#127908; Audio';};
-  rec.start();
-}
 
 // ═══════════════════════════════════════════════════════════════════
 // EXPORT
@@ -3514,7 +2893,7 @@ function expICS(){
 document.addEventListener('DOMContentLoaded',()=>{
   const ls=document.getElementById('ls');
   if(ls){ls.classList.remove('on');ls.style.display='none';}
-  try{load();loadLog();iaLoadCfg();}catch(e){console.warn('load:',e);users=D_USERS;}
+  try{load();loadLog();}catch(e){console.warn('load:',e);users=D_USERS;}
   if(!users||!users.length)users=D_USERS;
   // sa_sess guarda o id do usuário (UUID string desde a migração para Supabase);
   // parseInt() cortava no primeiro caractere não numérico do UUID e nunca
