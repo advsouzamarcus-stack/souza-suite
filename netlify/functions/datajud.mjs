@@ -123,7 +123,7 @@ export default async (req) => {
 
   try {
     const ctrl = new AbortController();
-    const tid  = setTimeout(() => ctrl.abort(), 20000);
+    const tid  = setTimeout(() => ctrl.abort(), 35000);
 
     const resp = await fetch(`${DJ_BASE}${alias}/_search`, {
       method:  'POST',
@@ -165,7 +165,7 @@ export default async (req) => {
 
   } catch(e) {
     if (e.name === 'AbortError')
-      return err('Timeout: a API Datajud demorou mais de 20 segundos', 504);
+      return err('Timeout: a API Datajud demorou mais de 35 segundos', 504);
     console.error('[datajud]', e.message);
     return err('Erro interno: ' + e.message, 500);
   }

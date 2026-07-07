@@ -1399,11 +1399,25 @@ async function delProc(id){
 }
 function addProcToCalendar(id){const r=proc.find(p=>String(p.id)===String(id));if(!r||!r.prox)return;window.open(gcalUrl('⚖️ Movimentação: '+r.num.substring(0,20),r.prox,r.prox,'Processo: '+r.num+'\nCliente: '+cn(r.cliId)+'\nAdvogado: '+r.adv,r.vara),'_blank');}
 function searchProcNum(num,vara){
-  const t=vara.toLowerCase();let url;
-  if(t.includes('tjrj')||t.includes('vara')||t.includes('jec'))url='https://www3.tjrj.jus.br/consultaprocessual/#/consultapornumero?numProcesso='+encodeURIComponent(num);
-  else if(t.includes('trf'))url='https://portal.trf2.jus.br/portal/processo/consulta?numprocesso='+encodeURIComponent(num);
-  else if(t.includes('tst'))url='https://consultaprocessual.tst.jus.br/consultaProcessual/servlet/consulta?consulta=avancada&numeroInt='+encodeURIComponent(num);
-  else url='https://www.cnj.jus.br/pjecnj/ConsultaPublica/listView.seam?numero='+encodeURIComponent(num);
+  const trib=detectTribCNJ(num); // detecta pelo próprio número CNJ (confiável) — não pelo texto da vara
+  let url, deepLinked=true;
+  if(trib==='tjrj')      url='https://www3.tjrj.jus.br/consultaprocessual/#/consultapornumero?numProcesso='+encodeURIComponent(num);
+  else if(trib==='trf2') url='https://portal.trf2.jus.br/portal/processo/consulta?numprocesso='+encodeURIComponent(num);
+  else if(trib==='tst')  { url='https://consultaprocessual.tst.jus.br/'; deepLinked=false; }
+  else if(trib==='stj')  { url='https://processo.stj.jus.br/processo/pesquisa/'; deepLinked=false; }
+  else if(trib==='tse')  { url='https://www.tse.jus.br/servicos-eleitorais/processos-judiciais'; deepLinked=false; }
+  else if(trib==='stm')  { url='https://www.stm.jus.br/servicos-stm/processo-judicial'; deepLinked=false; }
+  else if(trib && /^trt\d+$/.test(trib)) { url=`https://pje.${trib}.jus.br/consultaprocessual/consulta-cidadao`; deepLinked=false; }
+  else if(trib && /^trf\d+$/.test(trib)) { url=`https://pje1g.${trib}.jus.br/pje/ConsultaPublica/listView.seam`; deepLinked=false; }
+  else if(trib && /^tj/.test(trib))      { url=`https://www.google.com/search?q=${encodeURIComponent('consulta processual '+trib.toUpperCase()+' '+num)}`; deepLinked=false; }
+  else { url='https://www.google.com/search?q='+encodeURIComponent('consulta processual '+num); deepLinked=false; }
+  // Quando não há link direto pelo número (a maioria dos tribunais fora TJRJ/TRF2
+  // não aceita o número via URL de forma confiável), copia o número para a área
+  // de transferência para colar na busca do próprio tribunal.
+  if(!deepLinked){
+    try{navigator.clipboard&&navigator.clipboard.writeText(num);}catch(e){}
+    alert('Número copiado: '+num+'\n\nEste tribunal não permite busca direta pelo link — cole o número na página que vai abrir.');
+  }
   window.open(url,'_blank');
 }
 
@@ -1789,7 +1803,7 @@ async function djFetch(alias, body) {
   for (const endpoint of endpoints) {
     try {
       const ctrl = new AbortController();
-      const tid  = setTimeout(() => ctrl.abort(), 25000);
+      const tid  = setTimeout(() => ctrl.abort(), 40000);
       const r = await fetch(endpoint, {
         method:  'POST',
         headers: { 'Content-Type': 'application/json' },
@@ -1998,7 +2012,7 @@ function renderBusca(){
         {ico:'⚡',n:'Datajud CNJ',d:'API Pública Nacional',u:'https://datajud-wiki.cnj.jus.br/api-publica/'},
         {ico:'⚖️',n:'TJRJ',d:'Tribunal de Justiça do RJ',u:'https://www3.tjrj.jus.br/consultaprocessual/'},
         {ico:'🏛️',n:'TRF2',d:'Tribunal Regional Federal 2ª',u:'https://portal.trf2.jus.br/portal/processo/consulta'},
-        {ico:'👷',n:'TRT1',d:'Trabalho — 1ª Região RJ',u:'https://consultaprocessual.tst.jus.br/'},
+        {ico:'👷',n:'TRT1',d:'Trabalho — 1ª Região RJ',u:'https://pje.trt1.jus.br/consultaprocessual/consulta-cidadao'},
         {ico:'📖',n:'STJ',d:'Superior Tribunal de Justiça',u:'https://processo.stj.jus.br/processo/pesquisa/'},
         {ico:'🇧🇷',n:'STF',d:'Supremo Tribunal Federal',u:'https://portal.stf.jus.br/processos/pesquisar.asp'},
         {ico:'📋',n:'PJe RJ',d:'Processo Judicial Eletrônico',u:'https://pje.tjrj.jus.br/consultapublica/'},
@@ -2077,11 +2091,15 @@ async function djBuscarNum(){
     const hits = (data && data.hits && data.hits.hits) || [];
 
     if(!hits.length){
+      const anoProc = parseInt(numClean.slice(9,13),10);
+      const anoAtual = new Date().getFullYear();
+      const recente = anoProc && (anoAtual - anoProc <= 0);
       res.innerHTML=`<div class="dj-err">
         <b>Processo não encontrado no Datajud.</b><br>
         Consultado: <code style="font-family:monospace">${numClean}</code> — Tribunal: <b>${tribKey.toUpperCase()}</b><br>
-        <span style="font-size:11px;opacity:.8">Possíveis causas: processo em segredo de justiça (nivelSigilo > 0),
-        tribunal incorreto, número divergente, ou dado ainda não indexado pelo CNJ.</span>
+        <span style="font-size:11px;opacity:.8">
+        ${recente?`<b>Causa mais provável:</b> processo distribuído em ${anoProc} — o CNJ costuma levar algumas semanas para indexar processos recém-distribuídos na base pública do Datajud. Tente novamente mais tarde, ou consulte diretamente no portal do tribunal.<br>`:''}
+        Outras causas possíveis: processo em segredo de justiça (nivelSigilo > 0), tribunal incorreto ou número divergente.</span>
       </div>`;
       return;
     }
