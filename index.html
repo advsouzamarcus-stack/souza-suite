@@ -574,7 +574,17 @@ tr:hover td{background:#f8fafc!important}
 <div class="mo-desk" id="m-cli"><div class="mbox">
   <h3>👤 <span id="m-cli-t">Novo Cliente</span></h3>
   <input type="hidden" id="cli-id">
-  <div class="frow"><div class="ff" style="flex:2"><div class="fl">Nome Completo *</div><input id="cli-nome" placeholder="Nome completo"></div><div class="ff"><div class="fl">Tipo</div><select id="cli-tipo"><option>Novo</option><option>Ativo</option><option>Inativo</option></select></div></div>
+  <div class="fg">
+    <div class="fl">Tipo de Pessoa</div>
+    <div style="display:flex;gap:8px">
+      <div class="ri on" id="ri-cli-pf" onclick="setCliPessoa('fisica')"><div class="rc"></div><span class="rt">Pessoa Física</span></div>
+      <div class="ri" id="ri-cli-pj" onclick="setCliPessoa('juridica')"><div class="rc"></div><span class="rt">Pessoa Jurídica</span></div>
+    </div>
+  </div>
+  <div class="frow"><div class="ff" style="flex:2"><div class="fl" id="cli-nome-lbl">Nome Completo *</div><input id="cli-nome" placeholder="Nome completo"></div><div class="ff"><div class="fl">Status</div><select id="cli-tipo"><option>Novo</option><option>Ativo</option><option>Inativo</option></select></div></div>
+  <div class="frow" id="cli-pj-row" style="display:none">
+    <div class="ff" style="flex:2"><div class="fl">Nome Fantasia</div><input id="cli-fantasia" placeholder="Nome fantasia"></div>
+  </div>
   <div class="frow"><div class="ff"><div class="fl">CPF / CNPJ</div><input id="cli-cpf" placeholder="000.000.000-00"></div><div class="ff"><div class="fl">Telefone (WhatsApp) *</div><input id="cli-tel" placeholder="(21) 99999-9999"></div><div class="ff"><div class="fl">E-mail</div><input type="email" id="cli-email" placeholder="email@exemplo.com"></div></div>
   <div class="frow"><div class="ff" style="flex:2"><div class="fl">Endereço</div><input id="cli-end" placeholder="Rua, Número – Cidade/Estado"></div></div>
   <div class="frow"><div class="ff"><div class="fl">Observações</div><textarea id="cli-obs" rows="2" style="resize:vertical"></textarea></div></div>
@@ -1282,9 +1292,10 @@ function renderCli(){
   const p=perm();
   let html=`<div class="fbar"><input id="cli-q" style="max-width:260px" placeholder="🔍 Buscar nome, CPF ou tipo..." value="${q}" oninput="renderCli()">${p.e?`<button class="btn bp" onclick="openCliModal()">+ Novo Cliente</button>`:''}<span style="font-size:11px;color:var(--mu)">${filt.length} registro(s)</span></div>
   <div class="card"><div class="tw"><table>
-    <thead><tr><th>Nome</th><th>CPF/CNPJ</th><th>Telefone</th><th>E-mail</th><th>Tipo</th><th>Observações</th><th>Comunicação</th>${p.e?'<th>Ações</th>':''}</tr></thead>
+<thead><tr><th>Nome</th><th>Pessoa</th><th>CPF/CNPJ</th><th>Telefone</th><th>E-mail</th><th>Tipo</th><th>Observações</th><th>Comunicação</th>${p.e?'<th>Ações</th>':''}</tr></thead>
     <tbody>${filt.map(c=>`<tr>
       <td style="font-weight:600;white-space:nowrap">${c.nome}</td>
+      <td>${c.pessoa==='juridica'?'<span class="badge bpu">PJ</span>':'<span class="badge b-req">PF</span>'}</td>
       <td class="mono">${c.cpf}</td>
       <td style="white-space:nowrap;font-size:12px">${c.tel}</td>
       <td style="color:#2563eb;font-size:11px">${c.email||'—'}</td>
@@ -1295,18 +1306,27 @@ function renderCli(){
     </tbody></table></div></div>`;
   document.getElementById('admin-cnt').innerHTML=html;
 }
+function setCliPessoa(p){
+  document.getElementById('ri-cli-pf').classList.toggle('on',p==='fisica');
+  document.getElementById('ri-cli-pj').classList.toggle('on',p==='juridica');
+  document.getElementById('cli-pj-row').style.display=p==='juridica'?'flex':'none';
+  document.getElementById('cli-nome-lbl').textContent=p==='juridica'?'Razão Social *':'Nome Completo *';
+  document.getElementById('cli-id').dataset.pessoa=p;
+}
 function openCliModal(id){
   document.getElementById('cli-id').value=id||'';
   document.getElementById('m-cli-t').textContent=id?'Editar Cliente':'Novo Cliente';
-  if(id){const c=cli.find(x=>String(x.id)===String(id));['nome','cpf','tel','email','end','obs'].forEach(f=>document.getElementById('cli-'+f).value=c[f]||'');document.getElementById('cli-tipo').value=c.tipo;}
-  else{['nome','cpf','tel','email','end','obs'].forEach(f=>document.getElementById('cli-'+f).value='');document.getElementById('cli-tipo').value='Novo';}
+  if(id){const c=cli.find(x=>String(x.id)===String(id));['nome','cpf','tel','email','end','obs','fantasia'].forEach(f=>document.getElementById('cli-'+f).value=c[f]||'');document.getElementById('cli-tipo').value=c.tipo;setCliPessoa(c.pessoa||'fisica');}
+  else{['nome','cpf','tel','email','end','obs','fantasia'].forEach(f=>document.getElementById('cli-'+f).value='');document.getElementById('cli-tipo').value='Novo';setCliPessoa('fisica');}
   openMo('m-cli');
 }
 const editCli=id=>openCliModal(id);
 function saveCli(){
-  const nome=document.getElementById('cli-nome').value.trim();if(!nome)return alert('Informe o nome.');
+  const pessoa=document.getElementById('cli-id').dataset.pessoa||'fisica';
+  const nome=document.getElementById('cli-nome').value.trim();
+  if(!nome)return alert(pessoa==='juridica'?'Informe a razão social.':'Informe o nome.');
   const id=document.getElementById('cli-id').value;
-  const o={nome,cpf:document.getElementById('cli-cpf').value.trim(),tel:document.getElementById('cli-tel').value.replace(/\D/g,''),email:document.getElementById('cli-email').value.trim(),end:document.getElementById('cli-end').value.trim(),tipo:document.getElementById('cli-tipo').value,obs:document.getElementById('cli-obs').value.trim()};
+  const o={nome,pessoa,fantasia:document.getElementById('cli-fantasia').value.trim(),cpf:document.getElementById('cli-cpf').value.trim(),tel:document.getElementById('cli-tel').value.replace(/\D/g,''),email:document.getElementById('cli-email').value.trim(),end:document.getElementById('cli-end').value.trim(),tipo:document.getElementById('cli-tipo').value,obs:document.getElementById('cli-obs').value.trim()};
   if(id){const idx=cli.findIndex(c=>String(c.id)===String(id));if(idx>=0)cli.splice(idx,1,{...o,id});else cli.push({...o,id});}else cli.push({...o,id:gid2()});
   save();closeMo('m-cli');renderCli();
   pushToServer().catch(()=>{});
