@@ -603,6 +603,36 @@ tr:hover td{background:#f8fafc!important}
   <div class="mfoot"><button class="btn bp" onclick="saveProc()">💾 Salvar</button><button class="btn bgh" onclick="closeMo('m-proc')">Cancelar</button></div>
 </div></div>
 
+<!-- Modal: Partes do Processo -->
+<div class="mo-desk" id="m-partes"><div class="mbox">
+  <h3>👥 Partes do Processo</h3>
+  <input type="hidden" id="partes-proc-id">
+  <div id="partes-proc-info" style="font-size:11px;color:var(--mu);margin-bottom:10px"></div>
+  <div id="partes-lista" style="margin-bottom:14px"></div>
+  <div class="divider"></div>
+  <div class="stit">Adicionar Parte</div>
+  <div class="frow">
+    <div class="ff" style="flex:2"><div class="fl">Cliente/Entidade</div><select id="pt-cli"></select></div>
+    <div class="ff"><div class="fl">Polo</div><select id="pt-polo">
+      <option value="ativo">Ativo</option>
+      <option value="passivo">Passivo</option>
+      <option value="terceiro_interessado">Terceiro Interessado</option>
+      <option value="assistente">Assistente</option>
+    </select></div>
+  </div>
+  <div class="frow">
+    <div class="ff"><div class="fl">Papel</div><select id="pt-papel">
+      <option value="cliente">Cliente</option>
+      <option value="parte_contraria">Parte Contrária</option>
+      <option value="testemunha">Testemunha</option>
+      <option value="perito">Perito</option>
+      <option value="outro">Outro</option>
+    </select></div>
+    <div class="ff" style="flex:2"><div class="fl">Advogado da Parte (se souber)</div><input id="pt-adv" placeholder="Nome do advogado externo"></div>
+  </div>
+  <div class="mfoot"><button class="btn bp" onclick="addParte()">+ Adicionar</button><button class="btn bgh" onclick="closeMo('m-partes')">Fechar</button></div>
+</div></div>
+
 <!-- Modal: Tarefa -->
 <div class="mo-desk" id="m-tar"><div class="mbox">
   <h3>✅ <span id="m-tar-t">Nova Tarefa</span></h3>
@@ -733,7 +763,7 @@ const esc=s=>String(s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>
 // ═══════════════════════════════════════════════════════════════════
 // VARIÁVEIS DE ESTADO — declaradas antes de qualquer referência
 // ═══════════════════════════════════════════════════════════════════
-let currentUser=null,users=[],cli=[],proc=[],tar=[],fin=[];
+let currentUser=null,users=[],cli=[],proc=[],tar=[],fin=[],partes=[];
 const cn=id=>(cli.find(c=>String(c.id)===String(id))||{}).nome||'—';
 
 // ═══════════════════════════════════════════════════════════════════
@@ -838,7 +868,7 @@ function save(){
   const el=document.getElementById('sbadge');
   if(el)el.textContent='💾 Salvando...';
   saveT=setTimeout(()=>{
-    const _sd={users,cli,proc,tar,fin};['users','cli','proc','tar','fin'].forEach(k=>localStorage.setItem('sa_'+k,JSON.stringify(_sd[k])));
+    const _sd={users,cli,proc,tar,fin,partes};['users','cli','proc','tar','fin','partes'].forEach(k=>localStorage.setItem('sa_'+k,JSON.stringify(_sd[k])));
     // Push para servidor (sem bloquear a UI)
     if(SA_JWT) pushToServer().catch(()=>{});
     if(el)el.textContent='✅ Salvo às '+new Date().toLocaleTimeString('pt-BR',{hour:'2-digit',minute:'2-digit'});
@@ -859,8 +889,8 @@ function saveBk(){
 }
 function saveGc(){localStorage.setItem('ms_gcal',JSON.stringify(gcfg));}
 function load(){
-  const _ld={users:D_USERS,cli:D_CLI,proc:D_PROC,tar:D_TAR,fin:D_FIN};
-  ['users','cli','proc','tar','fin'].forEach(k=>{
+  const _ld={users:D_USERS,cli:D_CLI,proc:D_PROC,tar:D_TAR,fin:D_FIN,partes:[]};
+  ['users','cli','proc','tar','fin','partes'].forEach(k=>{
     const d=localStorage.getItem('sa_'+k);
     try{_ld[k]=d?JSON.parse(d):_ld[k];}catch(e){console.warn('load err',k,e);}
   });
@@ -868,7 +898,7 @@ function load(){
   const adminOk=savedU.some(u=>u.email==='marcus@souzaadv.com'&&u.ativo);
   users=adminOk?savedU:D_USERS;
   if(!adminOk){localStorage.removeItem('sa_users');localStorage.removeItem('sa_sess');}
-  cli=_ld.cli||D_CLI; proc=_ld.proc||D_PROC; tar=_ld.tar||D_TAR; fin=_ld.fin||D_FIN;
+  cli=_ld.cli||D_CLI; proc=_ld.proc||D_PROC; tar=_ld.tar||D_TAR; fin=_ld.fin||D_FIN; partes=_ld.partes||[];
   bk=JSON.parse(localStorage.getItem('ms_bookings')||'[]');
   const gc=localStorage.getItem('ms_gcal');if(gc)gcfg=JSON.parse(gc);
   // seedBk() NÃO é mais chamado automaticamente aqui. Antes, toda vez que
@@ -1071,6 +1101,7 @@ async function syncFromServer() {
     if (Array.isArray(d.data.agendamentos)) { bk = dropPending(d.data.agendamentos); localStorage.setItem('ms_bookings', JSON.stringify(bk)); changed=true; }
     if (Array.isArray(d.data.tarefas))      { tar   = dropPending(d.data.tarefas);      localStorage.setItem('sa_tar',      JSON.stringify(tar));   changed=true; }
     if (Array.isArray(d.data.financeiro))   { fin   = dropPending(d.data.financeiro);   localStorage.setItem('sa_fin',      JSON.stringify(fin));   changed=true; }
+    if (Array.isArray(d.data.partes))       { partes= dropPending(d.data.partes);       localStorage.setItem('sa_partes',   JSON.stringify(partes));changed=true; }
     if (Array.isArray(d.data.usuarios)      && d.data.usuarios.length)     { users = d.data.usuarios;     localStorage.setItem('sa_users',    JSON.stringify(users)); }
     if (Array.isArray(d.data.logs)) {
       // Combina o log do servidor (todos os aparelhos) com qualquer entrada
@@ -1136,6 +1167,7 @@ async function pushToServer() {
         agendamentos: bk   || [],
         tarefas:      tar  || [],
         financeiro:   fin  || [],
+        partes:       partes || [],
       }
     };
     const r = await fetch('/api/sync', {
@@ -1383,6 +1415,7 @@ function renderProc(){
       <td style="font-size:11px;white-space:nowrap">${r.adv}</td>
       <td class="eli" style="font-size:11px;color:var(--mu)">${r.obs||'—'}</td>
       <td><div style="display:flex;gap:3px">
+        <button class="btn bp xs" onclick="openPartesModal('${r.id}')" title="Partes do processo">👥</button>
         ${r.prox?`<button class="btn bca xs" onclick="addProcToCalendar('${r.id}')">📅</button>`:''}
         <button class="btn bsa xs" onclick="searchProcNum('${r.num}','${r.vara}')">🔍</button>
         ${p.e?`<button class="btn bgh xs" onclick="editProc('${r.id}')">✏️</button>`:''}
@@ -1401,6 +1434,45 @@ function openProcModal(id){
   openMo('m-proc');
 }
 const editProc=id=>openProcModal(id);
+
+const POLO_LBL={ativo:'Ativo',passivo:'Passivo',terceiro_interessado:'Terceiro Interessado',assistente:'Assistente'};
+const PAPEL_LBL={cliente:'Cliente',parte_contraria:'Parte Contrária',testemunha:'Testemunha',perito:'Perito',outro:'Outro'};
+function openPartesModal(procId){
+  document.getElementById('partes-proc-id').value=procId;
+  const p=proc.find(x=>String(x.id)===String(procId));
+  document.getElementById('partes-proc-info').innerHTML=`<strong>${p?p.num:''}</strong> — Cliente principal: ${cn(p?.cliId)}`;
+  buildCliSelect('pt-cli','');
+  document.getElementById('pt-adv').value='';
+  renderPartesLista();
+  openMo('m-partes');
+}
+function renderPartesLista(){
+  const procId=document.getElementById('partes-proc-id').value;
+  const lst=partes.filter(pt=>String(pt.procId)===String(procId));
+  document.getElementById('partes-lista').innerHTML = lst.length
+    ? lst.map(pt=>`<div style="display:flex;align-items:center;gap:8px;padding:7px 0;border-bottom:1px solid var(--bd);font-size:12px">
+        <span style="flex:1"><strong>${cn(pt.cliId)}</strong> — ${PAPEL_LBL[pt.papel]||pt.papel} <span class="badge bb">${POLO_LBL[pt.polo]||pt.polo}</span>${pt.advExterno?` · Adv: ${esc(pt.advExterno)}`:''}</span>
+        <button class="btn bd_ xs" onclick="delParte('${pt.id}')">🗑️</button>
+      </div>`).join('')
+    : `<div style="color:var(--mu);font-size:11px;padding:8px 0">Nenhuma parte adicional cadastrada.</div>`;
+}
+function addParte(){
+  const procId=document.getElementById('partes-proc-id').value;
+  const cliId=document.getElementById('pt-cli').value;
+  if(!cliId)return alert('Selecione o cliente/entidade.');
+  const o={procId,cliId,polo:document.getElementById('pt-polo').value,papel:document.getElementById('pt-papel').value,advExterno:document.getElementById('pt-adv').value.trim()};
+  partes.push({...o,id:gid2()});
+  save();renderPartesLista();
+  pushToServer().catch(()=>{});
+  document.getElementById('pt-adv').value='';
+}
+async function delParte(id){
+  if(!confirm('Remover esta parte do processo?'))return;
+  partes=partes.filter(pt=>String(pt.id)!==String(id));
+  localStorage.setItem('sa_partes',JSON.stringify(partes));
+  renderPartesLista();
+  await delServerRecord('partes',id);
+}
 function saveProc(){
   const num=document.getElementById('proc-num').value.trim();if(!num)return alert('Informe o número do processo.');
   const cliId=document.getElementById('proc-cli').value;if(!cliId)return alert('Selecione o cliente.');
