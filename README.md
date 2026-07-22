@@ -7,14 +7,10 @@ OAB/RJ 250.430 · OAB/RJ 160.689 — Rio de Janeiro/RJ
 
 **[https://advsouzamarcus-stack.github.io/souza-suite/](https://advsouzamarcus-stack.github.io/souza-suite/)**
 
-## Credenciais
+## Acesso
 
-| Usuário | E-mail | Senha |
-|---|---|---|
-| Dr. Marcus Vinicius Souza | marcus@souzaadv.com | Admin@2025 |
-| Dr. Luiz Fabiano R. de Souza | luiz@souzaadv.com | Luiz@2025 |
-| Edvania Souza | edvania@souzaadv.com | 07122015 |
-| Gleison Barbosa | Gleison@souzaadv.com | G123456 |
+As credenciais de login não ficam mais neste README por motivo de segurança.
+Cada usuário deve solicitar acesso ao administrador do sistema (Dr. Marcus).
 
 ## Funcionalidades
 
