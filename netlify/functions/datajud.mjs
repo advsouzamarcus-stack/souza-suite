@@ -103,7 +103,7 @@ async function buscarEmTribunal(tribKey, queryDSL, size) {
   const payload = { size: Math.min(size, 20), query: queryDSL };
   try {
     const ctrl = new AbortController();
-    const tid = setTimeout(() => ctrl.abort(), 6000);
+    const tid = setTimeout(() => ctrl.abort(), 9000);
     const resp = await fetch(`${DJ_BASE}${alias}/_search`, {
       method: 'POST',
       headers: { 'Authorization': `APIKey ${DJ_KEY}`, 'Content-Type': 'application/json' },
@@ -121,13 +121,15 @@ async function buscarEmTribunal(tribKey, queryDSL, size) {
   }
 }
 
-async function jurimetriaSearch(segmento, queryDSL, sizePerTribunal) {
-  const tribunais = tribunaisDoSegmento(segmento);
-  if (!tribunais.length) return err(`Segmento desconhecido: ${segmento}`);
+async function jurimetriaSearch(segmento, queryDSL, sizePerTribunal, tribunaisExplicitos) {
+  const tribunais = (Array.isArray(tribunaisExplicitos) && tribunaisExplicitos.length)
+    ? tribunaisExplicitos.filter(t => DJ_EP[t])
+    : tribunaisDoSegmento(segmento);
+  if (!tribunais.length) return err(`Segmento desconhecido ou lista de tribunais vazia: ${segmento}`);
 
   // Pool com concorrencia limitada — o Datajud parece throttlar/derrubar
   // conexoes quando muitas chegam ao mesmo tempo com a mesma API key.
-  const CONCORRENCIA = 8;
+  const CONCORRENCIA = 4;
   const resultados = [];
   let cursor = 0;
   async function worker() {
@@ -160,11 +162,11 @@ export default async (req) => {
   try { body = await req.json(); }
   catch { return err('JSON inválido'); }
 
-  const { tribunal, numeroProcesso, query, size = 10, searchAfter, segmento } = body;
+  const { tribunal, numeroProcesso, query, size = 10, searchAfter, segmento, tribunais } = body;
 
-  if (segmento) {
+  if (segmento || (Array.isArray(tribunais) && tribunais.length)) {
     if (!query) return err('Informe query (classe, assunto, orgaoJulgador etc.) para busca por segmento.');
-    return await jurimetriaSearch(segmento, query, size);
+    return await jurimetriaSearch(segmento, query, size, tribunais);
   }
 
   // Determinar o tribunal
