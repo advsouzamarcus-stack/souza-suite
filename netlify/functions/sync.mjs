@@ -207,6 +207,37 @@ function supaToContrato(r) {
   };
 }
 
+// LEAD: {id, nome, tel, email, origem, stage, resumo, convertidoClienteId}
+// → leads: {id, name, phone, email, source, stage, summary, converted_client_id}
+async function leadToSupa(l) {
+  if(!l.id || !l.nome) return null;
+  return {
+    id:                  await uid(l.id, 'leads'),
+    name:                l.nome || '',
+    phone:               l.tel  || '',
+    email:               l.email|| '',
+    source:              l.origem || '',
+    stage:               l.stage || 'novo',
+    summary:             l.resumo || '',
+    converted_client_id: l.convertidoClienteId ? await uid(l.convertidoClienteId, 'clients') : null,
+    created_at:          l.criadoEm || new Date().toISOString(),
+    updated_at:          new Date().toISOString(),
+  };
+}
+function supaToLead(r) {
+  return {
+    id:                  r.id,
+    nome:                r.name    || '',
+    tel:                 r.phone   || '',
+    email:               r.email   || '',
+    origem:              r.source  || '',
+    stage:               r.stage   || 'novo',
+    resumo:              r.summary || '',
+    convertidoClienteId: r.converted_client_id || null,
+    criadoEm:            r.created_at || '',
+  };
+}
+
 async function bkToSupa(b) {
         if(!b.id) return null;
         const dateStr = b.data && b.hora ? `${b.data}T${b.hora}:00` : (b.data || new Date().toISOString().slice(0,10));
@@ -356,7 +387,7 @@ export default async (req) => {
 
         if(req.method === 'GET' || action === 'pull') {
                   try {
-                              const [clients, cases, appointments, tasks, financial, usrs, logs, parties, contracts] = await Promise.all([
+                              const [clients, cases, appointments, tasks, financial, usrs, logs, parties, contracts, leadRows] = await Promise.all([
                                             supa('clients?order=created_at.desc&limit=500'),
                                             supa('cases?order=created_at.desc&limit=500'),
                                             supa('appointments?order=starts_at.asc&limit=500'),
@@ -366,6 +397,7 @@ export default async (req) => {
                                             supa('access_log?order=created_at.desc&limit=300'),
                                             supa('case_parties?order=created_at.desc&limit=1000'),
     supa('contracts?order=created_at.desc&limit=500'),
+    supa('leads?order=created_at.desc&limit=500'),
                                           ]);
                               return ok({
                                             ok: true,
@@ -380,6 +412,7 @@ export default async (req) => {
                                                             logs:         logs.map(supaToLog),
                                                             partes:       parties.map(supaToParte),
           contratos:    contracts.map(supaToContrato),
+          leads:        leadRows.map(supaToLead),
                                             }
                               });
                   } catch(e) {
@@ -404,6 +437,7 @@ export default async (req) => {
                 { key:'financeiro',   table:'financial_records', fn: finToSupa  },
                 { key:'partes',       table:'case_parties',      fn: partToSupa },
       { key:'contratos',   table:'contracts',         fn: contratoToSupa },
+      { key:'leads',       table:'leads',              fn: leadToSupa },
                     ];
 
           for(const {key, table, fn} of MAPS) {
@@ -439,7 +473,7 @@ export default async (req) => {
                   try { body = await req.json(); } catch { return err('JSON inválido'); }
                   const TABLE_BY_KEY = {
                               clientes: 'clients', processos: 'cases', agendamentos: 'appointments',
-                              tarefas: 'tasks', financeiro: 'financial_records', partes: 'case_parties', contratos: 'contracts',
+                              tarefas: 'tasks', financeiro: 'financial_records', partes: 'case_parties', contratos: 'contracts', leads: 'leads',
                   };
                   const table = TABLE_BY_KEY[body.key] || body.table;
                   const rawId = body.id;
