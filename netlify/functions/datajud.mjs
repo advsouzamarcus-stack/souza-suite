@@ -82,6 +82,71 @@ const CORS = {
 const ok  = d => new Response(JSON.stringify(d), { headers: CORS });
 const err = (m,s=400) => new Response(JSON.stringify({error:m}), {status:s,headers:CORS});
 
+// ═══ JURIMETRIA — busca em todos os tribunais de um segmento ═══
+const SEGMENTOS = {
+  estadual:    k => /^tj/.test(k) && !/^tjm/.test(k),
+  trabalhista: k => /^trt/.test(k) || k === 'tst',
+  federal:     k => /^trf/.test(k),
+  eleitoral:   k => /^tre/.test(k) || k === 'tse',
+  militar:     k => /^tjm/.test(k) || k === 'stm',
+  superior:    k => k === 'stj',
+};
+function tribunaisDoSegmento(segmento) {
+  if (segmento === 'todos') return Object.keys(DJ_EP);
+  const test = SEGMENTOS[segmento];
+  if (!test) return [];
+  return Object.keys(DJ_EP).filter(test);
+}
+
+async function buscarEmTribunal(tribKey, queryDSL, size) {
+  const alias = DJ_EP[tribKey];
+  const payload = { size: Math.min(size, 20), query: queryDSL };
+  try {
+    const ctrl = new AbortController();
+    const tid = setTimeout(() => ctrl.abort(), 12000);
+    const resp = await fetch(`${DJ_BASE}${alias}/_search`, {
+      method: 'POST',
+      headers: { 'Authorization': `APIKey ${DJ_KEY}`, 'Content-Type': 'application/json' },
+      body: JSON.stringify(payload),
+      signal: ctrl.signal,
+    });
+    clearTimeout(tid);
+    if (!resp.ok) return { tribunal: tribKey.toUpperCase(), total: 0, hits: [], erro: `HTTP ${resp.status}` };
+    const data = await resp.json();
+    const hits = (data.hits && data.hits.hits) || [];
+    const total = (data.hits && data.hits.total && data.hits.total.value) || hits.length;
+    return { tribunal: tribKey.toUpperCase(), total, hits: hits.map(h => h._source) };
+  } catch (e) {
+    return { tribunal: tribKey.toUpperCase(), total: 0, hits: [], erro: e.name === 'AbortError' ? 'timeout' : e.message };
+  }
+}
+
+async function jurimetriaSearch(segmento, queryDSL, sizePerTribunal) {
+  const tribunais = tribunaisDoSegmento(segmento);
+  if (!tribunais.length) return err(`Segmento desconhecido: ${segmento}`);
+
+  const LOTE = 10;
+  const resultados = [];
+  for (let i = 0; i < tribunais.length; i += LOTE) {
+    const lote = tribunais.slice(i, i + LOTE);
+    const r = await Promise.all(lote.map(t => buscarEmTribunal(t, queryDSL, sizePerTribunal)));
+    resultados.push(...r);
+  }
+
+  const comErro = resultados.filter(r => r.erro);
+  const semErro = resultados.filter(r => !r.erro && r.total > 0).sort((a,b) => b.total - a.total);
+  const totalGeral = semErro.reduce((s,r) => s + r.total, 0);
+
+  return ok({
+    ok: true,
+    segmento,
+    tribunaisConsultados: tribunais.length,
+    tribunaisComErro: comErro.map(r => ({ tribunal: r.tribunal, erro: r.erro })),
+    totalGeral,
+    porTribunal: semErro,
+  });
+}
+
 export default async (req) => {
   if (req.method === 'OPTIONS') return new Response(null,{status:204,headers:CORS});
   if (req.method !== 'POST') return err('Use POST',405);
@@ -90,7 +155,12 @@ export default async (req) => {
   try { body = await req.json(); }
   catch { return err('JSON inválido'); }
 
-  const { tribunal, numeroProcesso, query, size = 10, searchAfter } = body;
+  const { tribunal, numeroProcesso, query, size = 10, searchAfter, segmento } = body;
+
+  if (segmento) {
+    if (!query) return err('Informe query (classe, assunto, orgaoJulgador etc.) para busca por segmento.');
+    return await jurimetriaSearch(segmento, query, size);
+  }
 
   // Determinar o tribunal
   let tribKey = tribunal?.toLowerCase();
