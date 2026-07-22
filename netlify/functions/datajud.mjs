@@ -51,29 +51,27 @@ function detectTribunal(num) {
   const tt  = d.substring(14,16);
   const MAP = {
     '8': {'01':'tjac','02':'tjal','03':'tjam','04':'tjap','05':'tjba','06':'tjce',
-           '07':'tjdft','08':'tjes','09':'tjgo','10':'tjma','11':'tjmt','12':'tjms',
-           '13':'tjmg','14':'tjpa','15':'tjpb','16':'tjpr','17':'tjpe','18':'tjpi',
-           '19':'tjrj','20':'tjrn','21':'tjrs','22':'tjro','23':'tjrr','24':'tjsc',
-           '25':'tjse','26':'tjsp','27':'tjto'},
-    '9': {'01':'trt1','02':'trt2','03':'trt3','04':'trt4','05':'trt5','06':'trt6',
-           '07':'trt7','08':'trt8','09':'trt9','10':'trt10','11':'trt11','12':'trt12',
-           '13':'trt13','14':'trt14','15':'trt15','16':'trt16','17':'trt17','18':'trt18',
-           '19':'trt19','20':'trt20','21':'trt21','22':'trt22','23':'trt23','24':'trt24',
-           '00':'tst'},
+          '07':'tjdft','08':'tjes','09':'tjgo','10':'tjma','11':'tjmt','12':'tjms',
+          '13':'tjmg','14':'tjpa','15':'tjpb','16':'tjpr','17':'tjpe','18':'tjpi',
+          '19':'tjrj','20':'tjrn','21':'tjrs','22':'tjro','23':'tjrr','24':'tjsc',
+          '25':'tjse','26':'tjsp','27':'tjto'},
+    '5': {'01':'trt1','02':'trt2','03':'trt3','04':'trt4','05':'trt5','06':'trt6',
+          '07':'trt7','08':'trt8','09':'trt9','10':'trt10','11':'trt11','12':'trt12',
+          '13':'trt13','14':'trt14','15':'trt15','16':'trt16','17':'trt17','18':'trt18',
+          '19':'trt19','20':'trt20','21':'trt21','22':'trt22','23':'trt23','24':'trt24',
+          '00':'tst'},
     '4': {'01':'trf1','02':'trf2','03':'trf3','04':'trf4','05':'trf5','06':'trf6'},
-    '3': {'00':'stj'}, '2': {'00':'tse'}, '6': {'00':'stm'},
+    '3': {'00':'stj'},
+    '6': {'01':'treac','02':'treal','03':'tream','04':'treap','05':'treba','06':'trece',
+          '07':'tredft','08':'trees','09':'trego','10':'trema','11':'tremt','12':'trems',
+          '13':'tremg','14':'trepa','15':'trepb','16':'trepr','17':'trepe','18':'trepi',
+          '19':'trerj','20':'trern','21':'trers','22':'trero','23':'trerr','24':'tresc',
+          '25':'trese','26':'tresp','27':'treto','00':'tse'},
+    '7': {'00':'stm'},
+    '9': {'13':'tjmmg','21':'tjmrs','26':'tjmsp'},
   };
   return (MAP[seg] && MAP[seg][tt]) || null;
 }
-
-const CORS = {
-  'Content-Type': 'application/json',
-  'Access-Control-Allow-Origin': '*',
-  'Access-Control-Allow-Methods': 'POST,OPTIONS',
-  'Access-Control-Allow-Headers': 'Content-Type,Authorization',
-};
-const ok  = d => new Response(JSON.stringify(d), { headers: CORS });
-const err = (m,s=400) => new Response(JSON.stringify({error:m}), {status:s,headers:CORS});
 
 export default async (req) => {
   if (req.method === 'OPTIONS') return new Response(null,{status:204,headers:CORS});
