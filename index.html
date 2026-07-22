@@ -1963,7 +1963,7 @@ function renderJurimetria(){
   html+='<option value="superior">Superior (STJ)</option>';
   html+='<option value="todos">Todos os Segmentos (87 tribunais)</option>';
   html+='</select></div>';
-  html+='<div class="ff" style="flex:2"><div class="fl">Classe / Assunto (palavra-chave)</div><input id="jur-classe" placeholder="Ex: Acao Trabalhista, Cobranca, Divorcio..."></div>';
+  html+='<div class="ff" style="flex:2"><div class="fl">Classe / Assunto (palavra-chave)</div><input id="jur-classe" placeholder="Ex: Acao Trabalhista, Cobranca, Divorcio..."></div><div class="ff"><div class="fl">Instância</div><select id="jur-instancia"><option value="g1">1ª Instância</option><option value="g2">2ª Instância</option><option value="sup">Superior</option><option value="todas">Todas</option></select></div>';
   html+='<div class="ff"><div class="fl">Resultados por tribunal</div><input type="number" id="jur-size" value="5" min="1" max="20"></div>';
   html+='</div>';
   html+='<div class="mfoot" style="justify-content:flex-start"><button class="btn bp" id="jur-btn" onclick="buscarJurimetria()">🔍 Buscar em todos os tribunais</button></div>';
@@ -1992,7 +1992,12 @@ async function buscarJurimetria(){
   progWrap.style.display='block'; progBar.style.width='0%';
   out.innerHTML='';
 
-  const query = classe ? {multi_match:{query:classe,fields:['classe.nome','assuntos.nome']}} : {match_all:{}};
+  const instancia=document.getElementById('jur-instancia').value;
+  const grauMap={g1:'G1',g2:'G2',sup:'SUP'};
+  let query = classe ? {multi_match:{query:classe,fields:['classe.nome','assuntos.nome']}} : {match_all:{}};
+  if(instancia!=='todas' && grauMap[instancia]){
+    query = {bool:{must:[query],filter:[{term:{grau:grauMap[instancia]}}]}};
+  }
 
   let porTribunal=[];
   let tribunaisComErro=[];
@@ -2032,7 +2037,7 @@ function renderJurimetriaResultados(porTribunal,tribunaisComErro,totalTribunais)
   let html='<div class="krow">';
   ordenado.slice(0,10).forEach(function(t){ html+=kc('#eff6ff',t.total.toLocaleString('pt-BR'),'#2563eb',t.tribunal); });
   html+='</div>';
-  html+='<div class="card"><div class="tw"><table><thead><tr><th>Tribunal</th><th>Forum</th><th>Nº Processo</th><th>Data de Entrada</th><th>Classe</th><th>Resultado</th></tr></thead><tbody>';
+  html+='<div class="card"><div class="tw"><table><thead><tr><th>Tribunal</th><th>Forum</th><th>Nº Processo</th><th>Data de Entrada</th><th>Classe</th><th>Assunto</th><th>Resultado</th></tr></thead><tbody>';
   ordenado.forEach(function(t){
     (t.hits||[]).forEach(function(h){
       html+='<tr>';
@@ -2041,6 +2046,7 @@ function renderJurimetriaResultados(porTribunal,tribunaisComErro,totalTribunais)
       html+='<td class="mono">'+djFmtNum(h.numeroProcesso)+'</td>';
       html+='<td>'+djFmtData(h.dataAjuizamento)+'</td>';
       html+='<td>'+((h.classe&&h.classe.nome)||'—')+'</td>';
+      html+='<td>'+((h.assuntos&&h.assuntos.length)?h.assuntos.slice(0,2).map(function(a){return a.nome;}).join('; '):'—')+'</td>';
       html+='<td>'+djResultado(h.movimentos)+'</td>';
       html+='</tr>';
     });
