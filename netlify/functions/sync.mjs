@@ -171,6 +171,42 @@ function supaToParte(r) {
         };
 }
 
+// CONTRATO: {id, cliId, procId, tipo, valorFixo, percExito, valorHora, valorMensal, escopo, status, dataInicio, dataFim}
+// → contracts: {id, client_id, case_id, contract_type, fixed_value, success_fee_percent, hourly_rate, monthly_value, scope_description, status, start_date, end_date}
+async function contratoToSupa(c) {
+  if(!c.id || !c.cliId) return null;
+  return {
+    id:                   await uid(c.id, 'contracts'),
+    client_id:            await uid(c.cliId, 'clients'),
+    case_id:              c.procId ? await uid(c.procId, 'cases') : null,
+    contract_type:        c.tipo || 'fixo',
+    fixed_value:          c.valorFixo || null,
+    success_fee_percent:  c.percExito || null,
+    hourly_rate:          c.valorHora || null,
+    monthly_value:        c.valorMensal || null,
+    scope_description:    c.escopo || '',
+    status:                c.status || 'vigente',
+    start_date:            c.dataInicio || new Date().toISOString().slice(0,10),
+    end_date:              c.dataFim || null,
+  };
+}
+function supaToContrato(r) {
+  return {
+    id:         r.id,
+    cliId:      r.client_id,
+    procId:     r.case_id,
+    tipo:       r.contract_type || 'fixo',
+    valorFixo:  r.fixed_value,
+    percExito:  r.success_fee_percent,
+    valorHora:  r.hourly_rate,
+    valorMensal:r.monthly_value,
+    escopo:     r.scope_description || '',
+    status:     r.status || 'vigente',
+    dataInicio: r.start_date,
+    dataFim:    r.end_date,
+  };
+}
+
 async function bkToSupa(b) {
         if(!b.id) return null;
         const dateStr = b.data && b.hora ? `${b.data}T${b.hora}:00` : (b.data || new Date().toISOString().slice(0,10));
@@ -283,6 +319,7 @@ async function finToSupa(f) {
                   description: f.desc || '',
                   amount:      parseFloat(f.ct || f.valor || 0),
                   amount_received: parseFloat(f.rc || 0),
+    contract_id: f.contratoId ? await uid(f.contratoId, 'contracts') : null,
                   kind:        ({'PIX':'receita','Transferência':'receita','TED':'receita','Crédito':'receita','Débito':'receita','Dinheiro':'receita','Boleto':'receita','Cartão':'receita','Honorários':'receita','Despesa':'despesa','despesa':'despesa','receita':'receita'}[f.pg]||'receita'),
                   status:      ({'Pago':'pago','Parcial':'pago','Pendente':'pendente','Cancelado':'cancelado','Atrasado':'atrasado','pago':'pago','pendente':'pendente','atrasado':'atrasado'}[f.st]||'pendente'),
                   due_at:      (f.data || new Date().toISOString()).slice(0,10),
@@ -299,6 +336,7 @@ function supaToFin(r) {
                   ct:    r.amount      || 0,
                   rc:    r.amount_received || 0,
                   pg:    r.kind        || 'PIX',
+    contratoId: r.contract_id || null,
                   st:    ({'pago':'Pago','pendente':'Pendente','atrasado':'Atrasado','cancelado':'Cancelado'}[r.status] || 'Pendente'),
                   data:  (r.due_at||'').slice(0,10),
         };
@@ -318,7 +356,7 @@ export default async (req) => {
 
         if(req.method === 'GET' || action === 'pull') {
                   try {
-                              const [clients, cases, appointments, tasks, financial, usrs, logs, parties] = await Promise.all([
+                              const [clients, cases, appointments, tasks, financial, usrs, logs, parties, contracts] = await Promise.all([
                                             supa('clients?order=created_at.desc&limit=500'),
                                             supa('cases?order=created_at.desc&limit=500'),
                                             supa('appointments?order=starts_at.asc&limit=500'),
@@ -327,6 +365,7 @@ export default async (req) => {
                                             supa('users?select=id,name,email,role,active,oab,cargo,tel,custom_perms&order=id.asc'),
                                             supa('access_log?order=created_at.desc&limit=300'),
                                             supa('case_parties?order=created_at.desc&limit=1000'),
+    supa('contracts?order=created_at.desc&limit=500'),
                                           ]);
                               return ok({
                                             ok: true,
@@ -340,6 +379,7 @@ export default async (req) => {
                                                             usuarios:     usrs.map(supaToUser),
                                                             logs:         logs.map(supaToLog),
                                                             partes:       parties.map(supaToParte),
+          contratos:    contracts.map(supaToContrato),
                                             }
                               });
                   } catch(e) {
@@ -363,6 +403,7 @@ export default async (req) => {
                 { key:'tarefas',      table:'tasks',             fn: tarToSupa  },
                 { key:'financeiro',   table:'financial_records', fn: finToSupa  },
                 { key:'partes',       table:'case_parties',      fn: partToSupa },
+      { key:'contratos',   table:'contracts',         fn: contratoToSupa },
                     ];
 
           for(const {key, table, fn} of MAPS) {
@@ -398,7 +439,7 @@ export default async (req) => {
                   try { body = await req.json(); } catch { return err('JSON inválido'); }
                   const TABLE_BY_KEY = {
                               clientes: 'clients', processos: 'cases', agendamentos: 'appointments',
-                              tarefas: 'tasks', financeiro: 'financial_records', partes: 'case_parties',
+                              tarefas: 'tasks', financeiro: 'financial_records', partes: 'case_parties', contratos: 'contracts',
                   };
                   const table = TABLE_BY_KEY[body.key] || body.table;
                   const rawId = body.id;
