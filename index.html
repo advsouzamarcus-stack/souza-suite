@@ -537,6 +537,7 @@ tr:hover td{background:#f8fafc!important}
     <button class="atab" onclick="aTab('calmes',this)">🗓️ Mês</button>
     <button class="atab" onclick="aTab('financeiro',this)">💰 Financeiro</button>
     <button class="atab" onclick="aTab('contratos',this)">📄 Contratos</button>
+    <button class="atab" onclick="aTab('leads',this)">🎯 Leads</button>
     <button class="atab" onclick="aTab('comunicacoes',this)">💬 Comunicações</button>
     <div class="tab-sep"></div>
     <button class="atab" onclick="aTab('agenda',this)">📌 Agenda Hoje</button>
@@ -670,6 +671,17 @@ tr:hover td{background:#f8fafc!important}
   <div class="mfoot"><button class="btn bp" onclick="saveContrato()">💾 Salvar</button><button class="btn bgh" onclick="closeMo('m-ctr')">Cancelar</button></div>
 </div></div>
 
+<!-- Modal: Lead -->
+<div class="mo-desk" id="m-lead"><div class="mbox">
+  <h3>🎯 <span id="m-lead-t">Novo Lead</span></h3>
+  <input type="hidden" id="lead-id">
+  <div class="frow"><div class="ff" style="flex:2"><div class="fl">Nome *</div><input id="lead-nome"></div><div class="ff"><div class="fl">Telefone</div><input id="lead-tel"></div></div>
+  <div class="frow"><div class="ff"><div class="fl">E-mail</div><input type="email" id="lead-email"></div><div class="ff"><div class="fl">Origem</div><input id="lead-origem" placeholder="WhatsApp, indicação, site..."></div></div>
+  <div class="fg"><div class="fl">Estágio</div><select id="lead-stage"><option value="novo">Novo</option><option value="em_contato">Em Contato</option><option value="proposta_enviada">Proposta Enviada</option><option value="negociacao">Negociação</option><option value="convertido">Convertido</option><option value="perdido">Perdido</option></select></div>
+  <div class="fg"><div class="fl">Resumo / Observações</div><textarea id="lead-resumo" rows="3" style="resize:vertical"></textarea></div>
+  <div class="mfoot"><button class="btn bp" onclick="saveLead()">💾 Salvar</button><button class="btn bgh" onclick="closeMo('m-lead')">Cancelar</button></div>
+</div></div>
+
 <!-- Modal: WhatsApp -->
 <div class="mo-desk" id="m-wa"><div class="mbox">
   <h3>📱 Enviar WhatsApp</h3>
@@ -780,7 +792,7 @@ const esc=s=>String(s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>
 // ═══════════════════════════════════════════════════════════════════
 // VARIÁVEIS DE ESTADO — declaradas antes de qualquer referência
 // ═══════════════════════════════════════════════════════════════════
-let currentUser=null,users=[],cli=[],proc=[],tar=[],fin=[],partes=[],contratos=[];
+let currentUser=null,users=[],cli=[],proc=[],tar=[],fin=[],partes=[],contratos=[],leads=[];
 const cn=id=>(cli.find(c=>String(c.id)===String(id))||{}).nome||'—';
 
 // ═══════════════════════════════════════════════════════════════════
@@ -885,7 +897,7 @@ function save(){
   const el=document.getElementById('sbadge');
   if(el)el.textContent='💾 Salvando...';
   saveT=setTimeout(()=>{
-    const _sd={users,cli,proc,tar,fin,partes,contratos};['users','cli','proc','tar','fin','partes','contratos'].forEach(k=>localStorage.setItem('sa_'+k,JSON.stringify(_sd[k])));
+    const _sd={users,cli,proc,tar,fin,partes,contratos,leads};['users','cli','proc','tar','fin','partes','contratos','leads'].forEach(k=>localStorage.setItem('sa_'+k,JSON.stringify(_sd[k])));
     // Push para servidor (sem bloquear a UI)
     if(SA_JWT) pushToServer().catch(()=>{});
     if(el)el.textContent='✅ Salvo às '+new Date().toLocaleTimeString('pt-BR',{hour:'2-digit',minute:'2-digit'});
@@ -907,7 +919,7 @@ function saveBk(){
 function saveGc(){localStorage.setItem('ms_gcal',JSON.stringify(gcfg));}
 function load(){
   const _ld={users:D_USERS,cli:D_CLI,proc:D_PROC,tar:D_TAR,fin:D_FIN,partes:[]};
-  ['users','cli','proc','tar','fin','partes','contratos'].forEach(k=>{
+  ['users','cli','proc','tar','fin','partes','contratos','leads'].forEach(k=>{
     const d=localStorage.getItem('sa_'+k);
     try{_ld[k]=d?JSON.parse(d):_ld[k];}catch(e){console.warn('load err',k,e);}
   });
@@ -915,7 +927,7 @@ function load(){
   const adminOk=savedU.some(u=>u.email==='marcus@souzaadv.com'&&u.ativo);
   users=adminOk?savedU:D_USERS;
   if(!adminOk){localStorage.removeItem('sa_users');localStorage.removeItem('sa_sess');}
-  cli=_ld.cli||D_CLI; proc=_ld.proc||D_PROC; tar=_ld.tar||D_TAR; fin=_ld.fin||D_FIN; partes=_ld.partes||[]; contratos=_ld.contratos||[];
+  cli=_ld.cli||D_CLI; proc=_ld.proc||D_PROC; tar=_ld.tar||D_TAR; fin=_ld.fin||D_FIN; partes=_ld.partes||[]; contratos=_ld.contratos||[]; leads=_ld.leads||[];
   bk=JSON.parse(localStorage.getItem('ms_bookings')||'[]');
   const gc=localStorage.getItem('ms_gcal');if(gc)gcfg=JSON.parse(gc);
   // seedBk() NÃO é mais chamado automaticamente aqui. Antes, toda vez que
@@ -1120,6 +1132,7 @@ async function syncFromServer() {
     if (Array.isArray(d.data.financeiro))   { fin   = dropPending(d.data.financeiro);   localStorage.setItem('sa_fin',      JSON.stringify(fin));   changed=true; }
     if (Array.isArray(d.data.partes))       { partes= dropPending(d.data.partes);       localStorage.setItem('sa_partes',   JSON.stringify(partes));changed=true; }
     if (Array.isArray(d.data.contratos)) { contratos = dropPending(d.data.contratos); localStorage.setItem('sa_contratos', JSON.stringify(contratos)); changed=true; }
+    if (Array.isArray(d.data.leads)) { leads = dropPending(d.data.leads); localStorage.setItem('sa_leads', JSON.stringify(leads)); changed=true; }
     if (Array.isArray(d.data.usuarios)      && d.data.usuarios.length)     { users = d.data.usuarios;     localStorage.setItem('sa_users',    JSON.stringify(users)); }
     if (Array.isArray(d.data.logs)) {
       // Combina o log do servidor (todos os aparelhos) com qualquer entrada
@@ -1187,6 +1200,7 @@ async function pushToServer() {
         financeiro:   fin  || [],
         partes:       partes || [],
         contratos:    contratos || [],
+        leads:        leads || [],
       }
     };
     const r = await fetch('/api/sync', {
@@ -1268,12 +1282,12 @@ function aTab(tab,btn){
   aTabCur=tab;
   document.querySelectorAll('.atab').forEach(b=>b.classList.remove('on'));
   if(btn)btn.classList.add('on');
-  const guards={clientes:()=>can('cli','v'),processos:()=>can('proc','v'),financeiro:()=>can('fin','v'),contratos:()=>can('fin','v'),tarefas:()=>can('tar','v'),comunicacoes:()=>can('cli','v'),usuarios:()=>can('usr','v'),config:()=>can('cfg','v')};
-  const gl={clientes:'Clientes',processos:'Processos',financeiro:'Financeiro',contratos:'Contratos',tarefas:'Tarefas',comunicacoes:'Comunicações',usuarios:'Usuários',config:'Configurações'};
+  const guards={clientes:()=>can('cli','v'),processos:()=>can('proc','v'),financeiro:()=>can('fin','v'),contratos:()=>can('fin','v'),leads:()=>can('fin','v'),tarefas:()=>can('tar','v'),comunicacoes:()=>can('cli','v'),usuarios:()=>can('usr','v'),config:()=>can('cfg','v')};
+  const gl={clientes:'Clientes',processos:'Processos',financeiro:'Financeiro',contratos:'Contratos',leads:'Leads',tarefas:'Tarefas',comunicacoes:'Comunicações',usuarios:'Usuários',config:'Configurações'};
   if(guards[tab]&&!guards[tab]()){logAccess(tab,'negado',true);denyAccess(gl[tab]||tab);return;}
   const r={
     dash:renderDash,clientes:renderCli,processos:renderProc,tarefas:renderTar,
-    semana:renderSem,calmes:renderCal,financeiro:renderFin,contratos:renderContratos,comunicacoes:renderCom,
+    semana:renderSem,calmes:renderCal,financeiro:renderFin,contratos:renderContratos,leads:renderLeads,comunicacoes:renderCom,
     agenda:renderAgenda,agcal:renderAgCal,kanban:renderKanban,agendamentos:renderAgendamentos,
     metricas:renderMetricas,busca:renderBusca,usuarios:renderUsers,gcal:renderGCal,
     config:renderConfig,acessos:renderAcessos
@@ -1799,6 +1813,113 @@ async function delContrato(id){
   renderContratos();
   await delServerRecord('contratos',id);
 }
+
+const LEAD_STAGE_LBL={novo:'Novo',em_contato:'Em Contato',proposta_enviada:'Proposta Enviada',negociacao:'Negociação',convertido:'Convertido',perdido:'Perdido'};
+function renderLeads(){
+  const p=perm(); if(!p.fin&&!p.e){document.getElementById('admin-cnt').innerHTML='<div class="card"><p style="color:var(--mu)">Acesso restrito.</p></div>';return;}
+  const q=(document.getElementById('lead-q')||{value:''}).value.toLowerCase();
+  const filt=leads.filter(function(l){return !q||(l.nome||'').toLowerCase().includes(q)||(l.tel||'').includes(q);});
+  const stages=['novo','em_contato','proposta_enviada','negociacao','convertido','perdido'];
+  let cards='';
+  stages.forEach(function(s){
+    const n=leads.filter(function(l){return l.stage===s;}).length;
+    cards+=kc('#f8fafc', n, '#334155', LEAD_STAGE_LBL[s]);
+  });
+  let html='<div class="krow">'+cards+'</div>';
+  html+='<div class="fbar"><input id="lead-q" style="max-width:240px" placeholder="Buscar..." value="'+q+'" oninput="renderLeads()">'+(p.e?'<button class="btn bp" onclick="openLeadModal()">+ Novo Lead</button>':'')+'</div>';
+  html+='<div class="card"><div class="tw"><table><thead><tr><th>Nome</th><th>Telefone</th><th>Origem</th><th>Estágio</th><th>Resumo</th>'+(p.e?'<th>Ações</th>':'')+'</tr></thead><tbody>'+filt.map(function(l){
+    let row='<tr>';
+    row+='<td style="font-weight:600;white-space:nowrap">'+(l.nome||'')+'</td>';
+    row+='<td>'+(l.tel||'')+'</td>';
+    row+='<td>'+(l.origem||'')+'</td>';
+    row+='<td>';
+    if(p.e){
+      row+='<select onchange="changeLeadStage(\''+l.id+'\',this.value)" style="font-size:11px;padding:3px">';
+      stages.forEach(function(s){
+        const sel=(s===l.stage)?' selected':'';
+        row+='<option value="'+s+'"'+sel+'>'+LEAD_STAGE_LBL[s]+'</option>';
+      });
+      row+='</select>';
+    } else {
+      row+='<span class="badge bb">'+(LEAD_STAGE_LBL[l.stage]||l.stage)+'</span>';
+    }
+    row+='</td>';
+    row+='<td style="max-width:220px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">'+(l.resumo||'')+'</td>';
+    if(p.e){
+      row+='<td><div style="display:flex;gap:3px">';
+      row+='<button class="btn bgh xs" onclick="editLead(\''+l.id+'\')">✏️</button>';
+      if(!l.convertidoClienteId){
+        row+='<button class="btn bca xs" onclick="convertLeadToClient(\''+l.id+'\')" title="Converter em Cliente">➡️</button>';
+      }
+      if(p.del){ row+='<button class="btn bd_ xs" onclick="delLead(\''+l.id+'\')">🗑️</button>'; }
+      row+='</div></td>';
+    }
+    row+='</tr>';
+    return row;
+  }).join('')+'</tbody></table></div></div>';
+  document.getElementById('admin-cnt').innerHTML=html;
+}
+function changeLeadStage(id,stage){
+  const l=leads.find(function(x){return String(x.id)===String(id);});
+  if(!l)return;
+  l.stage=stage;
+  save();renderLeads();
+  pushToServer().catch(function(){});
+}
+function openLeadModal(id){
+  document.getElementById('lead-id').value=id||'';
+  document.getElementById('m-lead-t').textContent=id?'Editar Lead':'Novo Lead';
+  if(id){
+    const l=leads.find(function(x){return String(x.id)===String(id);});
+    document.getElementById('lead-nome').value=l.nome||'';
+    document.getElementById('lead-tel').value=l.tel||'';
+    document.getElementById('lead-email').value=l.email||'';
+    document.getElementById('lead-origem').value=l.origem||'';
+    document.getElementById('lead-stage').value=l.stage||'novo';
+    document.getElementById('lead-resumo').value=l.resumo||'';
+  } else {
+    ['lead-nome','lead-tel','lead-email','lead-origem','lead-resumo'].forEach(function(f){document.getElementById(f).value='';});
+    document.getElementById('lead-stage').value='novo';
+  }
+  openMo('m-lead');
+}
+const editLead=function(id){openLeadModal(id);};
+function saveLead(){
+  const nome=document.getElementById('lead-nome').value.trim();
+  if(!nome)return alert('Informe o nome.');
+  const id=document.getElementById('lead-id').value;
+  const o={
+    nome: nome,
+    tel: document.getElementById('lead-tel').value.trim(),
+    email: document.getElementById('lead-email').value.trim(),
+    origem: document.getElementById('lead-origem').value.trim(),
+    stage: document.getElementById('lead-stage').value,
+    resumo: document.getElementById('lead-resumo').value.trim()
+  };
+  if(id){const idx=leads.findIndex(function(l){return String(l.id)===String(id);});if(idx>=0)leads.splice(idx,1,Object.assign({},leads[idx],o,{id:id}));else leads.push(Object.assign({},o,{id:id}));}else leads.push(Object.assign({},o,{id:gid2()}));
+  save();closeMo('m-lead');renderLeads();
+  pushToServer().catch(function(){});
+}
+async function delLead(id){
+  if(!confirm('Excluir este lead?'))return;
+  leads=leads.filter(function(l){return String(l.id)!==String(id);});
+  localStorage.setItem('sa_leads',JSON.stringify(leads));
+  renderLeads();
+  await delServerRecord('leads',id);
+}
+function convertLeadToClient(id){
+  const l=leads.find(function(x){return String(x.id)===String(id);});
+  if(!l)return;
+  if(!confirm('Converter este lead em cliente?'))return;
+  const novoCliente={pessoa:'fisica',nome:l.nome||'',cpf:'',tel:l.tel||'',email:l.email||'',end:'',tipo:'Novo',obs:'Convertido do lead: '+(l.origem||''),id:gid2()};
+  cli.push(novoCliente);
+  l.stage='convertido';
+  l.convertidoClienteId=novoCliente.id;
+  save();renderLeads();
+  pushToServer().catch(function(){});
+  alert('Lead convertido em cliente com sucesso.');
+}
+
 
 
 // ═══════════════════════════════════════════════════════════════════
