@@ -112,6 +112,77 @@ async function sendWhatsApp(to, text) {
 }
 
 // ── Handler principal ──────────────────────────────────────────────────────────
+// ── Persistência no CRM (Supabase) ──────────────────────────────
+const SUPA_URL = getEnv('SUPABASE_URL') || 'https://briobxgqygjcyrbasqan.supabase.co';
+const SUPA_KEY = getEnv('SUPABASE_SERVICE_ROLE_KEY');
+
+async function supa(path, method='GET', body=null) {
+  const r = await fetch(`${SUPA_URL}/rest/v1/${path}`, {
+    method,
+    headers: {
+      apikey: SUPA_KEY,
+      Authorization: `Bearer ${SUPA_KEY}`,
+      'Content-Type': 'application/json',
+      Prefer: method==='GET' ? '' : 'resolution=merge-duplicates,return=representation',
+    },
+    body: body ? JSON.stringify(body) : undefined,
+  });
+  if (r.status === 204) return [];
+  const data = await r.json();
+  if (!r.ok) throw new Error(JSON.stringify(data).slice(0,200));
+  return data;
+}
+
+// Localiza (ou cria) a conversa deste numero de WhatsApp, vinculando a um
+// cliente existente ou criando um Lead novo automaticamente.
+async function getOuCriarConversa(from) {
+  const existentes = await supa(`conversations?channel=eq.whatsapp&external_thread_id=eq.${from}&limit=1`);
+  if (existentes.length) return existentes[0];
+
+  const clientesMatch = await supa(`clients?phone=eq.${from}&limit=1`);
+  let leadId = null, clientId = null;
+  if (clientesMatch.length) {
+    clientId = clientesMatch[0].id;
+  } else {
+    const leadsExistentes = await supa(`leads?phone=eq.${from}&limit=1`);
+    if (leadsExistentes.length) {
+      leadId = leadsExistentes[0].id;
+    } else {
+      const novoLead = await supa('leads', 'POST', [{
+        name: 'Contato WhatsApp ' + from,
+        phone: from,
+        source: 'whatsapp',
+        stage: 'novo',
+      }]);
+      leadId = novoLead[0] && novoLead[0].id;
+    }
+  }
+
+  const novaConversa = await supa('conversations', 'POST', [{
+    lead_id: leadId,
+    client_id: clientId,
+    channel: 'whatsapp',
+    external_thread_id: from,
+    status: 'aberta',
+    ai_enabled: true,
+  }]);
+  return novaConversa[0];
+}
+
+async function salvarMensagem(conversationId, direction, sender, body) {
+  try {
+    await supa('messages', 'POST', [{
+      conversation_id: conversationId,
+      direction,
+      sender,
+      body,
+    }]);
+    await supa(`conversations?id=eq.${conversationId}`, 'PATCH', { updated_at: new Date().toISOString() });
+  } catch (e) {
+    console.error('[WA] Erro ao salvar mensagem:', e.message);
+  }
+}
+
 export default async function handler(req) {
 
   // ── GET: verificação do webhook pela Meta ───────────────────────────────────
@@ -156,9 +227,17 @@ export default async function handler(req) {
 
     // Processar de forma assíncrona para não bloquear o 200
     (async () => {
+      let conversa = null;
+      try {
+        conversa = await getOuCriarConversa(from);
+        await salvarMensagem(conversa.id, 'in', 'cliente', text);
+      } catch (e) {
+        console.error('[WA] Erro ao registrar conversa/lead:', e.message);
+      }
       try {
         const reply = await callGemini(text);
         await sendWhatsApp(from, reply);
+        if (conversa) await salvarMensagem(conversa.id, 'out', 'ia', reply);
       } catch (e) {
         console.error('[WA] Erro ao processar mensagem:', e.message);
         // Enviar mensagem de fallback para não deixar o cliente sem resposta
