@@ -536,6 +536,7 @@ tr:hover td{background:#f8fafc!important}
     <button class="atab" onclick="aTab('semana',this)">📋 Semana</button>
     <button class="atab" onclick="aTab('calmes',this)">🗓️ Mês</button>
     <button class="atab" onclick="aTab('financeiro',this)">💰 Financeiro</button>
+    <button class="atab" onclick="aTab('contratos',this)">📄 Contratos</button>
     <button class="atab" onclick="aTab('comunicacoes',this)">💬 Comunicações</button>
     <div class="tab-sep"></div>
     <button class="atab" onclick="aTab('agenda',this)">📌 Agenda Hoje</button>
@@ -653,6 +654,21 @@ tr:hover td{background:#f8fafc!important}
   <div class="mfoot"><button class="btn bp" onclick="saveFin()">💾 Salvar</button><button class="btn bgh" onclick="closeMo('m-fin')">Cancelar</button></div>
 </div></div>
 
+<!-- Modal: Contrato -->
+<div class="mo-desk" id="m-ctr"><div class="mbox">
+  <h3>📄 <span id="m-ctr-t">Novo Contrato</span></h3>
+  <input type="hidden" id="ctr-id">
+  <div class="frow"><div class="ff"><div class="fl">Cliente *</div><select id="ctr-cli"></select></div><div class="ff"><div class="fl">Processo (opcional)</div><select id="ctr-proc"></select></div></div>
+  <div class="frow"><div class="ff"><div class="fl">Tipo de Honorário</div><select id="ctr-tipo" onchange="setContratoTipo(this.value)"><option value="fixo">Honorários Fixos</option><option value="exito">% de Êxito</option><option value="hora">Por Hora</option><option value="misto">Misto</option><option value="contratual_mensal">Mensal (Contrato Contínuo)</option></select></div><div class="ff"><div class="fl">Status</div><select id="ctr-status"><option value="vigente">Vigente</option><option value="encerrado">Encerrado</option><option value="suspenso">Suspenso</option><option value="rescindido">Rescindido</option></select></div></div>
+  <div class="frow" id="ctr-row-fixo"><div class="ff"><div class="fl">Valor Fixo (R$)</div><input type="number" id="ctr-fixo" min="0" step="0.01"></div></div>
+  <div class="frow" id="ctr-row-exito" style="display:none"><div class="ff"><div class="fl">% de Êxito</div><input type="number" id="ctr-exito" min="0" max="100" step="0.1"></div></div>
+  <div class="frow" id="ctr-row-hora" style="display:none"><div class="ff"><div class="fl">Valor por Hora (R$)</div><input type="number" id="ctr-hora" min="0" step="0.01"></div></div>
+  <div class="frow" id="ctr-row-mensal" style="display:none"><div class="ff"><div class="fl">Valor Mensal (R$)</div><input type="number" id="ctr-mensal" min="0" step="0.01"></div></div>
+  <div class="frow"><div class="ff"><div class="fl">Data Início</div><input type="date" id="ctr-inicio"></div><div class="ff"><div class="fl">Data Fim (se houver)</div><input type="date" id="ctr-fim"></div></div>
+  <div class="fg"><div class="fl">Escopo / Observações</div><textarea id="ctr-escopo" rows="3" style="resize:vertical"></textarea></div>
+  <div class="mfoot"><button class="btn bp" onclick="saveContrato()">💾 Salvar</button><button class="btn bgh" onclick="closeMo('m-ctr')">Cancelar</button></div>
+</div></div>
+
 <!-- Modal: WhatsApp -->
 <div class="mo-desk" id="m-wa"><div class="mbox">
   <h3>📱 Enviar WhatsApp</h3>
@@ -763,7 +779,7 @@ const esc=s=>String(s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>
 // ═══════════════════════════════════════════════════════════════════
 // VARIÁVEIS DE ESTADO — declaradas antes de qualquer referência
 // ═══════════════════════════════════════════════════════════════════
-let currentUser=null,users=[],cli=[],proc=[],tar=[],fin=[],partes=[];
+let currentUser=null,users=[],cli=[],proc=[],tar=[],fin=[],partes=[],contratos=[];
 const cn=id=>(cli.find(c=>String(c.id)===String(id))||{}).nome||'—';
 
 // ═══════════════════════════════════════════════════════════════════
@@ -868,7 +884,7 @@ function save(){
   const el=document.getElementById('sbadge');
   if(el)el.textContent='💾 Salvando...';
   saveT=setTimeout(()=>{
-    const _sd={users,cli,proc,tar,fin,partes};['users','cli','proc','tar','fin','partes'].forEach(k=>localStorage.setItem('sa_'+k,JSON.stringify(_sd[k])));
+    const _sd={users,cli,proc,tar,fin,partes,contratos};['users','cli','proc','tar','fin','partes','contratos'].forEach(k=>localStorage.setItem('sa_'+k,JSON.stringify(_sd[k])));
     // Push para servidor (sem bloquear a UI)
     if(SA_JWT) pushToServer().catch(()=>{});
     if(el)el.textContent='✅ Salvo às '+new Date().toLocaleTimeString('pt-BR',{hour:'2-digit',minute:'2-digit'});
@@ -890,7 +906,7 @@ function saveBk(){
 function saveGc(){localStorage.setItem('ms_gcal',JSON.stringify(gcfg));}
 function load(){
   const _ld={users:D_USERS,cli:D_CLI,proc:D_PROC,tar:D_TAR,fin:D_FIN,partes:[]};
-  ['users','cli','proc','tar','fin','partes'].forEach(k=>{
+  ['users','cli','proc','tar','fin','partes','contratos'].forEach(k=>{
     const d=localStorage.getItem('sa_'+k);
     try{_ld[k]=d?JSON.parse(d):_ld[k];}catch(e){console.warn('load err',k,e);}
   });
@@ -898,7 +914,7 @@ function load(){
   const adminOk=savedU.some(u=>u.email==='marcus@souzaadv.com'&&u.ativo);
   users=adminOk?savedU:D_USERS;
   if(!adminOk){localStorage.removeItem('sa_users');localStorage.removeItem('sa_sess');}
-  cli=_ld.cli||D_CLI; proc=_ld.proc||D_PROC; tar=_ld.tar||D_TAR; fin=_ld.fin||D_FIN; partes=_ld.partes||[];
+  cli=_ld.cli||D_CLI; proc=_ld.proc||D_PROC; tar=_ld.tar||D_TAR; fin=_ld.fin||D_FIN; partes=_ld.partes||[]; contratos=_ld.contratos||[];
   bk=JSON.parse(localStorage.getItem('ms_bookings')||'[]');
   const gc=localStorage.getItem('ms_gcal');if(gc)gcfg=JSON.parse(gc);
   // seedBk() NÃO é mais chamado automaticamente aqui. Antes, toda vez que
@@ -1102,6 +1118,7 @@ async function syncFromServer() {
     if (Array.isArray(d.data.tarefas))      { tar   = dropPending(d.data.tarefas);      localStorage.setItem('sa_tar',      JSON.stringify(tar));   changed=true; }
     if (Array.isArray(d.data.financeiro))   { fin   = dropPending(d.data.financeiro);   localStorage.setItem('sa_fin',      JSON.stringify(fin));   changed=true; }
     if (Array.isArray(d.data.partes))       { partes= dropPending(d.data.partes);       localStorage.setItem('sa_partes',   JSON.stringify(partes));changed=true; }
+    if (Array.isArray(d.data.contratos)) { contratos = dropPending(d.data.contratos); localStorage.setItem('sa_contratos', JSON.stringify(contratos)); changed=true; }
     if (Array.isArray(d.data.usuarios)      && d.data.usuarios.length)     { users = d.data.usuarios;     localStorage.setItem('sa_users',    JSON.stringify(users)); }
     if (Array.isArray(d.data.logs)) {
       // Combina o log do servidor (todos os aparelhos) com qualquer entrada
@@ -1168,6 +1185,7 @@ async function pushToServer() {
         tarefas:      tar  || [],
         financeiro:   fin  || [],
         partes:       partes || [],
+        contratos:    contratos || [],
       }
     };
     const r = await fetch('/api/sync', {
@@ -1249,12 +1267,12 @@ function aTab(tab,btn){
   aTabCur=tab;
   document.querySelectorAll('.atab').forEach(b=>b.classList.remove('on'));
   if(btn)btn.classList.add('on');
-  const guards={clientes:()=>can('cli','v'),processos:()=>can('proc','v'),financeiro:()=>can('fin','v'),tarefas:()=>can('tar','v'),comunicacoes:()=>can('cli','v'),usuarios:()=>can('usr','v'),config:()=>can('cfg','v')};
-  const gl={clientes:'Clientes',processos:'Processos',financeiro:'Financeiro',tarefas:'Tarefas',comunicacoes:'Comunicações',usuarios:'Usuários',config:'Configurações'};
+  const guards={clientes:()=>can('cli','v'),processos:()=>can('proc','v'),financeiro:()=>can('fin','v'),contratos:()=>can('fin','v'),tarefas:()=>can('tar','v'),comunicacoes:()=>can('cli','v'),usuarios:()=>can('usr','v'),config:()=>can('cfg','v')};
+  const gl={clientes:'Clientes',processos:'Processos',financeiro:'Financeiro',contratos:'Contratos',tarefas:'Tarefas',comunicacoes:'Comunicações',usuarios:'Usuários',config:'Configurações'};
   if(guards[tab]&&!guards[tab]()){logAccess(tab,'negado',true);denyAccess(gl[tab]||tab);return;}
   const r={
     dash:renderDash,clientes:renderCli,processos:renderProc,tarefas:renderTar,
-    semana:renderSem,calmes:renderCal,financeiro:renderFin,comunicacoes:renderCom,
+    semana:renderSem,calmes:renderCal,financeiro:renderFin,contratos:renderContratos,comunicacoes:renderCom,
     agenda:renderAgenda,agcal:renderAgCal,kanban:renderKanban,agendamentos:renderAgendamentos,
     metricas:renderMetricas,busca:renderBusca,usuarios:renderUsers,gcal:renderGCal,
     config:renderConfig,acessos:renderAcessos
@@ -1662,6 +1680,115 @@ async function delFin(id){
   renderFin();
   await delServerRecord('financeiro',id);
 }
+
+const TIPO_HON_LBL={fixo:'Honorários Fixos',exito:'% de Êxito',hora:'Por Hora',misto:'Misto',contratual_mensal:'Mensal (Contrato Contínuo)'};
+const STATUS_CONTRATO_LBL={vigente:'Vigente',encerrado:'Encerrado',suspenso:'Suspenso',rescindido:'Rescindido'};
+function fmtContratoValor(c){
+  if(c.tipo==='fixo') return fmt(c.valorFixo||0);
+  if(c.tipo==='exito') return (c.percExito||0)+'% de êxito';
+  if(c.tipo==='hora') return fmt(c.valorHora||0)+'/hora';
+  if(c.tipo==='contratual_mensal') return fmt(c.valorMensal||0)+'/mês';
+  if(c.tipo==='misto') return 'Misto';
+  return '—';
+}
+function fillProcSelectContrato(id, procId){
+  const sel=document.getElementById(id);
+  let opts='<option value="">— Nenhum —</option>';
+  proc.forEach(function(p){
+    const sel2=(String(p.id)===String(procId))?' selected':'';
+    opts+='<option value="'+p.id+'"'+sel2+'>'+p.num+' — '+cn(p.cliId)+'</option>';
+  });
+  sel.innerHTML=opts;
+}
+function renderContratos(){
+  const p=perm(); if(!p.fin&&!p.e){document.getElementById('admin-cnt').innerHTML='<div class="card"><p style="color:var(--mu)">Acesso restrito ao módulo financeiro.</p></div>';return;}
+  const q=(document.getElementById('ctr-q')||{value:''}).value.toLowerCase();
+  const filt=contratos.filter(function(c){return !q||cn(c.cliId).toLowerCase().includes(q)||(c.escopo||'').toLowerCase().includes(q);});
+  const totVigentes=contratos.filter(function(c){return c.status==='vigente';}).length;
+  let html='<div class="krow">'+kc('#eff6ff',contratos.length,'#2563eb','Total de Contratos')+kc('#f0fdf4',totVigentes,'#16a34a','Vigentes')+'</div>';
+  html+='<div class="fbar"><input id="ctr-q" style="max-width:240px" placeholder="Buscar..." value="'+q+'" oninput="renderContratos()">'+(p.e?'<button class="btn bp" onclick="openContratoModal()">+ Novo Contrato</button>':'')+'</div>';
+  html+='<div class="card"><div class="tw"><table><thead><tr><th>Cliente</th><th>Tipo</th><th>Valor</th><th>Processo</th><th>Status</th><th>Início</th>'+(p.e?'<th>Ações</th>':'')+'</tr></thead><tbody>'+filt.map(function(c){
+    const pr=proc.find(function(p2){return String(p2.id)===String(c.procId);});
+    const procNum=pr?pr.num:'';
+    let row='<tr>';
+    row+='<td style="font-weight:600;white-space:nowrap">'+cn(c.cliId)+'</td>';
+    row+='<td>'+(TIPO_HON_LBL[c.tipo]||c.tipo)+'</td>';
+    row+='<td>'+fmtContratoValor(c)+'</td>';
+    row+='<td>'+(procNum||'—')+'</td>';
+    row+='<td><span class="badge bb">'+(STATUS_CONTRATO_LBL[c.status]||c.status)+'</span></td>';
+    row+='<td>'+(c.dataInicio||'—')+'</td>';
+    if(p.e){
+      row+='<td><div style="display:flex;gap:3px">';
+      row+='<button class="btn bgh xs" onclick="editContrato(\''+c.id+'\')">✏️</button>';
+      if(p.del){ row+='<button class="btn bd_ xs" onclick="delContrato(\''+c.id+'\')">🗑️</button>'; }
+      row+='</div></td>';
+    }
+    row+='</tr>';
+    return row;
+  }).join('')+'</tbody></table></div></div>';
+  document.getElementById('admin-cnt').innerHTML=html;
+}
+function setContratoTipo(tipo){
+  document.getElementById('ctr-tipo').value=tipo;
+  document.getElementById('ctr-row-fixo').style.display=tipo==='fixo'?'flex':'none';
+  document.getElementById('ctr-row-exito').style.display=tipo==='exito'?'flex':'none';
+  document.getElementById('ctr-row-hora').style.display=tipo==='hora'?'flex':'none';
+  document.getElementById('ctr-row-mensal').style.display=tipo==='contratual_mensal'?'flex':'none';
+}
+function openContratoModal(id){
+  document.getElementById('ctr-id').value=id||'';
+  document.getElementById('m-ctr-t').textContent=id?'Editar Contrato':'Novo Contrato';
+  const existing=id?(contratos.find(function(x){return String(x.id)===String(id);})||{}):{};
+  buildCliSelect('ctr-cli', existing.cliId||'');
+  fillProcSelectContrato('ctr-proc', existing.procId||'');
+  if(id){
+    document.getElementById('ctr-fixo').value=existing.valorFixo||'';
+    document.getElementById('ctr-exito').value=existing.percExito||'';
+    document.getElementById('ctr-hora').value=existing.valorHora||'';
+    document.getElementById('ctr-mensal').value=existing.valorMensal||'';
+    document.getElementById('ctr-escopo').value=existing.escopo||'';
+    document.getElementById('ctr-status').value=existing.status||'vigente';
+    document.getElementById('ctr-inicio').value=existing.dataInicio||'';
+    document.getElementById('ctr-fim').value=existing.dataFim||'';
+    setContratoTipo(existing.tipo||'fixo');
+  } else {
+    ['ctr-fixo','ctr-exito','ctr-hora','ctr-mensal','ctr-escopo','ctr-fim'].forEach(function(f){document.getElementById(f).value='';});
+    document.getElementById('ctr-status').value='vigente';
+    document.getElementById('ctr-inicio').value=td0;
+    setContratoTipo('fixo');
+  }
+  openMo('m-ctr');
+}
+const editContrato=function(id){openContratoModal(id);};
+function saveContrato(){
+  const cliId=document.getElementById('ctr-cli').value;
+  if(!cliId)return alert('Selecione o cliente.');
+  const id=document.getElementById('ctr-id').value;
+  const o={
+    cliId: cliId,
+    procId: document.getElementById('ctr-proc').value||null,
+    tipo: document.getElementById('ctr-tipo').value,
+    valorFixo: +document.getElementById('ctr-fixo').value||0,
+    percExito: +document.getElementById('ctr-exito').value||0,
+    valorHora: +document.getElementById('ctr-hora').value||0,
+    valorMensal: +document.getElementById('ctr-mensal').value||0,
+    escopo: document.getElementById('ctr-escopo').value.trim(),
+    status: document.getElementById('ctr-status').value,
+    dataInicio: document.getElementById('ctr-inicio').value||td0,
+    dataFim: document.getElementById('ctr-fim').value||null
+  };
+  if(id){const idx=contratos.findIndex(function(c){return String(c.id)===String(id);});if(idx>=0)contratos.splice(idx,1,Object.assign({},o,{id:id}));else contratos.push(Object.assign({},o,{id:id}));}else contratos.push(Object.assign({},o,{id:gid2()}));
+  save();closeMo('m-ctr');renderContratos();
+  pushToServer().catch(function(){});
+}
+async function delContrato(id){
+  if(!confirm('Excluir este contrato?'))return;
+  contratos=contratos.filter(function(c){return String(c.id)!==String(id);});
+  localStorage.setItem('sa_contratos',JSON.stringify(contratos));
+  renderContratos();
+  await delServerRecord('contratos',id);
+}
+
 
 // ═══════════════════════════════════════════════════════════════════
 // COMUNICAÇÕES
