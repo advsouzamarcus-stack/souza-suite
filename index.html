@@ -650,6 +650,7 @@ tr:hover td{background:#f8fafc!important}
   <h3>💰 <span id="m-fin-t">Novo Lançamento</span></h3>
   <input type="hidden" id="fin-id">
   <div class="frow"><div class="ff"><div class="fl">Cliente *</div><select id="fin-cli"></select></div><div class="ff" style="flex:2"><div class="fl">Descrição *</div><input id="fin-desc" placeholder="Ex: Honorários – Ação Trabalhista"></div><div class="ff"><div class="fl">Data</div><input type="date" id="fin-data"></div></div>
+  <div class="frow"><div class="ff" style="flex:2"><div class="fl">Contrato vinculado (opcional)</div><select id="fin-contrato"></select></div></div>
   <div class="frow"><div class="ff"><div class="fl">Valor Contratado (R$)</div><input type="number" id="fin-ct" min="0" step="0.01"></div><div class="ff"><div class="fl">Valor Recebido (R$)</div><input type="number" id="fin-rc" min="0" step="0.01"></div><div class="ff"><div class="fl">Pagamento</div><select id="fin-pg"><option>PIX</option><option>Transferência</option><option>Boleto</option><option>Parcelado</option><option>Dinheiro</option><option>Cartão</option></select></div><div class="ff"><div class="fl">Status</div><select id="fin-st"><option>Pago</option><option>Parcial</option><option>Pendente</option></select></div></div>
   <div class="mfoot"><button class="btn bp" onclick="saveFin()">💾 Salvar</button><button class="btn bgh" onclick="closeMo('m-fin')">Cancelar</button></div>
 </div></div>
@@ -1655,10 +1656,20 @@ function renderFin(){
   html+=`<div class="card"><div class="tw"><table><thead><tr><th>Cliente</th><th>Descrição</th><th>Data</th><th>Contratado</th><th>Recebido</th><th>Pendente</th><th>Pagamento</th><th>Status</th>${p.e?'<th>Ações</th>':''}</tr></thead><tbody>${filt.map(f=>{const pen=(+f.ct||0)-(+f.rc||0);return`<tr><td style="font-weight:600;white-space:nowrap">${cn(f.cliId)}</td><td>${f.desc}</td><td style="white-space:nowrap;font-size:11px">${fmtD(f.data)}</td><td style="font-weight:600;white-space:nowrap">${fmt(f.ct||0)}</td><td style="color:#16a34a;font-weight:600;white-space:nowrap">${fmt(f.rc||0)}</td><td style="color:${pen>0?'#dc2626':'#16a34a'};font-weight:600;white-space:nowrap">${fmt(pen)}</td><td>${f.pg}</td><td>${fsbadge(f.st)}</td>${p.e?`<td><div style="display:flex;gap:3px"><button class="btn bgh xs" onclick="editFin('${f.id}')">✏️</button>${p.del?`<button class="btn bd_ xs" onclick="delFin('${f.id}')">🗑️</button>`:''}</div></td>`:''}</tr>`;}).join('')}<tr style="background:#f1f5f9;font-weight:700"><td colspan="3">TOTAIS</td><td style="color:#2563eb;white-space:nowrap">${fmt(totC)}</td><td style="color:#16a34a;white-space:nowrap">${fmt(totR)}</td><td style="color:${totP>0?'#dc2626':'#16a34a'};white-space:nowrap">${fmt(totP)}</td><td colspan="${p.e?3:2}"></td></tr></tbody></table></div></div>`;
   document.getElementById('admin-cnt').innerHTML=html;
 }
+function fillContratoSelectFin(contratoId){
+  const sel=document.getElementById('fin-contrato');
+  let opts='<option value="">— Nenhum —</option>';
+  contratos.forEach(function(c){
+    const sel2=(String(c.id)===String(contratoId))?' selected':'';
+    opts+='<option value="'+c.id+'"'+sel2+'>'+cn(c.cliId)+' — '+(TIPO_HON_LBL[c.tipo]||c.tipo)+'</option>';
+  });
+  sel.innerHTML=opts;
+}
 function openFinModal(id){
   document.getElementById('fin-id').value=id||'';
   document.getElementById('m-fin-t').textContent=id?'Editar Lançamento':'Novo Lançamento';
   buildCliSelect('fin-cli',id?(fin.find(x=>String(x.id)===String(id))||{}).cliId:'');
+  fillContratoSelectFin(id?(fin.find(function(x){return String(x.id)===String(id);})||{}).contratoId:'');
   if(id){const f=fin.find(x=>String(x.id)===String(id));document.getElementById('fin-desc').value=f.desc;document.getElementById('fin-data').value=f.data||'';document.getElementById('fin-ct').value=f.ct||0;document.getElementById('fin-rc').value=f.rc||0;document.getElementById('fin-pg').value=f.pg;document.getElementById('fin-st').value=f.st;}
   else{document.getElementById('fin-desc').value='';document.getElementById('fin-data').value=td0;document.getElementById('fin-ct').value=0;document.getElementById('fin-rc').value=0;document.getElementById('fin-pg').value='PIX';document.getElementById('fin-st').value='Pendente';}
   openMo('m-fin');
@@ -1668,7 +1679,7 @@ function saveFin(){
   const desc=document.getElementById('fin-desc').value.trim();const cliId=document.getElementById('fin-cli').value;
   if(!desc||!cliId)return alert('Preencha cliente e descrição.');
   const id=document.getElementById('fin-id').value;
-  const o={cliId,desc,ct:+document.getElementById('fin-ct').value||0,rc:+document.getElementById('fin-rc').value||0,pg:document.getElementById('fin-pg').value,st:document.getElementById('fin-st').value,data:document.getElementById('fin-data').value};
+  const o={cliId,desc,ct:+document.getElementById('fin-ct').value||0,rc:+document.getElementById('fin-rc').value||0,pg:document.getElementById('fin-pg').value,st:document.getElementById('fin-st').value,data:document.getElementById('fin-data').value,contratoId:document.getElementById('fin-contrato').value||null};
   if(id){const idx=fin.findIndex(f=>String(f.id)===String(id));if(idx>=0)fin.splice(idx,1,{...o,id});else fin.push({...o,id});}else fin.push({...o,id:gid2()});
   save();closeMo('m-fin');renderFin();
   pushToServer().catch(()=>{});
