@@ -103,7 +103,7 @@ async function buscarEmTribunal(tribKey, queryDSL, size) {
   const payload = { size: Math.min(size, 20), query: queryDSL };
   try {
     const ctrl = new AbortController();
-    const tid = setTimeout(() => ctrl.abort(), 8000);
+    const tid = setTimeout(() => ctrl.abort(), 6000);
     const resp = await fetch(`${DJ_BASE}${alias}/_search`, {
       method: 'POST',
       headers: { 'Authorization': `APIKey ${DJ_KEY}`, 'Content-Type': 'application/json' },
@@ -125,8 +125,18 @@ async function jurimetriaSearch(segmento, queryDSL, sizePerTribunal) {
   const tribunais = tribunaisDoSegmento(segmento);
   if (!tribunais.length) return err(`Segmento desconhecido: ${segmento}`);
 
-  // Todos em paralelo (I/O-bound) — timeout individual curto evita estourar o limite da function
-  const resultados = await Promise.all(tribunais.map(t => buscarEmTribunal(t, queryDSL, sizePerTribunal)));
+  // Pool com concorrencia limitada — o Datajud parece throttlar/derrubar
+  // conexoes quando muitas chegam ao mesmo tempo com a mesma API key.
+  const CONCORRENCIA = 8;
+  const resultados = [];
+  let cursor = 0;
+  async function worker() {
+    while (cursor < tribunais.length) {
+      const t = tribunais[cursor++];
+      resultados.push(await buscarEmTribunal(t, queryDSL, sizePerTribunal));
+    }
+  }
+  await Promise.all(Array.from({length: Math.min(CONCORRENCIA, tribunais.length)}, worker));
 
   const comErro = resultados.filter(r => r.erro);
   const semErro = resultados.filter(r => !r.erro && r.total > 0).sort((a,b) => b.total - a.total);
