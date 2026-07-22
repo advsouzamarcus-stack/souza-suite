@@ -103,7 +103,7 @@ async function buscarEmTribunal(tribKey, queryDSL, size) {
   const payload = { size: Math.min(size, 20), query: queryDSL };
   try {
     const ctrl = new AbortController();
-    const tid = setTimeout(() => ctrl.abort(), 12000);
+    const tid = setTimeout(() => ctrl.abort(), 8000);
     const resp = await fetch(`${DJ_BASE}${alias}/_search`, {
       method: 'POST',
       headers: { 'Authorization': `APIKey ${DJ_KEY}`, 'Content-Type': 'application/json' },
@@ -125,13 +125,8 @@ async function jurimetriaSearch(segmento, queryDSL, sizePerTribunal) {
   const tribunais = tribunaisDoSegmento(segmento);
   if (!tribunais.length) return err(`Segmento desconhecido: ${segmento}`);
 
-  const LOTE = 10;
-  const resultados = [];
-  for (let i = 0; i < tribunais.length; i += LOTE) {
-    const lote = tribunais.slice(i, i + LOTE);
-    const r = await Promise.all(lote.map(t => buscarEmTribunal(t, queryDSL, sizePerTribunal)));
-    resultados.push(...r);
-  }
+  // Todos em paralelo (I/O-bound) — timeout individual curto evita estourar o limite da function
+  const resultados = await Promise.all(tribunais.map(t => buscarEmTribunal(t, queryDSL, sizePerTribunal)));
 
   const comErro = resultados.filter(r => r.erro);
   const semErro = resultados.filter(r => !r.erro && r.total > 0).sort((a,b) => b.total - a.total);
