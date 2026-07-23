@@ -1307,6 +1307,12 @@ function renderDash(){
   const atr=tar.filter(t=>t.data<td0&&!t.ok).length;
   const totC=fin.reduce((s,f)=>s+(+f.ct||0),0),totR=fin.reduce((s,f)=>s+(+f.rc||0),0);
   const agHj=bk.filter(b=>b.data===td0).length,agPen=bk.filter(b=>b.status==='solicitado').length;
+  const leadsAtivos=(leads||[]).filter(function(l){return l.stage!=='convertido'&&l.stage!=='perdido';}).length;
+  const contratosVig=(contratos||[]).filter(function(c){return c.status==='vigente';}).length;
+  const receitaRecMensal=(contratos||[]).filter(function(c){return c.status==='vigente';}).reduce(function(s,c){
+    if(c.tipo==='contratual_mensal') return s+(+c.valorMensal||0);
+    return s;
+  },0);
 
   let html=`<div class="krow">
     ${kc('#eff6ff',at,'#2563eb','Clientes Ativos')}
@@ -1316,6 +1322,8 @@ function renderDash(){
     ${kc(atr>0?'#fef2f2':'#f8fafc',atr,atr>0?'#dc2626':'#94a3b8','⚠️ Atrasadas')}
     ${kc('#faf6ee',agHj,'#A07840','Agend. Hoje')}
     ${kc(agPen>0?'#fef2f2':'#f8fafc',agPen,agPen>0?'#dc2626':'#94a3b8','Agend. Pendentes')}
+    ${kc('#eef2ff',leadsAtivos,'#4f46e5','Leads Ativos')}
+    ${kc('#fdf4ff',contratosVig,'#9333ea','Contratos Vigentes')}
   </div>`;
   if(agPen>0)html+=`<div class="al al-warn">⚠️ <strong>${agPen}</strong> agendamento(s) aguardando confirmação. <button class="btn bghost bsm" style="display:inline-flex" onclick="aTab('agendamentos',document.querySelectorAll('.atab')[13])">Ver agendamentos →</button></div>`;
   if(atr>0){const atrTar=tar.filter(t=>t.data<td0&&!t.ok);html+=`<div class="abox"><h4>🔴 ${atrTar.length} Tarefa(s) Atrasada(s)!</h4>${atrTar.map(t=>`<div style="padding:2px 0;font-size:12px">• ${t.desc} — <strong>${fmtD(t.data)}</strong> — ${cn(t.cliId)}</div>`).join('')}</div>`;}
