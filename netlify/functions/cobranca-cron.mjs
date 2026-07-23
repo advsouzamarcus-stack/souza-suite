@@ -1,3 +1,4 @@
+// redeploy-trigger 1784819121782
 // cobranca-cron.mjs
 // Cobranca automatica diaria: verifica lancamentos financeiros pendentes
 // ou atrasados e envia lembrete via WhatsApp para o cliente, registrando
