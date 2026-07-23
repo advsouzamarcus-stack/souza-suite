@@ -34,7 +34,7 @@ async function supa(path, method='GET', body=null) {
 async function sendWhatsApp(to, text) {
   if (!WA_PHONE_ID || !WA_TOKEN) {
     console.error('[COBRANCA] WA_PHONE_NUMBER_ID ou WA_TOKEN nao configurados.');
-    return false;
+    return { ok: false, status: 0, body: 'env vars ausentes' };
   }
   const url = `https://graph.facebook.com/v21.0/${WA_PHONE_ID}/messages`;
   const body = { messaging_product: 'whatsapp', to, type: 'text', text: { body: text } };
@@ -43,7 +43,8 @@ async function sendWhatsApp(to, text) {
     headers: { Authorization: `Bearer ${WA_TOKEN}`, 'Content-Type': 'application/json' },
     body: JSON.stringify(body),
   });
-  return r.ok;
+  const respBody = await r.text();
+  return { ok: r.ok, status: r.status, body: respBody };
 }
 
 function fmtData(iso) {
@@ -90,8 +91,8 @@ export default async (req) => {
           ? ('Ola ' + (cli.name||'') + '! Identificamos um pagamento em atraso referente a "' + (f.description||'') + '" no valor de ' + valor + ' (vencimento ' + fmtData(f.due_at) + '). Por favor, entre em contato conosco para regularizar. Qualquer duvida estamos a disposicao. — Souza Advocacia')
           : ('Ola ' + (cli.name||'') + '! Lembrete: "' + (f.description||'') + '" no valor de ' + valor + ' vence em ' + fmtData(f.due_at) + '. — Souza Advocacia');
 
-        const enviado = await sendWhatsApp(cli.phone, msg);
-        if (!enviado) { resultados.push({ id: f.id, ok: false, erro: 'falha no envio whatsapp' }); continue; }
+        const envio = await sendWhatsApp(cli.phone, msg);
+        if (!envio.ok) { resultados.push({ id: f.id, ok: false, erro: 'whatsapp ' + envio.status + ': ' + envio.body.slice(0,200) }); continue; }
 
         const conversa = await getOuCriarConversaCliente(cli.phone, cli.id);
         await supa('messages', 'POST', [{ conversation_id: conversa.id, direction: 'out', sender: 'sistema', body: msg }]);
