@@ -2099,7 +2099,7 @@ const EMAIL_TPLS={
   update:{sub:'Atualização do Seu Processo — Marcus Souza I Advogado',body:n=>`Prezado(a) ${n},\n\nTemos novidades sobre o andamento do seu processo. Por favor, entre em contato.\n\nAtenciosamente,\nMarcus Souza I Advogado`},
 };
 function renderCom(){
-  let html=`<div class="ccrow">
+  let html=`<div class="card" style="margin-bottom:14px"><div class="stitle">💬 Caixa de Entrada — WhatsApp</div><div style="display:flex;gap:0;min-height:420px;border:1px solid var(--bd);border-radius:8px;overflow:hidden"><div id="inbox-list" style="width:280px;min-width:280px;border-right:1px solid var(--bd);overflow-y:auto;max-height:480px;background:var(--n2)"><div style="padding:16px;color:var(--mu);font-size:12px;text-align:center">Carregando conversas...</div></div><div id="inbox-thread" style="flex:1;display:flex;flex-direction:column;min-width:0"><div style="flex:1;display:flex;align-items:center;justify-content:center;color:var(--mu);font-size:12px">Selecione uma conversa à esquerda</div></div></div></div><div class="ccrow">
   <div class="card cc">
     <div class="stitle">📱 WhatsApp em Massa</div>
     <select id="wa-group" style="margin-bottom:8px;width:100%"><option value="ativos">Todos os Clientes Ativos</option><option value="novos">Clientes Novos</option><option value="inativos">Clientes Inativos</option><option value="todos">Todos os Clientes</option></select>
@@ -2128,6 +2128,98 @@ function renderCom(){
   <div class="card"><div class="stitle">📋 Comunicações Individuais</div>
   <div class="tw"><table><thead><tr><th>Cliente</th><th>Telefone</th><th>E-mail</th><th>Tipo</th><th>WhatsApp</th><th>E-mail</th></tr></thead><tbody>${cli.map(c=>`<tr><td style="font-weight:600">${c.nome}</td><td>${c.tel||'—'}</td><td style="color:#2563eb;font-size:11px">${c.email||'—'}</td><td>${tbadge(c.tipo)}</td><td>${c.tel?`<button class="btn bwa xs" onclick="openWA('${c.id}')">📱 WhatsApp</button>`:'—'}</td><td>${c.email?`<button class="btn bma xs" onclick="openEmailModal('${c.id}')">✉️ E-mail</button>`:'—'}</td></tr>`).join('')}</tbody></table></div></div>`;
   document.getElementById('admin-cnt').innerHTML=html;
+  loadInbox();
+}
+
+let inboxConversas=[];
+let inboxAtual=null;
+async function loadInbox(){
+  const el=document.getElementById('inbox-list');
+  if(!el)return;
+  try{
+    const r=await fetch('/api/inbox',{headers:{'Authorization':'Bearer '+SA_JWT}});
+    const d=await r.json();
+    if(!d.ok){el.innerHTML='<div style="padding:16px;color:var(--mu);font-size:12px">Erro ao carregar.</div>';return;}
+    inboxConversas=d.conversas||[];
+    renderInboxList();
+  }catch(e){
+    el.innerHTML='<div style="padding:16px;color:var(--mu);font-size:12px">Erro: '+e.message+'</div>';
+  }
+}
+function renderInboxList(){
+  const el=document.getElementById('inbox-list');
+  if(!el)return;
+  if(!inboxConversas.length){el.innerHTML='<div style="padding:16px;color:var(--mu);font-size:12px;text-align:center">Nenhuma conversa ainda.</div>';return;}
+  el.innerHTML=inboxConversas.map(function(c){
+    const ativa=inboxAtual&&String(inboxAtual.id)===String(c.id);
+    const preview=(c.ultimaMensagem||'').slice(0,40);
+    const dirIcon=c.ultimaDirecao==='out'?'↩ ':'';
+    return '<div onclick="abrirConversa(\''+c.id+'\')" style="padding:10px 12px;border-bottom:1px solid var(--bd);cursor:pointer;background:'+(ativa?'var(--bg)':'transparent')+'">'
+      +'<div style="display:flex;justify-content:space-between;align-items:center;gap:6px">'
+      +'<strong style="font-size:12px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">'+esc(c.nome||c.telefone||'')+'</strong>'
+      +(c.aiEnabled?'<span class="badge bb" style="font-size:9px">IA</span>':'<span class="badge" style="font-size:9px;background:#fef2f2;color:#dc2626">Manual</span>')
+      +'</div>'
+      +'<div style="font-size:11px;color:var(--mu);white-space:nowrap;overflow:hidden;text-overflow:ellipsis">'+dirIcon+esc(preview)+'</div>'
+      +'</div>';
+  }).join('');
+}
+async function abrirConversa(id){
+  const conv=inboxConversas.find(function(c){return String(c.id)===String(id);});
+  if(!conv)return;
+  inboxAtual=conv;
+  renderInboxList();
+  const thread=document.getElementById('inbox-thread');
+  thread.innerHTML='<div style="padding:16px;color:var(--mu);font-size:12px">Carregando mensagens...</div>';
+  try{
+    const r=await fetch('/api/inbox/'+id+'/messages',{headers:{'Authorization':'Bearer '+SA_JWT}});
+    const d=await r.json();
+    const msgs=d.mensagens||[];
+    let html='<div style="padding:10px 14px;border-bottom:1px solid var(--bd);display:flex;justify-content:space-between;align-items:center">';
+    html+='<div><strong style="font-size:13px">'+esc(conv.nome||conv.telefone||'')+'</strong><div style="font-size:11px;color:var(--mu)">'+esc(conv.telefone||'')+'</div></div>';
+    html+='<label style="display:flex;align-items:center;gap:5px;font-size:11px;color:var(--mu)"><input type="checkbox" id="inbox-ai-toggle" '+(conv.aiEnabled?'checked':'')+' onchange="toggleInboxAI(\''+id+'\',this.checked)"> IA respondendo</label>';
+    html+='</div>';
+    html+='<div style="flex:1;overflow-y:auto;padding:12px;display:flex;flex-direction:column;gap:8px;max-height:360px">';
+    html+=msgs.map(function(m){
+      const isOut=m.direction==='out';
+      return '<div style="align-self:'+(isOut?'flex-end':'flex-start')+';max-width:75%;background:'+(isOut?'var(--pu)':'var(--n2)')+';color:'+(isOut?'#fff':'var(--tx)')+';padding:7px 10px;border-radius:10px;font-size:12px">'+esc(m.body||'')+'</div>';
+    }).join('');
+    html+='</div>';
+    html+='<div style="padding:10px;border-top:1px solid var(--bd);display:flex;gap:8px">';
+    html+='<input id="inbox-reply-input" placeholder="Digite uma resposta..." style="flex:1" onkeydown="if(event.key===\'Enter\')enviarRespostaInbox(\''+id+'\')">';
+    html+='<button class="btn bp" onclick="enviarRespostaInbox(\''+id+'\')">Enviar</button>';
+    html+='</div>';
+    thread.innerHTML=html;
+    const scrollArea=thread.children[1];
+    if(scrollArea)scrollArea.scrollTop=scrollArea.scrollHeight;
+  }catch(e){
+    thread.innerHTML='<div style="padding:16px;color:var(--mu);font-size:12px">Erro: '+e.message+'</div>';
+  }
+}
+async function enviarRespostaInbox(id){
+  const input=document.getElementById('inbox-reply-input');
+  const texto=input.value.trim();
+  if(!texto)return;
+  input.disabled=true;
+  try{
+    const r=await fetch('/api/inbox/'+id+'/reply',{method:'POST',headers:{'Content-Type':'application/json','Authorization':'Bearer '+SA_JWT},body:JSON.stringify({texto:texto})});
+    const d=await r.json();
+    if(!d.ok){alert('Erro ao enviar: '+(d.error||''));input.disabled=false;return;}
+    input.value='';
+    input.disabled=false;
+    await abrirConversa(id);
+    await loadInbox();
+  }catch(e){
+    alert('Erro: '+e.message);
+    input.disabled=false;
+  }
+}
+async function toggleInboxAI(id,enabled){
+  try{
+    await fetch('/api/inbox/'+id+'/toggle-ai',{method:'POST',headers:{'Content-Type':'application/json','Authorization':'Bearer '+SA_JWT},body:JSON.stringify({aiEnabled:enabled})});
+    const conv=inboxConversas.find(function(c){return String(c.id)===String(id);});
+    if(conv)conv.aiEnabled=enabled;
+    renderInboxList();
+  }catch(e){}
 }
 function openWA(cliId){waCliId=cliId;const c=cli.find(x=>String(x.id)===String(cliId));document.getElementById('wa-cliinfo').innerHTML=`<strong>${c.nome}</strong><br>📱 ${c.tel||'Sem telefone cadastrado'}`;document.getElementById('wa-msg').value=WA_TPLS.audiencia(c.nome.split(' ')[0]);openMo('m-wa');}
 function setWAMsg(btn,tpl){const c=cli.find(x=>String(x.id)===String(waCliId));if(!c)return;document.getElementById('wa-msg').value=WA_TPLS[tpl](c.nome.split(' ')[0]);}
