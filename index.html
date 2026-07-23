@@ -3261,7 +3261,6 @@ function rStep1(){
   <div class="fg"><div class="fl">Área Jurídica *</div><select class="fsel" id="f-area"><option value="">Selecione a área</option>${AREAS.map(a=>`<option ${app.area===a?'selected':''}>${a}</option>`).join('')}</select></div>
   ${extra}
   <div class="fg"><div class="fl">Resumo do Caso *</div><textarea class="fi" id="f-res" placeholder="Descreva brevemente sua situação jurídica...">${app.resumo}</textarea></div>
-  <div class="fg"><div class="fl">Documentos (opcional)</div><div class="up" onclick="document.getElementById('fi-file').click()"><div style="font-size:28px">📎</div><div style="font-size:12px;font-weight:600;color:var(--n);margin:4px 0">Toque para anexar</div><div style="font-size:10px;color:var(--mu)">PDF · Imagem · Word</div></div><input type="file" id="fi-file" multiple accept=".pdf,.jpg,.jpeg,.png,.doc,.docx" style="display:none" onchange="hFile(this)"><div id="file-lst">${app.files.map((f,i)=>`<div style="display:flex;align-items:center;gap:7px;padding:7px;background:var(--gb);border:1px solid var(--bd);border-radius:7px;margin-top:6px;font-size:11px">📎 ${f}<span onclick="rmFile(${i})" style="margin-left:auto;color:var(--re);cursor:pointer;font-size:15px">✕</span></div>`).join('')}</div></div>
   <div class="stit" style="margin-top:4px">Modalidade de Atendimento</div>
   <div id="modal-group">
     <div class="ri ${app.modal==='videoconferencia'?'on':''}" onclick="selModal('videoconferencia')"><div class="rc"></div><span class="rt">📹 Videoconferência</span></div>
