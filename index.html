@@ -536,7 +536,6 @@ tr:hover td{background:#f8fafc!important}
     <button class="atab" onclick="aTab('semana',this)">📋 Semana</button>
     <button class="atab" onclick="aTab('calmes',this)">🗓️ Mês</button>
     <button class="atab" onclick="aTab('financeiro',this)">💰 Financeiro</button>
-    <button class="atab" onclick="aTab('contratos',this)">📄 Contratos</button>
     <button class="atab" onclick="aTab('leads',this)">🎯 Leads</button>
     <button class="atab" onclick="aTab('jurimetria',this)">🔬 Jurimetria</button>
     <button class="atab" onclick="aTab('comunicacoes',this)">💬 Comunicações</button>
@@ -1284,12 +1283,12 @@ function aTab(tab,btn){
   aTabCur=tab;
   document.querySelectorAll('.atab').forEach(b=>b.classList.remove('on'));
   if(btn)btn.classList.add('on');
-  const guards={clientes:()=>can('cli','v'),processos:()=>can('proc','v'),financeiro:()=>can('fin','v'),contratos:()=>can('fin','v'),leads:()=>can('fin','v'),jurimetria:()=>can('fin','v'),tarefas:()=>can('tar','v'),comunicacoes:()=>can('cli','v'),inboxwa:()=>can('cli','v'),usuarios:()=>can('usr','v'),config:()=>can('cfg','v')};
-  const gl={clientes:'Clientes',processos:'Processos',financeiro:'Financeiro',contratos:'Contratos',leads:'Leads',jurimetria:'Jurimetria',tarefas:'Tarefas',comunicacoes:'Comunicações',inboxwa:'Caixa de Entrada',usuarios:'Usuários',config:'Configurações'};
+  const guards={clientes:()=>can('cli','v'),processos:()=>can('proc','v'),financeiro:()=>can('fin','v'),leads:()=>can('fin','v'),jurimetria:()=>can('fin','v'),tarefas:()=>can('tar','v'),comunicacoes:()=>can('cli','v'),inboxwa:()=>can('cli','v'),usuarios:()=>can('usr','v'),config:()=>can('cfg','v')};
+  const gl={clientes:'Clientes',processos:'Processos',financeiro:'Financeiro',leads:'Leads',jurimetria:'Jurimetria',tarefas:'Tarefas',comunicacoes:'Comunicações',inboxwa:'Caixa de Entrada',usuarios:'Usuários',config:'Configurações'};
   if(guards[tab]&&!guards[tab]()){logAccess(tab,'negado',true);denyAccess(gl[tab]||tab);return;}
   const r={
     dash:renderDash,clientes:renderCli,processos:renderProc,tarefas:renderTar,
-    semana:renderSem,calmes:renderCal,financeiro:renderFin,contratos:renderContratos,leads:renderLeads,jurimetria:renderJurimetria,comunicacoes:renderCom,inboxwa:renderInbox,
+    semana:renderSem,calmes:renderCal,financeiro:renderFin,leads:renderLeads,jurimetria:renderJurimetria,comunicacoes:renderCom,inboxwa:renderInbox,
     agenda:renderAgenda,agcal:renderAgCal,kanban:renderKanban,agendamentos:renderAgendamentos,
     metricas:renderMetricas,busca:renderBusca,usuarios:renderUsers,gcal:renderGCal,
     config:renderConfig,acessos:renderAcessos
