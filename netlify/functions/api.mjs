@@ -143,6 +143,50 @@ async function deleteUser(id, current, event) {
   return response(200, data);
 }
 
+// Caixa de Entrada (WhatsApp) — lista conversas com preview da ultima
+// mensagem, e retorna o historico completo de uma conversa especifica.
+async function handleInbox(event, seg, current) {
+  if (event.httpMethod !== 'GET') return response(405, { error: 'Metodo nao suportado.' });
+  const db = supabase();
+
+  if (seg[1] && seg[2] === 'messages') {
+    const { data, error } = await db.from('messages').select('*')
+      .eq('conversation_id', seg[1]).order('created_at', { ascending: true }).limit(500);
+    if (error) return response(500, { ok: false, error: error.message });
+    return response(200, { ok: true, mensagens: (data || []).map(function(m) {
+      return { id: m.id, direcao: m.direction, remetente: m.sender, texto: m.body, dataHora: m.created_at };
+    }) });
+  }
+
+  const { data: convs, error: convErr } = await db.from('conversations').select('*')
+    .order('updated_at', { ascending: false }).limit(100);
+  if (convErr) return response(500, { ok: false, error: convErr.message });
+
+  const result = [];
+  for (const c of (convs || [])) {
+    let nome = c.external_thread_id;
+    if (c.client_id) {
+      const { data: cli } = await db.from('clients').select('name').eq('id', c.client_id).single();
+      if (cli && cli.name) nome = cli.name;
+    } else if (c.lead_id) {
+      const { data: lead } = await db.from('leads').select('name').eq('id', c.lead_id).single();
+      if (lead && lead.name) nome = lead.name;
+    }
+    const { data: lastMsgArr } = await db.from('messages').select('body,direction')
+      .eq('conversation_id', c.id).order('created_at', { ascending: false }).limit(1);
+    const lastMsg = (lastMsgArr && lastMsgArr[0]) || null;
+    result.push({
+      id: c.id,
+      nome: nome,
+      telefone: c.external_thread_id,
+      ultimaMensagem: lastMsg ? lastMsg.body : '',
+      ultimaDirecao: lastMsg ? lastMsg.direction : '',
+      status: c.status,
+    });
+  }
+  return response(200, { ok: true, conversas: result });
+}
+
 async function handleTable(event, table, id, current) {
   if (table === 'users') {
     if (event.httpMethod === 'GET') return listUsers();
@@ -307,6 +351,7 @@ export async function handler(event) {
     const current = requireAuth(event);
     if (seg[0] === 'sync') return await legacySync(event);
     if (seg[0] === 'datajud') return await handleDatajud(event, seg);
+    if (seg[0] === 'inbox') return await handleInbox(event, seg, current);
     return await handleTable(event, seg[0], seg[1], current);
   } catch (e) { return response(e.status || e.statusCode || 500, { ok: false, error: e.message || 'Erro interno.' }); }
 }
