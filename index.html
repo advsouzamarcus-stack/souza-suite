@@ -2106,7 +2106,7 @@ function renderInbox(){
 }
 
 function renderCom(){
-  let html=`<div class="card" style="margin-bottom:14px"><div class="stitle">💬 Caixa de Entrada — WhatsApp</div><div style="display:flex;gap:0;min-height:420px;border:1px solid var(--bd);border-radius:8px;overflow:hidden"><div id="inbox-list" style="width:280px;min-width:280px;border-right:1px solid var(--bd);overflow-y:auto;max-height:480px;background:var(--n2)"><div style="padding:16px;color:var(--mu);font-size:12px;text-align:center">Carregando conversas...</div></div><div id="inbox-thread" style="flex:1;display:flex;flex-direction:column;min-width:0"><div style="flex:1;display:flex;align-items:center;justify-content:center;color:var(--mu);font-size:12px">Selecione uma conversa à esquerda</div></div></div></div><div class="ccrow">
+  let html=`<div class="ccrow">
   <div class="card cc">
     <div class="stitle">📱 WhatsApp em Massa</div>
     <select id="wa-group" style="margin-bottom:8px;width:100%"><option value="ativos">Todos os Clientes Ativos</option><option value="novos">Clientes Novos</option><option value="inativos">Clientes Inativos</option><option value="todos">Todos os Clientes</option></select>
@@ -2135,7 +2135,6 @@ function renderCom(){
   <div class="card"><div class="stitle">📋 Comunicações Individuais</div>
   <div class="tw"><table><thead><tr><th>Cliente</th><th>Telefone</th><th>E-mail</th><th>Tipo</th><th>WhatsApp</th><th>E-mail</th></tr></thead><tbody>${cli.map(c=>`<tr><td style="font-weight:600">${c.nome}</td><td>${c.tel||'—'}</td><td style="color:#2563eb;font-size:11px">${c.email||'—'}</td><td>${tbadge(c.tipo)}</td><td>${c.tel?`<button class="btn bwa xs" onclick="openWA('${c.id}')">📱 WhatsApp</button>`:'—'}</td><td>${c.email?`<button class="btn bma xs" onclick="openEmailModal('${c.id}')">✉️ E-mail</button>`:'—'}</td></tr>`).join('')}</tbody></table></div></div>`;
   document.getElementById('admin-cnt').innerHTML=html;
-  loadInbox();
 }
 
 let inboxConversas=[];
