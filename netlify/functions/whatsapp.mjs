@@ -230,14 +230,14 @@ export default async function handler(req) {
       let conversa = null;
       try {
         conversa = await getOuCriarConversa(from);
-        await salvarMensagem(conversa.id, 'in', 'cliente', text);
+        await salvarMensagem(conversa.id, 'inbound', 'cliente', text);
       } catch (e) {
         console.error('[WA] Erro ao registrar conversa/lead:', e.message);
       }
       try {
         const reply = await callGemini(text);
         await sendWhatsApp(from, reply);
-        if (conversa) await salvarMensagem(conversa.id, 'out', 'ia', reply);
+        if (conversa) await salvarMensagem(conversa.id, 'outbound', 'ia', reply);
       } catch (e) {
         console.error('[WA] Erro ao processar mensagem:', e.message);
         // Enviar mensagem de fallback para não deixar o cliente sem resposta
