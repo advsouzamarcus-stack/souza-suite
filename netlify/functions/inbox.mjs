@@ -136,7 +136,7 @@ export default async (req) => {
       const envio = await sendWhatsApp(conv.external_thread_id, texto);
       if (!envio.ok) return err('Falha ao enviar: ' + envio.body.slice(0,200), 502);
 
-      await supa('messages', 'POST', [{ conversation_id: conv.id, direction: 'out', sender: 'humano', body: texto }]);
+      await supa('messages', 'POST', [{ conversation_id: conv.id, direction: 'outbound', sender: 'humano', body: texto }]);
       await supa(`conversations?id=eq.${conv.id}`, 'PATCH', { updated_at: new Date().toISOString() });
 
       return ok({ ok: true });
