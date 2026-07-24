@@ -96,7 +96,7 @@ export default async (req) => {
         if (!envio.ok) { resultados.push({ id: f.id, ok: false, erro: 'whatsapp ' + envio.status + ': ' + envio.body.slice(0,200) }); continue; }
 
         const conversa = await getOuCriarConversaCliente(cli.phone, cli.id);
-        await supa('messages', 'POST', [{ conversation_id: conversa.id, direction: 'out', sender: 'sistema', body: msg }]);
+        await supa('messages', 'POST', [{ conversation_id: conversa.id, direction: 'outbound', sender: 'sistema', body: msg }]);
         await supa(`conversations?id=eq.${conversa.id}`, 'PATCH', { updated_at: new Date().toISOString() });
 
         resultados.push({ id: f.id, ok: true, atrasado });
